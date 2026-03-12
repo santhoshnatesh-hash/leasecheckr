@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LeaseCheck — Founding Member Gold</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+
+:root {
+  --canvas:       #f8f5f0;
+  --canvas-2:     #f2ede4;
+  --canvas-3:     #ece6db;
+  --white:        #ffffff;
+  --ink:          #1c1917;
+  --ink-2:        #3d3830;
+  --ink-3:        #6b6259;
+  --ink-4:        #a89f94;
+  --ink-5:        #cfc8bf;
+  --copper:       #a8692e;
+  --copper-lt:    #c4864a;
+  --copper-bg:    #f5ebe0;
+  --copper-pale:  #faf3ea;
+  --sage:         #5c7a65;
+  --sage-lt:      #7a9e85;
+  --sage-bg:      #eef4f0;
+  --rose:         #a85a4a;
+  --rose-bg:      #fdf0ee;
+  --border:       rgba(28,25,23,0.09);
+  --border-lt:    rgba(28,25,23,0.05);
+  --ease:         cubic-bezier(0.16, 1, 0.3, 1);
+  --f-display:    'Cormorant Garamond', Georgia, serif;
+  --f-body:       'DM Sans', system-ui, sans-serif;
+  --f-mono:       'DM Mono', monospace;
+}
+
+body {
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--f-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px;
+  background: rgba(248,245,240,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-logo {
+  font-family: var(--f-display);
+  font-size: 18px; font-weight: 400;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink); text-decoration: none;
+}
+
+.nav-region {
+  font-family: var(--f-mono); font-size: 9px;
+  letter-spacing: 0.18em; color: var(--copper);
+  background: var(--copper-bg);
+  padding: 3px 8px; border-radius: 20px;
+  text-transform: uppercase;
+  border: 1px solid rgba(168,105,46,0.2);
+  margin-left: 8px;
+}
+
+.nav-right {
+  display: flex; align-items: center; gap: 16px;
+}
+
+.nav-link {
+  font-family: var(--f-mono); font-size: 11px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink-4); text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-link:hover { color: var(--ink); }
+
+.spots-pill {
+  display: flex; align-items: center; gap: 7px;
+  background: var(--rose-bg);
+  border: 1px solid rgba(168,90,74,0.2);
+  border-radius: 100px; padding: 6px 14px;
+}
+
+.spots-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--rose);
+  animation: blink 2s infinite;
+}
+
+@keyframes blink {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.spots-text {
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--rose);
+}
+
+/* ── HERO ── */
+.founder-hero {
+  min-height: 100vh;
+  display: flex; align-items: center;
+  padding: 100px 48px 80px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.hero-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px; align-items: center;
+  width: 100%;
+}
+
+.hero-left { }
+
+.hero-kicker {
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--copper); margin-bottom: 20px;
+  display: flex; align-items: center; gap: 10px;
+  opacity: 0; animation: rise 0.8s 0.1s var(--ease) forwards;
+}
+.hero-kicker::before { content: ''; width: 20px; height: 1px; background: var(--copper); }
+
+.hero-h1 {
+  font-family: var(--f-display);
+  font-size: clamp(44px, 5.5vw, 72px);
+  font-weight: 300; line-height: 1.04;
+  letter-spacing: -0.01em; color: var(--ink);
+  margin-bottom: 20px;
+  opacity: 0; animation: rise 0.8s 0.18s var(--ease) forwards;
+}
+.hero-h1 em { font-style: italic; color: var(--copper); }
+.hero-h1 .muted { color: var(--ink-4); }
+
+.hero-body {
+  font-size: 16px; font-weight: 300;
+  color: var(--ink-3); line-height: 1.8;
+  max-width: 440px; margin-bottom: 32px;
+  opacity: 0; animation: rise 0.8s 0.26s var(--ease) forwards;
+}
+.hero-body strong { color: var(--ink); font-weight: 500; }
+
+/* ── AUDIO PLAYER ── */
+.audio-player {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  opacity: 0; animation: rise 0.8s 0.34s var(--ease) forwards;
+  position: relative;
+  overflow: hidden;
+}
+
+.audio-player::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; bottom: 0;
+  background: var(--copper);
+  border-radius: 2px 0 0 2px;
+}
+
+.audio-player.customer::before { background: var(--sage); }
+
+.ap-top {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 14px;
+}
+
+.ap-play-btn {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--ink); color: var(--canvas);
+  border: none; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; transition: all 0.2s;
+  padding-left: 3px;
+}
+.ap-play-btn:hover { background: var(--copper); transform: scale(1.05); }
+.audio-player.customer .ap-play-btn:hover { background: var(--sage); }
+
+.ap-info { flex: 1; }
+
+.ap-label {
+  font-family: var(--f-mono); font-size: 9px;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--copper); margin-bottom: 3px;
+}
+.audio-player.customer .ap-label { color: var(--sage); }
+
+.ap-title {
+  font-family: var(--f-display); font-size: 17px;
+  font-weight: 400; color: var(--ink); line-height: 1.2;
+}
+
+.ap-duration {
+  font-family: var(--f-mono); font-size: 11px;
+  color: var(--ink-4); align-self: center;
+}
+
+.ap-waveform {
+  display: flex; align-items: center;
+  gap: 2px; height: 28px; margin-bottom: 8px;
+}
+
+.wave-bar {
+  flex: 1; border-radius: 1px;
+  background: var(--canvas-3);
+  transition: background 0.15s;
+  cursor: pointer;
+}
+.wave-bar:hover { background: var(--copper); }
+.audio-player.customer .wave-bar:hover { background: var(--sage); }
+.wave-bar.played { background: var(--copper-lt); }
+.audio-player.customer .wave-bar.played { background: var(--sage-lt); }
+
+.ap-track {
+  height: 3px; background: var(--canvas-3);
+  border-radius: 2px; overflow: hidden;
+  margin-bottom: 8px; cursor: pointer;
+}
+
+.ap-progress {
+  height: 100%; width: 0%;
+  background: var(--copper);
+  border-radius: 2px;
+  transition: width 0.1s linear;
+}
+.audio-player.customer .ap-progress { background: var(--sage); }
+
+.ap-bottom {
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.ap-time {
+  font-family: var(--f-mono); font-size: 10px;
+  color: var(--ink-4); letter-spacing: 0.06em;
+}
+
+.ap-placeholder-note {
+  font-family: var(--f-mono); font-size: 9px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink-5);
+  display: flex; align-items: center; gap: 6px;
+}
+
+.placeholder-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--copper); opacity: 0.5;
+  animation: blink 2s 0.5s infinite;
+}
+.audio-player.customer .placeholder-dot { background: var(--sage); }
+
+/* ── HERO RIGHT — SIGNUP CARD ── */
+.signup-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  box-shadow: 0 4px 8px rgba(28,25,23,0.04), 0 20px 60px rgba(28,25,23,0.08);
+  overflow: hidden;
+  opacity: 0; animation: rise 0.9s 0.3s var(--ease) forwards;
+}
+
+.card-top {
+  background: var(--ink);
+  padding: 32px 36px 28px;
+  position: relative; overflow: hidden;
+}
+
+.card-top::after {
+  content: '✦';
+  position: absolute; right: 24px; bottom: -24px;
+  font-size: 120px; color: rgba(248,245,240,0.04);
+  pointer-events: none; line-height: 1;
+}
+
+.card-eyebrow {
+  font-family: var(--f-mono); font-size: 9px;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--copper-lt); margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.card-eyebrow::before { content: ''; width: 14px; height: 1px; background: var(--copper-lt); }
+
+.card-title {
+  font-family: var(--f-display); font-size: 34px;
+  font-weight: 300; color: #f8f5f0;
+  line-height: 1.1; margin-bottom: 8px;
+}
+.card-title em { font-style: italic; color: var(--copper-lt); }
+
+.card-subtitle {
+  font-size: 13px; font-weight: 300;
+  color: rgba(248,245,240,0.45); line-height: 1.6;
+}
+
+.spots-counter {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 20px; padding-top: 20px;
+  border-top: 1px solid rgba(248,245,240,0.08);
+}
+
+.spots-remaining {
+  font-family: var(--f-display); font-size: 40px;
+  font-weight: 300; color: #f8f5f0;
+  line-height: 1;
+}
+
+.spots-info { text-align: right; }
+
+.spots-of {
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(248,245,240,0.3); margin-bottom: 4px;
+}
+
+.spots-bar-track {
+  width: 120px; height: 3px;
+  background: rgba(248,245,240,0.1);
+  border-radius: 2px; overflow: hidden;
+}
+
+.spots-bar-fill {
+  height: 100%; width: 15%;
+  background: var(--copper-lt);
+  border-radius: 2px;
+  transition: width 1s var(--ease);
+}
+
+.card-body { padding: 28px 36px; }
+
+/* Perks */
+.perks-list {
+  display: flex; flex-direction: column; gap: 16px;
+  margin-bottom: 28px;
+}
+
+.perk-item {
+  display: flex; align-items: flex-start; gap: 14px;
+}
+
+.perk-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--copper-bg);
+  border: 1px solid rgba(168,105,46,0.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+
+.perk-content { }
+
+.perk-title {
+  font-size: 14px; font-weight: 500;
+  color: var(--ink); margin-bottom: 2px;
+}
+
+.perk-desc {
+  font-size: 12px; font-weight: 300;
+  color: var(--ink-3); line-height: 1.6;
+}
+
+.perk-desc strong { color: var(--copper); font-weight: 500; }
+
+/* Form */
+.signup-form { }
+
+.sf-group { margin-bottom: 14px; }
+
+.sf-label {
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-3); margin-bottom: 6px; display: block;
+}
+
+.sf-input {
+  width: 100%;
+  background: var(--canvas);
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 13px 16px;
+  font-family: var(--f-body); font-size: 15px;
+  color: var(--ink); outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  appearance: none;
+}
+.sf-input::placeholder { color: var(--ink-5); }
+.sf-input:focus {
+  border-color: var(--copper);
+  box-shadow: 0 0 0 3px rgba(168,105,46,0.1);
+  background: var(--white);
+}
+
+.sf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.town-select {
+  width: 100%;
+  background: var(--canvas);
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 13px 16px;
+  font-family: var(--f-body); font-size: 15px;
+  color: var(--ink); outline: none; appearance: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.town-select:focus {
+  border-color: var(--copper);
+  box-shadow: 0 0 0 3px rgba(168,105,46,0.1);
+}
+
+.consent-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  margin-bottom: 20px; margin-top: 4px;
+}
+
+.consent-check {
+  width: 18px; height: 18px; border-radius: 5px;
+  border: 1.5px solid var(--border);
+  background: var(--canvas); flex-shrink: 0;
+  margin-top: 2px; cursor: pointer; appearance: none;
+  position: relative; transition: all 0.2s;
+}
+.consent-check:checked {
+  background: var(--copper); border-color: var(--copper);
+}
+.consent-check:checked::after {
+  content: '';
+  position: absolute; left: 4px; top: 1px;
+  width: 6px; height: 10px;
+  border: 2px solid white;
+  border-top: none; border-left: none;
+  transform: rotate(45deg);
+}
+
+.consent-text {
+  font-size: 12px; font-weight: 300;
+  color: var(--ink-3); line-height: 1.6;
+}
+.consent-text a { color: var(--copper); text-decoration: none; }
+
+.submit-btn {
+  width: 100%;
+  background: var(--ink); color: var(--canvas);
+  font-family: var(--f-body); font-size: 15px; font-weight: 500;
+  padding: 16px; border: none; border-radius: 12px;
+  cursor: pointer; letter-spacing: 0.01em;
+  transition: background 0.25s, transform 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.submit-btn:hover { background: var(--copper); transform: translateY(-1px); }
+.submit-btn:disabled { background: var(--ink-5); cursor: not-allowed; transform: none; }
+
+.submit-sub {
+  text-align: center; margin-top: 10px;
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink-5);
+}
+
+/* ── SUCCESS STATE ── */
+.success-state {
+  display: none; text-align: center; padding: 48px 36px;
+}
+
+.success-icon {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: var(--copper); color: white;
+  font-size: 28px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.success-title {
+  font-family: var(--f-display); font-size: 32px;
+  font-weight: 300; color: var(--ink);
+  margin-bottom: 8px; line-height: 1.2;
+  font-style: italic;
+}
+
+.success-body {
+  font-size: 14px; font-weight: 300;
+  color: var(--ink-3); line-height: 1.75;
+  margin-bottom: 24px;
+}
+
+.success-coins {
+  background: var(--copper-bg);
+  border: 1px solid rgba(168,105,46,0.2);
+  border-radius: 14px; padding: 20px 24px;
+  margin-bottom: 20px;
+}
+
+.coins-num {
+  font-family: var(--f-display); font-size: 52px;
+  font-weight: 300; color: var(--copper);
+  line-height: 1; margin-bottom: 4px;
+}
+
+.coins-label {
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--copper);
+}
+
+.success-number {
+  font-family: var(--f-display); font-size: 22px;
+  font-weight: 300; color: var(--ink-3);
+  margin-bottom: 20px;
+}
+
+.success-number strong { color: var(--copper); }
+
+.success-cta {
+  width: 100%;
+  background: var(--ink); color: var(--canvas);
+  font-family: var(--f-body); font-size: 15px; font-weight: 500;
+  padding: 16px; border: none; border-radius: 12px;
+  cursor: pointer; margin-bottom: 10px;
+  transition: background 0.25s;
+  text-decoration: none; display: block; text-align: center;
+}
+.success-cta:hover { background: var(--copper); }
+
+.referral-box {
+  background: var(--canvas-2);
+  border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 16px;
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer; margin-bottom: 8px;
+  transition: border-color 0.2s;
+}
+.referral-box:hover { border-color: var(--copper); }
+
+.referral-url {
+  font-family: var(--f-mono); font-size: 11px;
+  color: var(--copper); flex: 1;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.referral-copy {
+  font-family: var(--f-mono); font-size: 9px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink-4); flex-shrink: 0;
+}
+
+.referral-hint {
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.08em; color: var(--ink-5);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* ── MILESTONES ── */
+.milestones-section {
+  background: var(--canvas-2);
+  border-top: 1px solid var(--border);
+  padding: 100px 48px;
+}
+
+.milestones-inner {
+  max-width: 1200px; margin: 0 auto;
+}
+
+.section-label {
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--copper); margin-bottom: 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-label::after { content: ''; flex: 1; max-width: 40px; height: 1px; background: var(--copper); opacity: 0.5; }
+
+.section-h2 {
+  font-family: var(--f-display);
+  font-size: clamp(40px, 5vw, 64px);
+  font-weight: 300; line-height: 1.05;
+  color: var(--ink); margin-bottom: 16px;
+}
+.section-h2 em { font-style: italic; color: var(--copper); }
+.section-h2 .muted { color: var(--ink-4); }
+
+.section-body {
+  font-size: 15px; font-weight: 300;
+  color: var(--ink-3); line-height: 1.8;
+  max-width: 520px; margin-bottom: 64px;
+}
+
+.milestone-timeline {
+  position: relative;
+  padding-left: 32px;
+}
+
+.milestone-timeline::before {
+  content: '';
+  position: absolute; left: 7px; top: 8px; bottom: 8px;
+  width: 1px; background: var(--border);
+}
+
+.milestone-item {
+  position: relative; margin-bottom: 40px;
+  opacity: 0; transform: translateX(-8px);
+  transition: all 0.6s var(--ease);
+}
+.milestone-item.visible { opacity: 1; transform: translateX(0); }
+
+.milestone-marker {
+  position: absolute; left: -32px; top: 4px;
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--canvas-2);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s;
+}
+.milestone-item.done .milestone-marker { background: var(--sage); border-color: var(--sage); }
+.milestone-item.next .milestone-marker { background: var(--copper); border-color: var(--copper); animation: pulse 2s infinite; }
+.milestone-item.locked .milestone-marker { background: var(--canvas-3); }
+
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(168,105,46,0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(168,105,46,0); }
+}
+
+.milestone-content {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 16px; padding: 24px 28px;
+}
+.milestone-item.next .milestone-content { border-color: rgba(168,105,46,0.3); }
+.milestone-item.done .milestone-content { background: var(--sage-bg); border-color: rgba(92,122,101,0.25); }
+
+.milestone-trigger {
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-4); margin-bottom: 6px;
+}
+.milestone-item.next .milestone-trigger { color: var(--copper); }
+.milestone-item.done .milestone-trigger { color: var(--sage); }
+
+.milestone-title {
+  font-family: var(--f-display); font-size: 22px;
+  font-weight: 400; color: var(--ink);
+  margin-bottom: 6px; line-height: 1.2;
+}
+
+.milestone-desc {
+  font-size: 13px; font-weight: 300;
+  color: var(--ink-3); line-height: 1.7;
+}
+.milestone-desc strong { color: var(--ink); font-weight: 500; }
+
+/* ── ECONOMICS ── */
+.economics-section {
+  padding: 100px 48px;
+  max-width: 1200px; margin: 0 auto;
+}
+
+.revenue-table-wrap {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 20px; overflow: hidden;
+  margin-top: 48px;
+}
+
+.rev-table-header {
+  display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  padding: 14px 32px;
+  background: var(--canvas-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.rev-header-cell {
+  font-family: var(--f-mono); font-size: 9px;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--ink-4);
+}
+.rev-header-cell:not(:first-child) { text-align: right; }
+
+.rev-row {
+  display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  padding: 18px 32px;
+  border-bottom: 1px solid var(--border-lt);
+  align-items: center;
+  transition: background 0.15s;
+}
+.rev-row:last-child { border-bottom: none; }
+.rev-row:hover { background: var(--canvas); }
+.rev-row.highlight { background: var(--copper-pale); }
+
+.rev-milestone {
+  font-family: var(--f-display); font-size: 18px;
+  font-weight: 400; color: var(--ink);
+}
+
+.rev-value {
+  font-family: var(--f-display); font-size: 20px;
+  font-weight: 300; text-align: right;
+}
+
+.rv-revenue { color: var(--ink-3); }
+.rv-pool    { color: var(--copper); }
+.rv-founder { color: var(--sage); }
+
+.economics-note {
+  margin-top: 24px;
+  padding: 20px 28px;
+  background: var(--copper-pale);
+  border: 1px solid rgba(168,105,46,0.15);
+  border-radius: 12px;
+  font-size: 13px; font-weight: 300;
+  color: var(--ink-3); line-height: 1.75;
+}
+.economics-note strong { color: var(--copper); font-weight: 500; }
+
+/* ── CUSTOMER EXPLAINER SECTION ── */
+.explainer-section {
+  background: var(--ink);
+  padding: 100px 48px;
+}
+
+.explainer-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 80px; align-items: center;
+}
+
+.explainer-left { }
+
+.exp-kicker {
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--copper-lt); margin-bottom: 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.exp-kicker::before { content: ''; width: 16px; height: 1px; background: var(--copper-lt); }
+
+.exp-h2 {
+  font-family: var(--f-display);
+  font-size: clamp(40px, 5vw, 60px);
+  font-weight: 300; line-height: 1.05;
+  color: #f8f5f0; margin-bottom: 16px;
+}
+.exp-h2 em { font-style: italic; color: var(--copper-lt); }
+
+.exp-body {
+  font-size: 15px; font-weight: 300;
+  color: rgba(248,245,240,0.5); line-height: 1.8;
+  margin-bottom: 32px;
+}
+
+.step-flow {
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+.flow-step {
+  display: flex; align-items: flex-start; gap: 14px;
+}
+
+.flow-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(248,245,240,0.06);
+  border: 1px solid rgba(248,245,240,0.12);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--f-mono); font-size: 11px;
+  color: rgba(248,245,240,0.4); flex-shrink: 0;
+}
+
+.flow-text {
+  font-size: 14px; font-weight: 300;
+  color: rgba(248,245,240,0.55); line-height: 1.65;
+  padding-top: 4px;
+}
+.flow-text strong { color: rgba(248,245,240,0.85); font-weight: 400; }
+
+/* Customer audio player (dark version) */
+.audio-player-dark {
+  background: rgba(248,245,240,0.04);
+  border: 1px solid rgba(248,245,240,0.1);
+  border-radius: 18px;
+  padding: 20px 24px;
+  position: relative; overflow: hidden;
+}
+
+.audio-player-dark::before {
+  content: '';
+  position: absolute; top: 0; left: 0;
+  width: 3px; bottom: 0;
+  background: var(--sage-lt);
+  border-radius: 2px 0 0 2px;
+}
+
+.apd-top {
+  display: flex; align-items: center; gap: 14px; margin-bottom: 14px;
+}
+
+.apd-play-btn {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(248,245,240,0.1); color: #f8f5f0;
+  border: 1px solid rgba(248,245,240,0.15);
+  cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; padding-left: 3px;
+  transition: all 0.2s;
+}
+.apd-play-btn:hover { background: var(--sage); border-color: var(--sage); }
+
+.apd-label {
+  font-family: var(--f-mono); font-size: 9px;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--sage-lt); margin-bottom: 3px;
+}
+
+.apd-title {
+  font-family: var(--f-display); font-size: 17px;
+  font-weight: 400; color: #f8f5f0; line-height: 1.2;
+}
+
+.apd-waveform {
+  display: flex; align-items: center; gap: 2px; height: 28px; margin-bottom: 8px;
+}
+
+.apd-bar {
+  flex: 1; border-radius: 1px;
+  background: rgba(248,245,240,0.1);
+  transition: background 0.15s; cursor: pointer;
+}
+.apd-bar:hover { background: var(--sage-lt); }
+
+.apd-track {
+  height: 3px; background: rgba(248,245,240,0.1);
+  border-radius: 2px; overflow: hidden; margin-bottom: 8px;
+}
+
+.apd-progress {
+  height: 100%; width: 0%;
+  background: var(--sage-lt); border-radius: 2px;
+}
+
+.apd-bottom {
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.apd-time {
+  font-family: var(--f-mono); font-size: 10px;
+  color: rgba(248,245,240,0.3); letter-spacing: 0.06em;
+}
+
+.apd-note {
+  font-family: var(--f-mono); font-size: 9px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(248,245,240,0.2);
+  display: flex; align-items: center; gap: 6px;
+}
+
+/* ── FOOTER ── */
+footer {
+  padding: 40px 48px;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: 1200px; margin: 0 auto;
+}
+
+.footer-logo {
+  font-family: var(--f-display); font-size: 18px;
+  font-weight: 400; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--ink);
+}
+
+.footer-links {
+  display: flex; gap: 28px; list-style: none;
+}
+
+.footer-links a {
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink-4); text-decoration: none;
+  transition: color 0.2s;
+}
+.footer-links a:hover { color: var(--copper); }
+
+.footer-copy {
+  font-family: var(--f-mono); font-size: 10px;
+  color: var(--ink-5); letter-spacing: 0.06em;
+}
+
+/* ── EMBEDDED PLATINUM CARD ── */
+.card-scene-embed {
+  perspective: 1000px;
+  width: 340px; height: 214px;
+}
+.card-embed {
+  width: 340px; height: 214px;
+  border-radius: 16px;
+  position: relative; transform-style: preserve-3d;
+  animation: cardFloat 6s ease-in-out infinite;
+  cursor: pointer;
+}
+@keyframes cardFloat {
+  0%,100% { transform: rotateX(4deg) rotateY(-6deg) translateY(0px); }
+  33%      { transform: rotateX(-2deg) rotateY(4deg) translateY(-8px); }
+  66%      { transform: rotateX(6deg) rotateY(2deg) translateY(-4px); }
+}
+.card-face-embed {
+  position: absolute; inset: 0; border-radius: 16px; overflow: hidden;
+  background: linear-gradient(135deg,#2a2420 0%,#1a1512 25%,#2d2520 50%,#1a1512 75%,#251e18 100%);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4),0 8px 16px rgba(0,0,0,0.5),0 24px 48px rgba(0,0,0,0.6),0 0 0 0.5px rgba(168,105,46,0.3),inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.card-glow-embed { position:absolute;inset:-2px;border-radius:18px;box-shadow:0 0 40px rgba(168,105,46,0.15),0 0 80px rgba(168,105,46,0.07); }
+.ce-grain { position:absolute;inset:0;border-radius:16px;opacity:0.35;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");mix-blend-mode:overlay; }
+.ce-sheen { position:absolute;inset:0;border-radius:16px;background:linear-gradient(105deg,transparent 20%,rgba(196,170,120,0.06) 35%,rgba(212,190,150,0.12) 42%,rgba(196,170,120,0.06) 49%,transparent 65%);pointer-events:none; }
+.ce-stripe { position:absolute;top:-40px;left:-30px;width:130px;height:400px;background:linear-gradient(to bottom,transparent,rgba(196,160,100,0.06) 40%,rgba(196,160,100,0.06) 60%,transparent);transform:rotate(-25deg);pointer-events:none; }
+.ce-geo { position:absolute;bottom:-16px;right:-16px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(168,105,46,0.1) 0%,transparent 70%);pointer-events:none; }
+.ce-chip { position:absolute;top:38px;left:26px;width:36px;height:28px;border-radius:5px;background:linear-gradient(135deg,#c8a96a,#e8cc88,#b89448,#d4b870,#c8a96a);box-shadow:0 1px 3px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.3); }
+.ce-chip-lines { position:absolute;inset:3px;display:grid;grid-template-rows:1fr 1fr 1fr;gap:2px;opacity:0.35; }
+.ce-chip-lines div { border-radius:1px;background:rgba(80,50,10,0.7); }
+.ce-chip-center { position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:14px;height:20px;border:1px solid rgba(80,50,10,0.4);border-radius:3px; }
+.ce-brand { position:absolute;top:24px;right:56px;font-family:'Cormorant Garamond',serif;font-size:11px;font-weight:300;letter-spacing:0.28em;text-transform:uppercase;color:rgba(196,170,130,0.7); }
+.ce-logo-mark { position:absolute;top:22px;right:22px; }
+.ce-diamond { width:22px;height:22px;background:linear-gradient(135deg,rgba(196,160,100,0.9),rgba(168,105,46,0.7));clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);box-shadow:0 2px 8px rgba(168,105,46,0.4); }
+.ce-tier { position:absolute;top:82px;left:26px; }
+.ce-tier-label { font-family:'DM Mono',monospace;font-size:7px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(196,160,100,0.5);margin-bottom:1px; }
+.ce-tier-name { font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;letter-spacing:0.12em;background:linear-gradient(135deg,#e8d098 0%,#c8a050 30%,#f0dca0 55%,#b08030 80%,#d4b060 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;filter:drop-shadow(0 1px 2px rgba(168,105,46,0.4)); }
+.ce-number { position:absolute;bottom:54px;left:26px;display:flex;gap:12px; }
+.ce-num-grp { font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.2em;color:rgba(196,160,100,0.4); }
+.ce-num-hi { color:rgba(196,160,100,0.7); }
+.ce-rule { position:absolute;bottom:56px;left:26px;right:26px;height:0.5px;background:linear-gradient(to right,transparent,rgba(196,160,100,0.2) 20%,rgba(196,160,100,0.2) 80%,transparent); }
+.ce-holder { position:absolute;bottom:22px;left:26px;right:26px;display:flex;align-items:flex-end;justify-content:space-between; }
+.ce-holder-label { font-family:'DM Mono',monospace;font-size:7px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(196,160,100,0.3);margin-bottom:2px; }
+.ce-holder-name { font-family:'DM Sans',sans-serif;font-size:10px;font-weight:400;letter-spacing:0.14em;text-transform:uppercase;color:rgba(232,210,160,0.75); }
+.ce-valid-label { font-family:'DM Mono',monospace;font-size:6px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(196,160,100,0.3);margin-bottom:2px; }
+.ce-valid-value { font-family:'DM Mono',monospace;font-size:14px;letter-spacing:0.12em;color:rgba(196,160,100,0.55); }
+.ce-network { position:absolute;bottom:20px;right:22px;display:flex; }
+.ce-net-c { width:22px;height:22px;border-radius:50%;opacity:0.3; }
+.ce-net-c:first-child { background:rgba(196,100,60,0.6);margin-right:-8px; }
+.ce-net-c:last-child { background:rgba(196,160,60,0.5); }
+
+
+.reveal {
+  opacity: 0; transform: translateY(20px);
+  transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 900px) {
+  .hero-inner { grid-template-columns: 1fr; gap: 48px; }
+  .explainer-inner { grid-template-columns: 1fr; }
+  .rev-table-header, .rev-row { grid-template-columns: 1.5fr 1fr 1fr; }
+  .rev-header-cell:last-child, .rev-value.rv-founder:last-child { display: none; }
+  nav { padding: 0 24px; }
+  .founder-hero, .milestones-section, .economics-section, .explainer-section { padding-left: 24px; padding-right: 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div style="display:flex;align-items:center">
+    <a href="index.html" class="nav-logo">LeaseCheck</a>
+    <span class="nav-region">NJ Beta</span>
+  </div>
+  <div class="nav-right">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="intake.html" class="nav-link">Check a Deal</a>
+    <div class="spots-pill">
+      <div class="spots-dot"></div>
+      <span class="spots-text" id="spotsNav">153 of 1,000 claimed</span>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="founder-hero">
+  <div class="hero-inner">
+
+    <!-- LEFT -->
+    <div class="hero-left">
+      <div class="hero-kicker">Founding Member Gold · 1,000 Memberships Only</div>
+
+      <h1 class="hero-h1">
+        Early access.<br>
+        Permanent status.<br>
+        <em>No seat reserved twice.</em>
+      </h1>
+
+      <p class="hero-body">
+        LeaseCheck is built on real deal data submitted by real NJ drivers. The first 1,000 members who submit a qualifying deal receive <strong>Founding Member Gold status</strong> — lifetime premium access and a numbered Platinum membership card, with priority consideration for any member perks introduced as the platform grows.
+      </p>
+
+      <!-- ── FOUNDER AUDIO PLAYER ── -->
+      <div class="audio-player" id="founderPlayer">
+        <div class="ap-top">
+          <button class="ap-play-btn" onclick="togglePlay('founder')" id="founderPlayBtn">▶</button>
+          <div class="ap-info">
+            <div class="ap-label">Founding Members · 90 sec</div>
+            <div class="ap-title">Why joining now is different — and what it means</div>
+          </div>
+          <div class="ap-duration">1:32</div>
+        </div>
+
+        <!-- Waveform bars -->
+        <div class="ap-waveform" id="founderWave"></div>
+
+        <div class="ap-track" onclick="seekAudio('founder', event)">
+          <div class="ap-progress" id="founderProgress"></div>
+        </div>
+
+        <div class="ap-bottom">
+          <div class="ap-time" id="founderTime">0:00 / 1:32</div>
+          <div class="ap-placeholder-note">
+            <div class="placeholder-dot"></div>
+            Audio ready to drop in
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px;margin-top:8px">
+        <div style="height:1px;flex:1;background:var(--border)"></div>
+        <div style="font-family:var(--f-mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-5)">Generated with NotebookLM</div>
+        <div style="height:1px;flex:1;background:var(--border)"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: SIGNUP CARD -->
+    <div class="hero-right">
+      <div class="signup-card" id="signupCard">
+        <div class="card-top">
+          <div class="card-eyebrow">Founding Member Gold</div>
+          <div class="card-title">Reserve your <em>membership.</em></div>
+          <div class="card-subtitle">Submit a qualifying deal. Receive permanent member status and lifetime premium access.</div>
+
+          <div class="spots-counter">
+            <div>
+              <div class="spots-remaining" id="spotsNum">153</div>
+              <div style="font-family:var(--f-mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(248,245,240,0.3);margin-top:3px">Memberships claimed</div>
+            </div>
+            <div class="spots-info">
+              <div class="spots-of">of 1,000 total</div>
+              <div class="spots-bar-track">
+                <div class="spots-bar-fill" id="spotsBarFill"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body">
+
+          <!-- Perks -->
+          <div class="perks-list">
+            <div class="perk-item">
+              <div class="perk-icon">♾</div>
+              <div class="perk-content">
+                <div class="perk-title">Lifetime premium access</div>
+                <div class="perk-desc">Every LeaseCheck feature — deal scoring, county benchmarks, dealer report cards, timing tools — free for life. No subscription. No exceptions.</div>
+              </div>
+            </div>
+            <div class="perk-item">
+              <div class="perk-icon">💳</div>
+              <div class="perk-content">
+                <div class="perk-title">Numbered Platinum membership card</div>
+                <div class="perk-desc">A physical card bearing your founding member number. Issued once, never reissued. May provide preferred eligibility for member perks if introduced in future, subject to availability and separate terms.</div>
+              </div>
+            </div>
+            <div class="perk-item">
+              <div class="perk-icon">✦</div>
+              <div class="perk-content">
+                <div class="perk-title">Permanent Gold member status</div>
+                <div class="perk-desc">Priority access to every new feature before public release. Founding member badge on your profile. Listed in the LeaseCheck founding member directory.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form -->
+          <div class="signup-form" id="signupForm">
+            <div class="sf-row">
+              <div class="sf-group">
+                <label class="sf-label">First Name</label>
+                <input class="sf-input" type="text" id="sf-first" placeholder="Sarah" oninput="checkForm()">
+              </div>
+              <div class="sf-group">
+                <label class="sf-label">Last Name</label>
+                <input class="sf-input" type="text" id="sf-last" placeholder="Chen" oninput="checkForm()">
+              </div>
+            </div>
+
+            <div class="sf-group">
+              <label class="sf-label">Email Address</label>
+              <input class="sf-input" type="email" id="sf-email" placeholder="you@email.com" oninput="checkForm()">
+            </div>
+
+            <div class="sf-group">
+              <label class="sf-label">Your NJ Town</label>
+              <select class="town-select" id="sf-town" onchange="checkForm()">
+                <option value="">Select your town</option>
+                <optgroup label="Bergen County">
+                  <option>Paramus</option><option>Ramsey</option><option>Hackensack</option>
+                  <option>Ridgewood</option><option>Fort Lee</option><option>Tenafly</option>
+                </optgroup>
+                <optgroup label="Essex County">
+                  <option>Millburn / Short Hills</option><option>Livingston</option>
+                  <option>Montclair</option><option>Maplewood</option><option>West Orange</option>
+                </optgroup>
+                <optgroup label="Morris County">
+                  <option>Chatham</option><option>Madison</option><option>Morristown</option>
+                  <option>Florham Park</option>
+                </optgroup>
+                <optgroup label="Union County">
+                  <option>Westfield</option><option>Summit</option><option>Scotch Plains</option>
+                </optgroup>
+                <optgroup label="Monmouth County">
+                  <option>Freehold</option><option>Marlboro</option><option>Holmdel</option>
+                </optgroup>
+                <optgroup label="Middlesex County">
+                  <option>Edison</option><option>Woodbridge</option><option>Metuchen</option>
+                </optgroup>
+                <optgroup label="Somerset County">
+                  <option>Princeton area</option><option>Bernardsville</option><option>Basking Ridge</option>
+                </optgroup>
+                <option value="other">Other NJ town</option>
+              </select>
+            </div>
+
+            <div class="consent-row">
+              <input type="checkbox" class="consent-check" id="sf-consent" onchange="checkForm()">
+              <label for="sf-consent" class="consent-text">
+                I agree to the <a href="#">Founding Member Terms</a>. I understand that Founding Member Gold is a membership status program, not a financial product. Any future member perks are discretionary, subject to availability, and governed by separate terms if introduced.
+              </label>
+            </div>
+
+            <button class="submit-btn" id="submitBtn" onclick="submitFounder()" disabled>
+              <span>Claim My Founding Membership</span>
+              <span style="opacity:0.5">✦</span>
+            </button>
+            <div class="submit-sub">No payment · Subject to qualifying deal submission</div>
+          </div>
+
+            <div class="success-state" id="successState">
+              <div class="success-icon">💳</div>
+              <div class="success-title">Membership confirmed.</div>
+              <div class="success-body">You're one of the first 1,000. Your Founding Member Gold status is permanent. Your numbered Platinum card will be prepared once your qualifying deal is verified.</div>
+
+              <div class="success-coins" style="background:linear-gradient(135deg,#2a2420,#1a1512);border-color:rgba(196,160,100,0.25);">
+                <div class="coins-num" style="background:linear-gradient(135deg,#e8d098,#c8a050,#f0dca0,#b08030);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Gold</div>
+                <div class="coins-label" style="color:rgba(196,160,100,0.7);">Founding Member · Numbered Card · Lifetime Access</div>
+              </div>
+
+              <div class="success-number">Member <strong>#<span id="founderNum">153</span></strong> of 1,000</div>
+
+            <a href="intake.html" class="success-cta">Submit My Qualifying Deal →</a>
+
+            <div class="referral-box" onclick="copyReferral()">
+              <div class="referral-url" id="referralUrl">leasecheck.nj/join?ref=LC0153</div>
+              <div class="referral-copy">Copy Link</div>
+            </div>
+            <div class="referral-hint">Share with other NJ drivers · Help build the dataset</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- MILESTONES -->
+<section class="milestones-section">
+  <div class="milestones-inner">
+    <div class="reveal">
+      <div class="section-label">Platform Roadmap</div>
+      <h2 class="section-h2">Where we're <em>going.</em><br><span class="muted">What that means for you.</span></h2>
+      <p class="section-body">As LeaseCheck grows, Founding Members are first in line — for every tool, every market, and every opportunity we introduce.</p>
+    </div>
+
+    <div class="milestone-timeline">
+
+      <div class="milestone-item done reveal">
+        <div class="milestone-marker"></div>
+        <div class="milestone-content">
+          <div class="milestone-trigger">✓ Now · Founding period open</div>
+          <div class="milestone-title">Membership status confirmed</div>
+          <div class="milestone-desc">Your Founding Member Gold status is recorded immediately upon submission of a qualifying deal. Your member number is permanent and your profile is marked accordingly.</div>
+        </div>
+      </div>
+
+      <div class="milestone-item next reveal">
+        <div class="milestone-marker"></div>
+        <div class="milestone-content">
+          <div class="milestone-trigger">→ Building toward · 5,000 members</div>
+          <div class="milestone-title">Expanded platform coverage</div>
+          <div class="milestone-desc">At 5,000 members, LeaseCheck expands county coverage, adds more vehicle segments, and unlocks advanced deal scoring tools. Founding Members get access first — before any public rollout.</div>
+        </div>
+      </div>
+
+      <div class="milestone-item locked reveal">
+        <div class="milestone-marker"></div>
+        <div class="milestone-content">
+          <div class="milestone-trigger">10,000 members</div>
+          <div class="milestone-title">Full analytics suite — included for Gold members</div>
+          <div class="milestone-desc">County-level benchmarking, dealer report cards, seasonal timing tools, and advanced money factor analysis — all included for Founding Members at no charge, as features are developed and released.</div>
+        </div>
+      </div>
+
+      <div class="milestone-item locked reveal">
+        <div class="milestone-marker"></div>
+        <div class="milestone-content">
+          <div class="milestone-trigger">25,000 members</div>
+          <div class="milestone-title">Member perks program — if introduced</div>
+          <div class="milestone-desc">At significant scale, LeaseCheck may introduce a member perks program in partnership with relevant NJ businesses. Founding Members would receive priority consideration for any such program. Any perks would be subject to availability and governed by separate terms.</div>
+        </div>
+      </div>
+
+      <div class="milestone-item locked reveal">
+        <div class="milestone-marker"></div>
+        <div class="milestone-content">
+          <div class="milestone-trigger">50,000 members</div>
+          <div class="milestone-title">Multi-state expansion</div>
+          <div class="milestone-desc">LeaseCheck expands beyond New Jersey. Founding Members carry their Gold status into every new market — with first access to new regional tools and any programs introduced in expanded coverage areas.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ECONOMICS -->
+<section class="economics-section reveal" style="background:var(--ink);padding:100px 48px;">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;">
+
+      <!-- Card display -->
+      <div style="display:flex;align-items:center;justify-content:center;">
+        <div class="card-scene-embed" id="cardSceneEmbed">
+          <div class="card-embed" id="cardEmbed">
+            <div class="card-glow-embed"></div>
+            <div class="card-face-embed">
+              <div class="ce-grain"></div>
+              <div class="ce-sheen"></div>
+              <div class="ce-stripe"></div>
+              <div class="ce-geo"></div>
+              <div class="ce-chip">
+                <div class="ce-chip-lines"><div></div><div></div><div></div></div>
+                <div class="ce-chip-center"></div>
+              </div>
+              <div class="ce-brand">LeaseCheck</div>
+              <div class="ce-logo-mark"><div class="ce-diamond"></div></div>
+              <div class="ce-tier">
+                <div class="ce-tier-label">Founder</div>
+                <div class="ce-tier-name">Platinum</div>
+              </div>
+              <div class="ce-number">
+                <span class="ce-num-grp">LC</span>
+                <span class="ce-num-grp">••••</span>
+                <span class="ce-num-grp">••••</span>
+                <span class="ce-num-grp ce-num-hi">0001</span>
+              </div>
+              <div class="ce-rule"></div>
+              <div class="ce-holder">
+                <div>
+                  <div class="ce-holder-label">Founder</div>
+                  <div class="ce-holder-name">First 1,000</div>
+                </div>
+                <div style="text-align:right">
+                  <div class="ce-valid-label">Valid For Life</div>
+                  <div class="ce-valid-value">∞</div>
+                </div>
+              </div>
+              <div class="ce-network">
+                <div class="ce-net-c"></div><div class="ce-net-c"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card description -->
+      <div>
+        <div class="exp-kicker" style="color:var(--copper-lt)">Numbered Platinum Card</div>
+        <h2 class="exp-h2" style="font-size:clamp(36px,4.5vw,56px)">One number.<br><em>Yours permanently.</em></h2>
+        <p class="exp-body">Every Founding Member receives a numbered Platinum membership card — a physical record of your place in the first 1,000. Issued once. Never reissued.</p>
+
+        <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:32px;">
+          <div class="flow-step">
+            <div class="flow-num">✦</div>
+            <div class="flow-text"><strong>Limited to the first 1,000.</strong> When the founding period closes, numbered cards are no longer issued. Your member number does not change.</div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">◎</div>
+            <div class="flow-text"><strong>Priority consideration for future perks.</strong> If a member perks program is introduced with NJ partners, Platinum card holders receive first access. Subject to availability and separate terms.</div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">♾</div>
+            <div class="flow-text"><strong>Lifetime premium access — included.</strong> All current and future LeaseCheck features included for Gold members at no charge, for as long as the platform operates.</div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-num">✦</div>
+            <div class="flow-text"><strong>Permanent place in the founding directory.</strong> Your name, member number, and NJ town, recorded in the founding member registry.</div>
+          </div>
+        </div>
+
+        <div style="background:rgba(248,245,240,0.04);border:1px solid rgba(248,245,240,0.1);border-radius:14px;padding:20px 24px;">
+          <div style="font-family:var(--f-mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(196,160,100,0.5);margin-bottom:8px;">Potential Partner Categories — If a Perks Program Is Introduced</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            <span style="background:rgba(248,245,240,0.06);border:1px solid rgba(248,245,240,0.1);border-radius:20px;padding:5px 12px;font-size:12px;color:rgba(248,245,240,0.45);font-family:var(--f-mono);font-size:10px;letter-spacing:0.06em;">Auto Mechanics</span>
+            <span style="background:rgba(248,245,240,0.06);border:1px solid rgba(248,245,240,0.1);border-radius:20px;padding:5px 12px;font-size:12px;color:rgba(248,245,240,0.45);font-family:var(--f-mono);font-size:10px;letter-spacing:0.06em;">Car Washes</span>
+            <span style="background:rgba(248,245,240,0.06);border:1px solid rgba(248,245,240,0.1);border-radius:20px;padding:5px 12px;font-size:12px;color:rgba(248,245,240,0.45);font-family:var(--f-mono);font-size:10px;letter-spacing:0.06em;">Restaurants</span>
+            <span style="background:rgba(248,245,240,0.06);border:1px solid rgba(248,245,240,0.1);border-radius:20px;padding:5px 12px;font-size:12px;color:rgba(248,245,240,0.45);font-family:var(--f-mono);font-size:10px;letter-spacing:0.06em;">Tire Shops</span>
+            <span style="background:rgba(248,245,240,0.06);border:1px solid rgba(248,245,240,0.1);border-radius:20px;padding:5px 12px;font-size:12px;color:rgba(248,245,240,0.45);font-family:var(--f-mono);font-size:10px;letter-spacing:0.06em;">Auto Insurance</span>
+            <span style="background:rgba(248,245,240,0.06);border:1px solid rgba(248,245,240,0.1);border-radius:20px;padding:5px 12px;font-size:12px;color:rgba(248,245,240,0.45);font-family:var(--f-mono);font-size:10px;letter-spacing:0.06em;">Coffee & More</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CUSTOMER EXPLAINER (dark section) -->
+<section class="explainer-section">
+  <div class="explainer-inner">
+
+    <div class="explainer-left reveal">
+      <div class="exp-kicker">For Every NJ Driver</div>
+      <h2 class="exp-h2">Know your <em>number.</em><br>In 60 seconds.</h2>
+      <p class="exp-body">LeaseCheck is free for every NJ driver — member or not. Submit your lease deal, get an instant score, and find out exactly where you stood in the market when you signed.</p>
+
+      <div class="step-flow">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-text"><strong>Photograph your lease document.</strong> We cover your personal details automatically before reading anything.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-text"><strong>Get your Deal Score instantly.</strong> A–F grade, compared against real NJ deals in your county.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-text"><strong>Read your full report.</strong> Cost breakdown, negotiation range, lease vs. finance analysis, and a checklist for next time.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="explainer-right reveal">
+      <!-- Dark audio player for customer explainer -->
+      <div class="audio-player-dark">
+        <div class="apd-top">
+          <button class="apd-play-btn" onclick="togglePlay('customer')" id="customerPlayBtn">▶</button>
+          <div class="ap-info">
+            <div class="apd-label">How It Works · 60 seconds</div>
+            <div class="apd-title">How LeaseCheck works — and what you get</div>
+          </div>
+          <div class="ap-duration" style="color:rgba(248,245,240,0.3);font-family:var(--f-mono);font-size:11px">1:02</div>
+        </div>
+
+        <div class="apd-waveform" id="customerWave"></div>
+
+        <div class="apd-track" onclick="seekAudio('customer', event)">
+          <div class="apd-progress" id="customerProgress"></div>
+        </div>
+
+        <div class="apd-bottom">
+          <div class="apd-time" id="customerTime">0:00 / 1:02</div>
+          <div class="apd-note">
+            <div class="placeholder-dot" style="background:var(--sage-lt)"></div>
+            Audio ready to drop in
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;text-align:center">
+        <div style="font-family:var(--f-mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(248,245,240,0.2)">Generated with NotebookLM · Replace src with your MP3</div>
+      </div>
+
+      <!-- CTA -->
+      <div style="margin-top:32px;background:rgba(248,245,240,0.04);border:1px solid rgba(248,245,240,0.08);border-radius:16px;padding:28px 28px;">
+        <div style="font-family:var(--f-display);font-size:26px;font-weight:300;color:#f8f5f0;margin-bottom:8px;line-height:1.2;">Check your deal — free.</div>
+        <div style="font-size:13px;font-weight:300;color:rgba(248,245,240,0.45);line-height:1.7;margin-bottom:20px;">No account required. No personal data stored. 60 seconds to know where your deal stands.</div>
+        <a href="intake.html" style="display:block;background:#f8f5f0;color:var(--ink);font-family:var(--f-body);font-size:14px;font-weight:500;padding:14px 24px;border-radius:10px;text-decoration:none;text-align:center;transition:background 0.2s;" onmouseover="this.style.background='var(--copper-bg)'" onmouseout="this.style.background='#f8f5f0'">
+          Check My Lease Deal →
+        </a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">LeaseCheck</div>
+  <ul class="footer-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="intake.html">Check a Deal</a></li>
+    <li><a href="#">Founding Member Terms</a></li>
+    <li><a href="#">Privacy</a></li>
+    <li><a href="#">Contact</a></li>
+  </ul>
+  <div class="footer-copy">© 2026 LeaseCheck NJ</div>
+</footer>
+<div style="background:var(--canvas-2);border-top:1px solid var(--border);padding:16px 48px;text-align:center;">
+  <p style="font-family:var(--f-mono);font-size:9px;letter-spacing:0.08em;color:var(--ink-5);line-height:1.8;max-width:900px;margin:0 auto;">Founding Member Gold is a promotional membership status program, not a financial product, investment, or security. Lifetime premium access applies to LeaseCheck features as currently offered and is subject to continued platform operation. Any future member perks, partner programs, or benefits are discretionary, not guaranteed, and would be subject to availability and separate terms if introduced. LeaseCheck makes no promise of monetary value, discounts, or economic return in connection with membership.</p>
+</div>
+
+<script>
+
+// ── WAVEFORM GENERATION ────────────────────────────
+function generateWave(containerId, barClass, count = 48) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  for (let i = 0; i < count; i++) {
+    const bar = document.createElement('div');
+    bar.className = barClass;
+    const h = 20 + Math.random() * 60;
+    bar.style.height = h + '%';
+    bar.dataset.idx = i;
+    container.appendChild(bar);
+  }
+}
+
+generateWave('founderWave', 'wave-bar');
+generateWave('customerWave', 'apd-bar');
+
+// ── AUDIO PLAYERS (placeholder — swap in real MP3) ─
+// To connect real audio: set audioSrc below to your MP3 URL
+// e.g. const founderAudio = new Audio('https://your-cdn.com/founder-explainer.mp3');
+
+const players = {
+  founder: {
+    audio: null, // new Audio('YOUR_FOUNDER_MP3_URL.mp3'),
+    playing: false,
+    progress: 0,
+    duration: 92,
+    progressEl: 'founderProgress',
+    timeEl: 'founderTime',
+    waveEl: 'founderWave',
+    btnEl: 'founderPlayBtn',
+    barClass: 'wave-bar'
+  },
+  customer: {
+    audio: null, // new Audio('YOUR_CUSTOMER_MP3_URL.mp3'),
+    playing: false,
+    progress: 0,
+    duration: 62,
+    progressEl: 'customerProgress',
+    timeEl: 'customerTime',
+    waveEl: 'customerWave',
+    btnEl: 'customerPlayBtn',
+    barClass: 'apd-bar'
+  }
+};
+
+// Demo playback simulation
+let founderTimer = null, customerTimer = null;
+
+function formatTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return m + ':' + String(sec).padStart(2,'0');
+}
+
+function togglePlay(id) {
+  const p = players[id];
+  const btn = document.getElementById(p.btnEl);
+  const totalSec = p.duration;
+
+  if (p.audio) {
+    // Real audio
+    if (p.playing) { p.audio.pause(); p.playing = false; btn.textContent = '▶'; }
+    else { p.audio.play(); p.playing = true; btn.textContent = '⏸'; }
+  } else {
+    // Demo simulation
+    if (p.playing) {
+      clearInterval(id === 'founder' ? founderTimer : customerTimer);
+      p.playing = false; btn.textContent = '▶';
+    } else {
+      p.playing = true; btn.textContent = '⏸';
+      const interval = setInterval(() => {
+        if (!p.playing) { clearInterval(interval); return; }
+        p.progress = Math.min(100, p.progress + (100 / totalSec / 10));
+        const elapsed = (p.progress / 100) * totalSec;
+        document.getElementById(p.progressEl).style.width = p.progress + '%';
+        document.getElementById(p.timeEl).textContent = formatTime(elapsed) + ' / ' + formatTime(totalSec);
+        const bars = document.getElementById(p.waveEl).querySelectorAll('.' + p.barClass);
+        const playedCount = Math.floor((p.progress / 100) * bars.length);
+        bars.forEach((b, i) => {
+          b.classList.toggle('played', i < playedCount);
+        });
+        if (p.progress >= 100) {
+          clearInterval(interval); p.playing = false;
+          btn.textContent = '▶'; p.progress = 0;
+        }
+      }, 100);
+      if (id === 'founder') founderTimer = interval;
+      else customerTimer = interval;
+    }
+  }
+}
+
+function seekAudio(id, e) {
+  const p = players[id];
+  const track = e.currentTarget;
+  const rect = track.getBoundingClientRect();
+  const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  p.progress = pct * 100;
+  document.getElementById(p.progressEl).style.width = p.progress + '%';
+  if (p.audio) p.audio.currentTime = pct * p.duration;
+}
+
+// ── SPOTS COUNTER ──────────────────────────────────
+let membersClaimed = 153;
+
+function updateSpots(claimed) {
+  membersClaimed = claimed;
+  document.getElementById('spotsNum').textContent = claimed.toLocaleString();
+  document.getElementById('spotsNav').textContent = claimed.toLocaleString() + ' of 1,000 claimed';
+  const fillPct = (claimed / 1000) * 100;
+  document.getElementById('spotsBarFill').style.width = fillPct + '%';
+}
+
+updateSpots(153);
+
+// ── FORM VALIDATION ────────────────────────────────
+function checkForm() {
+  const first  = document.getElementById('sf-first').value.trim();
+  const last   = document.getElementById('sf-last').value.trim();
+  const email  = document.getElementById('sf-email').value.trim();
+  const town   = document.getElementById('sf-town').value;
+  const consent = document.getElementById('sf-consent').checked;
+  const valid = first && last && email.includes('@') && town && consent;
+  document.getElementById('submitBtn').disabled = !valid;
+}
+
+// ── SUBMIT ─────────────────────────────────────────
+let founderNumber = null;
+
+function submitFounder() {
+  const btn = document.getElementById('submitBtn');
+  btn.textContent = 'Claiming your spot…';
+  btn.disabled = true;
+
+  // Generate founder number
+  founderNumber = membersClaimed + 1;
+
+  setTimeout(() => {
+    // Save to session
+    const data = {
+      firstName: document.getElementById('sf-first').value.trim(),
+      lastName: document.getElementById('sf-last').value.trim(),
+      email: document.getElementById('sf-email').value.trim(),
+      town: document.getElementById('sf-town').value,
+      founderNum: founderNumber,
+      coins: 2000,
+      joinedAt: new Date().toISOString()
+    };
+    sessionStorage.setItem('founderData', JSON.stringify(data));
+
+    // Show success
+    document.getElementById('signupForm').style.display = 'none';
+    document.getElementById('successState').style.display = 'block';
+    document.getElementById('founderNum').textContent = String(founderNumber).padStart(3, '0');
+    document.getElementById('referralUrl').textContent = 'leasecheck.nj/join?ref=LC' + String(founderNumber).padStart(4,'0');
+
+    // Increment claimed count
+    updateSpots(membersClaimed + 1);
+  }, 1400);
+}
+
+function copyReferral() {
+  const url = document.getElementById('referralUrl').textContent;
+  navigator.clipboard.writeText('https://' + url).then(() => {
+    document.querySelector('.referral-copy').textContent = '✓ Copied!';
+    setTimeout(() => document.querySelector('.referral-copy').textContent = 'Copy Link', 2000);
+  });
+}
+
+// ── PLATINUM CARD PARALLAX ─────────────────────────
+const cardScene = document.getElementById('cardSceneEmbed');
+const cardEl = document.getElementById('cardEmbed');
+if (cardScene && cardEl) {
+  cardScene.addEventListener('mousemove', (e) => {
+    const rect = cardScene.getBoundingClientRect();
+    const dx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+    const dy = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+    cardEl.style.animation = 'none';
+    cardEl.style.transform = `rotateX(${-dy * 14}deg) rotateY(${dx * 18}deg)`;
+  });
+  cardScene.addEventListener('mouseleave', () => {
+    cardEl.style.animation = 'cardFloat 6s ease-in-out infinite';
+    cardEl.style.transform = '';
+  });
+}
+
+// ── SCROLL REVEAL ──────────────────────────────────
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+const milestoneObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.milestone-item').forEach(el => milestoneObs.observe(el));
+</script>
+</body>
+</html>
