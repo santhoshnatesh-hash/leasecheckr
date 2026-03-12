@@ -1,1617 +1,969 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LeaseCheck — Founding Member Gold</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 16px; }
-
-:root {
-  --canvas:       #f8f5f0;
-  --canvas-2:     #f2ede4;
-  --canvas-3:     #ece6db;
-  --white:        #ffffff;
-  --ink:          #1c1917;
-  --ink-2:        #3d3830;
-  --ink-3:        #6b6259;
-  --ink-4:        #a89f94;
-  --ink-5:        #cfc8bf;
-  --copper:       #a8692e;
-  --copper-lt:    #c4864a;
-  --copper-bg:    #f5ebe0;
-  --copper-pale:  #faf3ea;
-  --sage:         #5c7a65;
-  --sage-lt:      #7a9e85;
-  --sage-bg:      #eef4f0;
-  --rose:         #a85a4a;
-  --rose-bg:      #fdf0ee;
-  --border:       rgba(28,25,23,0.09);
-  --border-lt:    rgba(28,25,23,0.05);
-  --ease:         cubic-bezier(0.16, 1, 0.3, 1);
-  --f-display:    'Cormorant Garamond', Georgia, serif;
-  --f-body:       'DM Sans', system-ui, sans-serif;
-  --f-mono:       'DM Mono', monospace;
-}
-
-body {
-  background: var(--canvas);
-  color: var(--ink);
-  font-family: var(--f-body);
-  -webkit-font-smoothing: antialiased;
-}
-
-/* ── NAV ── */
-nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
-  height: 60px;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 48px;
-  background: rgba(248,245,240,0.92);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border);
-}
-
-.nav-logo {
-  font-family: var(--f-display);
-  font-size: 18px; font-weight: 400;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--ink); text-decoration: none;
-}
-
-.nav-region {
-  font-family: var(--f-mono); font-size: 9px;
-  letter-spacing: 0.18em; color: var(--copper);
-  background: var(--copper-bg);
-  padding: 3px 8px; border-radius: 20px;
-  text-transform: uppercase;
-  border: 1px solid rgba(168,105,46,0.2);
-  margin-left: 8px;
-}
-
-.nav-right {
-  display: flex; align-items: center; gap: 16px;
-}
-
-.nav-link {
-  font-family: var(--f-mono); font-size: 11px;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--ink-4); text-decoration: none;
-  transition: color 0.2s;
-}
-.nav-link:hover { color: var(--ink); }
-
-.spots-pill {
-  display: flex; align-items: center; gap: 7px;
-  background: var(--rose-bg);
-  border: 1px solid rgba(168,90,74,0.2);
-  border-radius: 100px; padding: 6px 14px;
-}
-
-.spots-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--rose);
-  animation: blink 2s infinite;
-}
-
-@keyframes blink {
-  0%,100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-
-.spots-text {
-  font-family: var(--f-mono); font-size: 10px;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--rose);
-}
-
-/* ── HERO ── */
-.founder-hero {
-  min-height: 100vh;
-  display: flex; align-items: center;
-  padding: 100px 48px 80px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.hero-inner {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 80px; align-items: center;
-  width: 100%;
-}
-
-.hero-left { }
-
-.hero-kicker {
-  font-family: var(--f-mono); font-size: 10px;
-  letter-spacing: 0.22em; text-transform: uppercase;
-  color: var(--copper); margin-bottom: 20px;
-  display: flex; align-items: center; gap: 10px;
-  opacity: 0; animation: rise 0.8s 0.1s var(--ease) forwards;
-}
-.hero-kicker::before { content: ''; width: 20px; height: 1px; background: var(--copper); }
-
-.hero-h1 {
-  font-family: var(--f-display);
-  font-size: clamp(44px, 5.5vw, 72px);
-  font-weight: 300; line-height: 1.04;
-  letter-spacing: -0.01em; color: var(--ink);
-  margin-bottom: 20px;
-  opacity: 0; animation: rise 0.8s 0.18s var(--ease) forwards;
-}
-.hero-h1 em { font-style: italic; color: var(--copper); }
-.hero-h1 .muted { color: var(--ink-4); }
-
-.hero-body {
-  font-size: 16px; font-weight: 300;
-  color: var(--ink-3); line-height: 1.8;
-  max-width: 440px; margin-bottom: 32px;
-  opacity: 0; animation: rise 0.8s 0.26s var(--ease) forwards;
-}
-.hero-body strong { color: var(--ink); font-weight: 500; }
-
-/* ── AUDIO PLAYER ── */
-.audio-player {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 20px 24px;
-  margin-bottom: 20px;
-  opacity: 0; animation: rise 0.8s 0.34s var(--ease) forwards;
-  position: relative;
-  overflow: hidden;
-}
-
-.audio-player::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0;
-  width: 3px; bottom: 0;
-  background: var(--copper);
-  border-radius: 2px 0 0 2px;
-}
-
-.audio-player.customer::before { background: var(--sage); }
-
-.ap-top {
-  display: flex; align-items: center; gap: 14px;
-  margin-bottom: 14px;
-}
-
-.ap-play-btn {
-  width: 44px; height: 44px; border-radius: 50%;
-  background: var(--ink); color: var(--canvas);
-  border: none; cursor: pointer; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; transition: all 0.2s;
-  padding-left: 3px;
-}
-.ap-play-btn:hover { background: var(--copper); transform: scale(1.05); }
-.audio-player.customer .ap-play-btn:hover { background: var(--sage); }
-
-.ap-info { flex: 1; }
-
-.ap-label {
-  font-family: var(--f-mono); font-size: 9px;
-  letter-spacing: 0.16em; text-transform: uppercase;
-  color: var(--copper); margin-bottom: 3px;
-}
-.audio-player.customer .ap-label { color: var(--sage); }
-
-.ap-title {
-  font-family: var(--f-display); font-size: 17px;
-  font-weight: 400; color: var(--ink); line-height: 1.2;
-}
-
-.ap-duration {
-  font-family: var(--f-mono); font-size: 11px;
-  color: var(--ink-4); align-self: center;
-}
-
-.ap-waveform {
-  display: flex; align-items: center;
-  gap: 2px; height: 28px; margin-bottom: 8px;
-}
-
-.wave-bar {
-  flex: 1; border-radius: 1px;
-  background: var(--canvas-3);
-  transition: background 0.15s;
-  cursor: pointer;
-}
-.wave-bar:hover { background: var(--copper); }
-.audio-player.customer .wave-bar:hover { background: var(--sage); }
-.wave-bar.played { background: var(--copper-lt); }
-.audio-player.customer .wave-bar.played { background: var(--sage-lt); }
-
-.ap-track {
-  height: 3px; background: var(--canvas-3);
-  border-radius: 2px; overflow: hidden;
-  margin-bottom: 8px; cursor: pointer;
-}
-
-.ap-progress {
-  height: 100%; width: 0%;
-  background: var(--copper);
-  border-radius: 2px;
-  transition: width 0.1s linear;
-}
-.audio-player.customer .ap-progress { background: var(--sage); }
-
-.ap-bottom {
-  display: flex; align-items: center; justify-content: space-between;
-}
-
-.ap-time {
-  font-family: var(--f-mono); font-size: 10px;
-  color: var(--ink-4); letter-spacing: 0.06em;
-}
-
-.ap-placeholder-note {
-  font-family: var(--f-mono); font-size: 9px;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--ink-5);
-  display: flex; align-items: center; gap: 6px;
-}
-
-.placeholder-dot {
-  width: 5px; height: 5px; border-radius: 50%;
-  background: var(--copper); opacity: 0.5;
-  animation: blink 2s 0.5s infinite;
-}
-.audio-player.customer .placeholder-dot { background: var(--sage); }
-
-/* ── HERO RIGHT — SIGNUP CARD ── */
-.signup-card {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  box-shadow: 0 4px 8px rgba(28,25,23,0.04), 0 20px 60px rgba(28,25,23,0.08);
-  overflow: hidden;
-  opacity: 0; animation: rise 0.9s 0.3s var(--ease) forwards;
-}
-
-.card-top {
-  background: var(--ink);
-  padding: 32px 36px 28px;
-  position: relative; overflow: hidden;
-}
-
-.card-top::after {
-  content: '✦';
-  position: absolute; right: 24px; bottom: -24px;
-  font-size: 120px; color: rgba(248,245,240,0.04);
-  pointer-events: none; line-height: 1;
-}
-
-.card-eyebrow {
-  font-family: var(--f-mono); font-size: 9px;
-  letter-spacing: 0.22em; text-transform: uppercase;
-  color: var(--copper-lt); margin-bottom: 10px;
-  display: flex; align-items: center; gap: 8px;
-}
-.card-eyebrow::before { content: ''; width: 14px; height: 1px; background: var(--copper-lt); }
-
-.card-title {
-  font-family: var(--f-display); font-size: 34px;
-  font-weight: 300; color: #f8f5f0;
-  line-height: 1.1; margin-bottom: 8px;
-}
-.card-title em { font-style: italic; color: var(--copper-lt); }
-
-.card-subtitle {
-  font-size: 13px; font-weight: 300;
-  color: rgba(248,245,240,0.45); line-height: 1.6;
-}
-
-.spots-counter {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-top: 20px; padding-top: 20px;
-  border-top: 1px solid rgba(248,245,240,0.08);
-}
-
-.spots-remaining {
-  font-family: var(--f-display); font-size: 40px;
-  font-weight: 300; color: #f8f5f0;
-  line-height: 1;
-}
-
-.spots-info { text-align: right; }
-
-.spots-of {
-  font-family: var(--f-mono); font-size: 10px;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  color: rgba(248,245,240,0.3); margin-bottom: 4px;
-}
-
-.spots-bar-track {
-  width: 120px; height: 3px;
-  background: rgba(248,245,240,0.1);
-  border-radius: 2px; overflow: hidden;
-}
-
-.spots-bar-fill {
-  height: 100%; width: 15%;
-  background: var(--copper-lt);
-  border-radius: 2px;
-  transition: width 1s var(--ease);
-}
-
-.card-body { padding: 28px 36px; }
-
-/* Perks */
-.perks-list {
-  display: flex; flex-direction: column; gap: 16px;
-  margin-bottom: 28px;
-}
-
-.perk-item {
-  display: flex; align-items: flex-start; gap: 14px;
-}
-
-.perk-icon {
-  width: 36px; height: 36px; border-radius: 10px;
-  background: var(--copper-bg);
-  border: 1px solid rgba(168,105,46,0.15);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px; flex-shrink: 0;
-}
-
-.perk-content { }
-
-.perk-title {
-  font-size: 14px; font-weight: 500;
-  color: var(--ink); margin-bottom: 2px;
-}
-
-.perk-desc {
-  font-size: 12px; font-weight: 300;
-  color: var(--ink-3); line-height: 1.6;
-}
-
-.perk-desc strong { color: var(--copper); font-weight: 500; }
-
-/* Form */
-.signup-form { }
-
-.sf-group { margin-bottom: 14px; }
-
-.sf-label {
-  font-family: var(--f-mono); font-size: 10px;
-  letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--ink-3); margin-bottom: 6px; display: block;
-}
-
-.sf-input {
-  width: 100%;
-  background: var(--canvas);
-  border: 1px solid var(--border);
-  border-radius: 12px; padding: 13px 16px;
-  font-family: var(--f-body); font-size: 15px;
-  color: var(--ink); outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-  appearance: none;
-}
-.sf-input::placeholder { color: var(--ink-5); }
-.sf-input:focus {
-  border-color: var(--copper);
-  box-shadow: 0 0 0 3px rgba(168,105,46,0.1);
-  background: var(--white);
-}
-
-.sf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-.town-select {
-  width: 100%;
-  background: var(--canvas);
-  border: 1px solid var(--border);
-  border-radius: 12px; padding: 13px 16px;
-  font-family: var(--f-body); font-size: 15px;
-  color: var(--ink); outline: none; appearance: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-.town-select:focus {
-  border-color: var(--copper);
-  box-shadow: 0 0 0 3px rgba(168,105,46,0.1);
-}
-
-.consent-row {
-  display: flex; align-items: flex-start; gap: 12px;
-  margin-bottom: 20px; margin-top: 4px;
-}
-
-.consent-check {
-  width: 18px; height: 18px; border-radius: 5px;
-  border: 1.5px solid var(--border);
-  background: var(--canvas); flex-shrink: 0;
-  margin-top: 2px; cursor: pointer; appearance: none;
-  position: relative; transition: all 0.2s;
-}
-.consent-check:checked {
-  background: var(--copper); border-color: var(--copper);
-}
-.consent-check:checked::after {
-  content: '';
-  position: absolute; left: 4px; top: 1px;
-  width: 6px; height: 10px;
-  border: 2px solid white;
-  border-top: none; border-left: none;
-  transform: rotate(45deg);
-}
-
-.consent-text {
-  font-size: 12px; font-weight: 300;
-  color: var(--ink-3); line-height: 1.6;
-}
-.consent-text a { color: var(--copper); text-decoration: none; }
-
-.submit-btn {
-  width: 100%;
-  background: var(--ink); color: var(--canvas);
-  font-family: var(--f-body); font-size: 15px; font-weight: 500;
-  padding: 16px; border: none; border-radius: 12px;
-  cursor: pointer; letter-spacing: 0.01em;
-  transition: background 0.25s, transform 0.15s;
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-}
-.submit-btn:hover { background: var(--copper); transform: translateY(-1px); }
-.submit-btn:disabled { background: var(--ink-5); cursor: not-allowed; transform: none; }
-
-.submit-sub {
-  text-align: center; margin-top: 10px;
-  font-family: var(--f-mono); font-size: 10px;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--ink-5);
-}
-
-/* ── SUCCESS STATE ── */
-.success-state {
-  display: none; text-align: center; padding: 48px 36px;
-}
-
-.success-icon {
-  width: 72px; height: 72px; border-radius: 50%;
-  background: var(--copper); color: white;
-  font-size: 28px;
-  display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 20px;
-}
-
-.success-title {
-  font-family: var(--f-display); font-size: 32px;
-  font-weight: 300; color: var(--ink);
-  margin-bottom: 8px; line-height: 1.2;
-  font-style: italic;
-}
-
-.success-body {
-  font-size: 14px; font-weight: 300;
-  color: var(--ink-3); line-height: 1.75;
-  margin-bottom: 24px;
-}
-
-.success-coins {
-  background: var(--copper-bg);
-  border: 1px solid rgba(168,105,46,0.2);
-  border-radius: 14px; padding: 20px 24px;
-  margin-bottom: 20px;
-}
-
-.coins-num {
-  font-family: var(--f-display); font-size: 52px;
-  font-weight: 300; color: var(--copper);
-  line-height: 1; margin-bottom: 4px;
-}
-
-.coins-label {
-  font-family: var(--f-mono); font-size: 10px;
-  letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--copper);
-}
-
-.success-number {
-  font-family: var(--f-display); font-size: 22px;
-  font-weight: 300; color: var(--ink-3);
-  margin-bottom: 20px;
-}
-
-.success-number strong { color: var(--copper); }
-
-.success-cta {
-  width: 100%;
-  background: var(--ink); color: var(--canvas);
-  font-family: var(--f-body); font-size: 15px; font-weight: 500;
-  padding: 16px; border: none; border-radius: 12px;
-  cursor: pointer; margin-bottom: 10px;
-  transition: background 0.25s;
-  text-decoration: none; display: block; text-align: center;
-}
-.success-cta:hover { background: var(--copper); }
-
-.referral-box {
-  background: var(--canvas-2);
-  border: 1px solid var(--border);
-  border-radius: 10px; padding: 12px 16px;
-  display: flex; align-items: center; gap: 10px;
-  cursor: pointer; margin-bottom: 8px;
-  transition: border-color 0.2s;
-}
-.referral-box:hover { border-color: var(--copper); }
-
-.referral-url {
-  font-family: var(--f-mono); font-size: 11px;
-  color: var(--copper); flex: 1;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-
-.referral-copy {
-  font-family: var(--f-mono); font-size: 9px;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--ink-4); flex-shrink: 0;
-}
-
-.referral-hint {
-  font-family: var(--f-mono); font-size: 10px;
-  letter-spacing: 0.08em; color: var(--ink-5);
-  text-align: center;
-  text-transform: uppercase;
-}
-
-/* ── MILESTONES ── */
-.milestones-section {
-  background: var(--canvas-2);
-  border-top: 1px solid var(--border);
-  padding: 100px 48px;
-}
-
-.milestones-inner {
-  max-width: 1200px; margin: 0 auto;
-}
-
-.section-label {
-  font-family: var(--f-mono); font-size: 10px;
-  letter-spacing: 0.22em; text-transform: uppercase;
-  color: var(--copper); margin-bottom: 16px;
-  display: flex; align-items: center; gap: 10px;
-}
-.section-label::after { content: ''; flex: 1; max-width: 40px; height: 1px; background: var(--copper); opacity: 0.5; }
-
-.section-h2 {
-  font-family: var(--f-display);
-  font-size: clamp(40px, 5vw, 64px);
-  font-weight: 300; line-height: 1.05;
-  color: var(--ink); margin-bottom: 16px;
-}
-.section-h2 em { font-style: italic; color: var(--copper); }
-.section-h2 .muted { color: var(--ink-4); }
-
-.section-body {
-  font-size: 15px; font-weight: 300;
-  color: var(--ink-3); line-height: 1.8;
-  max-width: 520px; margin-bottom: 64px;
-}
-
-.milestone-timeline {
-  position: relative;
-  padding-left: 32px;
-}
-
-.milestone-timeline::before {
-  content: '';
-  position: absolute; left: 7px; top: 8px; bottom: 8px;
-  width: 1px; background: var(--border);
-}
-
-.milestone-item {
-  position: relative; margin-bottom: 40px;
-  opacity: 0; transform: translateX(-8px);
-  transition: all 0.6s var(--ease);
-}
-.milestone-item.visible { opacity: 1; transform: translateX(0); }
-
-.milestone-marker {
-  position: absolute; left: -32px; top: 4px;
-  width: 16px; height: 16px; border-radius: 50%;
-  border: 2px solid var(--border);
-  background: var(--canvas-2);
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.3s;
-}
-.milestone-item.done .milestone-marker { background: var(--sage); border-color: var(--sage); }
-.milestone-item.next .milestone-marker { background: var(--copper); border-color: var(--copper); animation: pulse 2s infinite; }
-.milestone-item.locked .milestone-marker { background: var(--canvas-3); }
-
-@keyframes pulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(168,105,46,0.4); }
-  50% { box-shadow: 0 0 0 6px rgba(168,105,46,0); }
-}
-
-.milestone-content {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 16px; padding: 24px 28px;
-}
-.milestone-item.next .milestone-content { border-color: rgba(168,105,46,0.3); }
-.milestone-item.done .milestone-content { background: var(--sage-bg); border-color: rgba(92,122,101,0.25); }
-
-.milestone-trigger {
-  font-family: var(--f-mono); font-size: 10px;
-  letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--ink-4); margin-bottom: 6px;
-}
-.milestone-item.next .milestone-trigger { color: var(--copper); }
-.milestone-item.done .milestone-trigger { color: var(--sage); }
-
-.milestone-title {
-  font-family: var(--f-display); font-size: 22px;
-  font-weight: 400; color: var(--ink);
-  margin-bottom: 6px; line-height: 1.2;
-}
-
-.milestone-desc {
-  font-size: 13px; font-weight: 300;
-  color: var(--ink-3); line-height: 1.7;
-}
-.milestone-desc strong { color: var(--ink); font-weight: 500; }
-
-/* ── ECONOMICS ── */
-.economics-section {
-  padding: 100px 48px;
-  max-width: 1200px; margin: 0 auto;
-}
-
-.revenue-table-wrap {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 20px; overflow: hidden;
-  margin-top: 48px;
-}
-
-.rev-table-header {
-  display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr;
-  padding: 14px 32px;
-  background: var(--canvas-2);
-  border-bottom: 1px solid var(--border);
-}
-
-.rev-header-cell {
-  font-family: var(--f-mono); font-size: 9px;
-  letter-spacing: 0.15em; text-transform: uppercase;
-  color: var(--ink-4);
-}
-.rev-header-cell:not(:first-child) { text-align: right; }
-
-.rev-row {
-  display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr;
-  padding: 18px 32px;
-  border-bottom: 1px solid var(--border-lt);
-  align-items: center;
-  transition: background 0.15s;
-}
-.rev-row:last-child { border-bottom: none; }
-.rev-row:hover { background: var(--canvas); }
-.rev-row.highlight { background: var(--copper-pale); }
-
-.rev-milestone {
-  font-family: var(--f-display); font-size: 18px;
-  font-weight: 400; color: var(--ink);
-}
-
-.rev-value {
-  font-family: var(--f-display); font-size: 20px;
-  font-weight: 300; text-align: right;
-}
-
-.rv-revenue { color: var(--ink-3); }
-.rv-pool    { color: var(--copper); }
-.rv-founder { color: var(--sage); }
-
-.economics-note {
-  margin-top: 24px;
-  padding: 20px 28px;
-  background: var(--copper-pale);
-  border: 1px solid rgba(168,105,46,0.15);
-  border-radius: 12px;
-  font-size: 13px; font-weight: 300;
-  color: var(--ink-3); line-height: 1.75;
-}
-.economics-note strong { color: var(--copper); font-weight: 500; }
-
-/* ── CUSTOMER EXPLAINER SECTION ── */
-.explainer-section {
-  background: var(--ink);
-  padding: 100px 48px;
-}
-
-.explainer-inner {
-  max-width: 1200px; margin: 0 auto;
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 80px; align-items: center;
-}
-
-.explainer-left { }
-
-.exp-kicker {
-  font-family: var(--f-mono); font-size: 10px;
-  letter-spacing: 0.22em; text-transform: uppercase;
-  color: var(--copper-lt); margin-bottom: 16px;
-  display: flex; align-items: center; gap: 10px;
-}
-.exp-kicker::before { content: ''; width: 16px; height: 1px; background: var(--copper-lt); }
-
-.exp-h2 {
-  font-family: var(--f-display);
-  font-size: clamp(40px, 5vw, 60px);
-  font-weight: 300; line-height: 1.05;
-  color: #f8f5f0; margin-bottom: 16px;
-}
-.exp-h2 em { font-style: italic; color: var(--copper-lt); }
-
-.exp-body {
-  font-size: 15px; font-weight: 300;
-  color: rgba(248,245,240,0.5); line-height: 1.8;
-  margin-bottom: 32px;
-}
-
-.step-flow {
-  display: flex; flex-direction: column; gap: 16px;
-}
-
-.flow-step {
-  display: flex; align-items: flex-start; gap: 14px;
-}
-
-.flow-num {
-  width: 28px; height: 28px; border-radius: 50%;
-  background: rgba(248,245,240,0.06);
-  border: 1px solid rgba(248,245,240,0.12);
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--f-mono); font-size: 11px;
-  color: rgba(248,245,240,0.4); flex-shrink: 0;
-}
-
-.flow-text {
-  font-size: 14px; font-weight: 300;
-  color: rgba(248,245,240,0.55); line-height: 1.65;
-  padding-top: 4px;
-}
-.flow-text strong { color: rgba(248,245,240,0.85); font-weight: 400; }
-
-/* Customer audio player (dark version) */
-.audio-player-dark {
-  background: rgba(248,245,240,0.04);
-  border: 1px solid rgba(248,245,240,0.1);
-  border-radius: 18px;
-  padding: 20px 24px;
-  position: relative; overflow: hidden;
-}
-
-.audio-player-dark::before {
-  content: '';
-  position: absolute; top: 0; left: 0;
-  width: 3px; bottom: 0;
-  background: var(--sage-lt);
-  border-radius: 2px 0 0 2px;
-}
-
-.apd-top {
-  display: flex; align-items: center; gap: 14px; margin-bottom: 14px;
-}
-
-.apd-play-btn {
-  width: 44px; height: 44px; border-radius: 50%;
-  background: rgba(248,245,240,0.1); color: #f8f5f0;
-  border: 1px solid rgba(248,245,240,0.15);
-  cursor: pointer; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; padding-left: 3px;
-  transition: all 0.2s;
-}
-.apd-play-btn:hover { background: var(--sage); border-color: var(--sage); }
-
-.apd-label {
-  font-family: var(--f-mono); font-size: 9px;
-  letter-spacing: 0.16em; text-transform: uppercase;
-  color: var(--sage-lt); margin-bottom: 3px;
-}
-
-.apd-title {
-  font-family: var(--f-display); font-size: 17px;
-  font-weight: 400; color: #f8f5f0; line-height: 1.2;
-}
-
-.apd-waveform {
-  display: flex; align-items: center; gap: 2px; height: 28px; margin-bottom: 8px;
-}
-
-.apd-bar {
-  flex: 1; border-radius: 1px;
-  background: rgba(248,245,240,0.1);
-  transition: background 0.15s; cursor: pointer;
-}
-.apd-bar:hover { background: var(--sage-lt); }
-
-.apd-track {
-  height: 3px; background: rgba(248,245,240,0.1);
-  border-radius: 2px; overflow: hidden; margin-bottom: 8px;
-}
-
-.apd-progress {
-  height: 100%; width: 0%;
-  background: var(--sage-lt); border-radius: 2px;
-}
-
-.apd-bottom {
-  display: flex; align-items: center; justify-content: space-between;
-}
-
-.apd-time {
-  font-family: var(--f-mono); font-size: 10px;
-  color: rgba(248,245,240,0.3); letter-spacing: 0.06em;
-}
-
-.apd-note {
-  font-family: var(--f-mono); font-size: 9px;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  color: rgba(248,245,240,0.2);
-  display: flex; align-items: center; gap: 6px;
-}
-
-/* ── FOOTER ── */
-footer {
-  padding: 40px 48px;
-  border-top: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-  max-width: 1200px; margin: 0 auto;
-}
-
-.footer-logo {
-  font-family: var(--f-display); font-size: 18px;
-  font-weight: 400; letter-spacing: 0.12em;
-  text-transform: uppercase; color: var(--ink);
-}
-
-.footer-links {
-  display: flex; gap: 28px; list-style: none;
-}
-
-.footer-links a {
-  font-family: var(--f-mono); font-size: 10px;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--ink-4); text-decoration: none;
-  transition: color 0.2s;
-}
-.footer-links a:hover { color: var(--copper); }
-
-.footer-copy {
-  font-family: var(--f-mono); font-size: 10px;
-  color: var(--ink-5); letter-spacing: 0.06em;
-}
-
-/* ── EMBEDDED PLATINUM CARD ── */
-.card-scene-embed {
-  perspective: 1000px;
-  width: 340px; height: 214px;
-}
-.card-embed {
-  width: 340px; height: 214px;
-  border-radius: 16px;
-  position: relative; transform-style: preserve-3d;
-  animation: cardFloat 6s ease-in-out infinite;
-  cursor: pointer;
-}
-@keyframes cardFloat {
-  0%,100% { transform: rotateX(4deg) rotateY(-6deg) translateY(0px); }
-  33%      { transform: rotateX(-2deg) rotateY(4deg) translateY(-8px); }
-  66%      { transform: rotateX(6deg) rotateY(2deg) translateY(-4px); }
-}
-.card-face-embed {
-  position: absolute; inset: 0; border-radius: 16px; overflow: hidden;
-  background: linear-gradient(135deg,#2a2420 0%,#1a1512 25%,#2d2520 50%,#1a1512 75%,#251e18 100%);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.4),0 8px 16px rgba(0,0,0,0.5),0 24px 48px rgba(0,0,0,0.6),0 0 0 0.5px rgba(168,105,46,0.3),inset 0 1px 0 rgba(255,255,255,0.06);
-}
-.card-glow-embed { position:absolute;inset:-2px;border-radius:18px;box-shadow:0 0 40px rgba(168,105,46,0.15),0 0 80px rgba(168,105,46,0.07); }
-.ce-grain { position:absolute;inset:0;border-radius:16px;opacity:0.35;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");mix-blend-mode:overlay; }
-.ce-sheen { position:absolute;inset:0;border-radius:16px;background:linear-gradient(105deg,transparent 20%,rgba(196,170,120,0.06) 35%,rgba(212,190,150,0.12) 42%,rgba(196,170,120,0.06) 49%,transparent 65%);pointer-events:none; }
-.ce-stripe { position:absolute;top:-40px;left:-30px;width:130px;height:400px;background:linear-gradient(to bottom,transparent,rgba(196,160,100,0.06) 40%,rgba(196,160,100,0.06) 60%,transparent);transform:rotate(-25deg);pointer-events:none; }
-.ce-geo { position:absolute;bottom:-16px;right:-16px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(168,105,46,0.1) 0%,transparent 70%);pointer-events:none; }
-.ce-chip { position:absolute;top:38px;left:26px;width:36px;height:28px;border-radius:5px;background:linear-gradient(135deg,#c8a96a,#e8cc88,#b89448,#d4b870,#c8a96a);box-shadow:0 1px 3px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.3); }
-.ce-chip-lines { position:absolute;inset:3px;display:grid;grid-template-rows:1fr 1fr 1fr;gap:2px;opacity:0.35; }
-.ce-chip-lines div { border-radius:1px;background:rgba(80,50,10,0.7); }
-.ce-chip-center { position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:14px;height:20px;border:1px solid rgba(80,50,10,0.4);border-radius:3px; }
-.ce-brand { position:absolute;top:24px;right:56px;font-family:'Cormorant Garamond',serif;font-size:11px;font-weight:300;letter-spacing:0.28em;text-transform:uppercase;color:rgba(196,170,130,0.7); }
-.ce-logo-mark { position:absolute;top:22px;right:22px; }
-.ce-diamond { width:22px;height:22px;background:linear-gradient(135deg,rgba(196,160,100,0.9),rgba(168,105,46,0.7));clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);box-shadow:0 2px 8px rgba(168,105,46,0.4); }
-.ce-tier { position:absolute;top:82px;left:26px; }
-.ce-tier-label { font-family:'DM Mono',monospace;font-size:7px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(196,160,100,0.5);margin-bottom:1px; }
-.ce-tier-name { font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;letter-spacing:0.12em;background:linear-gradient(135deg,#e8d098 0%,#c8a050 30%,#f0dca0 55%,#b08030 80%,#d4b060 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;filter:drop-shadow(0 1px 2px rgba(168,105,46,0.4)); }
-.ce-number { position:absolute;bottom:54px;left:26px;display:flex;gap:12px; }
-.ce-num-grp { font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.2em;color:rgba(196,160,100,0.4); }
-.ce-num-hi { color:rgba(196,160,100,0.7); }
-.ce-rule { position:absolute;bottom:56px;left:26px;right:26px;height:0.5px;background:linear-gradient(to right,transparent,rgba(196,160,100,0.2) 20%,rgba(196,160,100,0.2) 80%,transparent); }
-.ce-holder { position:absolute;bottom:22px;left:26px;right:26px;display:flex;align-items:flex-end;justify-content:space-between; }
-.ce-holder-label { font-family:'DM Mono',monospace;font-size:7px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(196,160,100,0.3);margin-bottom:2px; }
-.ce-holder-name { font-family:'DM Sans',sans-serif;font-size:10px;font-weight:400;letter-spacing:0.14em;text-transform:uppercase;color:rgba(232,210,160,0.75); }
-.ce-valid-label { font-family:'DM Mono',monospace;font-size:6px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(196,160,100,0.3);margin-bottom:2px; }
-.ce-valid-value { font-family:'DM Mono',monospace;font-size:14px;letter-spacing:0.12em;color:rgba(196,160,100,0.55); }
-.ce-network { position:absolute;bottom:20px;right:22px;display:flex; }
-.ce-net-c { width:22px;height:22px;border-radius:50%;opacity:0.3; }
-.ce-net-c:first-child { background:rgba(196,100,60,0.6);margin-right:-8px; }
-.ce-net-c:last-child { background:rgba(196,160,60,0.5); }
-
-
-.reveal {
-  opacity: 0; transform: translateY(20px);
-  transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
-}
-.reveal.visible { opacity: 1; transform: translateY(0); }
-
-@keyframes rise {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-@media (max-width: 900px) {
-  .hero-inner { grid-template-columns: 1fr; gap: 48px; }
-  .explainer-inner { grid-template-columns: 1fr; }
-  .rev-table-header, .rev-row { grid-template-columns: 1.5fr 1fr 1fr; }
-  .rev-header-cell:last-child, .rev-value.rv-founder:last-child { display: none; }
-  nav { padding: 0 24px; }
-  .founder-hero, .milestones-section, .economics-section, .explainer-section { padding-left: 24px; padding-right: 24px; }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Founding Membership — LeaseCheck NJ</title>
+  <meta name="description" content="Founding Members help build the benchmark for fair lease pricing in New Jersey. Lock in premium access and early-member status. First 1,000 only.">
+  <meta property="og:title" content="Become a Founding Member — LeaseCheck NJ">
+  <meta property="og:description" content="Founding Members help build the benchmark for fair lease pricing. Upload your lease document and lock in premium access from day one.">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --canvas:    #f8f5f0;
+      --canvas-dk: #f0ebe3;
+      --ink:       #1c1917;
+      --ink-lt:    #44403c;
+      --ink-xs:    #78716c;
+      --copper:    #a8692e;
+      --copper-lt: #c4864a;
+      --border:    rgba(28,25,23,0.10);
+      --green:     #4a7c5f;
+      --red:       #8b3a3a;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--canvas);
+      color: var(--ink);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2.5rem; height: 64px;
+      background: rgba(248,245,240,0.94);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+    .nav-wordmark {
+      font-family: 'DM Mono', monospace; font-size: 0.78rem;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink);
+    }
+    .nav-badge {
+      font-family: 'DM Mono', monospace; font-size: 0.58rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--copper); border: 1px solid var(--copper);
+      padding: 2px 6px; border-radius: 2px;
+    }
+    .nav-links { display: flex; align-items: center; gap: 2rem; list-style: none; }
+    .nav-links a {
+      font-size: 0.8rem; font-weight: 400; letter-spacing: 0.03em;
+      color: var(--ink-lt); text-decoration: none; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--ink); }
+    .nav-cta {
+      font-family: 'DM Mono', monospace; font-size: 0.7rem;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--canvas) !important; background: var(--ink);
+      padding: 0.5rem 1.25rem; border-radius: 2px; transition: background 0.2s !important;
+    }
+    .nav-cta:hover { background: var(--copper) !important; }
+
+    /* HERO */
+    .hero {
+      padding: 128px 2.5rem 80px;
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 340px;
+      gap: 6rem; align-items: center;
+    }
+    .hero-eyebrow {
+      font-family: 'DM Mono', monospace; font-size: 0.68rem;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--copper); margin-bottom: 1.25rem;
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .hero-eyebrow::before {
+      content: ''; display: block;
+      width: 2rem; height: 1px; background: var(--copper);
+    }
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.6rem, 4.5vw, 3.8rem);
+      font-weight: 300; line-height: 1.1;
+      letter-spacing: -0.01em; margin-bottom: 1.5rem;
+    }
+    h1 em { font-style: italic; color: var(--copper); }
+    .hero-sub {
+      font-size: 0.98rem; font-weight: 300;
+      line-height: 1.75; color: var(--ink-lt);
+      max-width: 460px; margin-bottom: 2.5rem;
+    }
+    .hero-counter {
+      font-family: 'DM Mono', monospace; font-size: 0.68rem;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-xs);
+    }
+    .hero-counter span { color: var(--copper); }
+
+    /* MEMBERSHIP CARD */
+    .card-wrap { display: flex; justify-content: center; }
+    .mem-card {
+      width: 300px; height: 188px;
+      background: linear-gradient(140deg, #2a2420 0%, #181310 65%, #201c18 100%);
+      border-radius: 10px;
+      padding: 24px 24px 20px;
+      display: flex; flex-direction: column; justify-content: space-between;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.26), 0 4px 12px rgba(0,0,0,0.16);
+      position: relative; overflow: hidden;
+    }
+    .mem-card::after {
+      content: '';
+      position: absolute; top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(200,169,106,0.06) 0%, transparent 68%);
+      pointer-events: none;
+    }
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; }
+    .card-chip {
+      width: 30px; height: 22px;
+      background: linear-gradient(135deg, #c8a96a, #e0cc8a, #c8a96a);
+      border-radius: 3px;
+    }
+    .card-issuer {
+      font-family: 'DM Mono', monospace; font-size: 0.56rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(200,169,106,0.5);
+    }
+    .card-role {
+      font-family: 'DM Mono', monospace; font-size: 0.52rem;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: rgba(200,169,106,0.42); margin-bottom: 0.28rem;
+    }
+    .card-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.28rem; font-weight: 300;
+      letter-spacing: 0.03em; color: #e8d5b0;
+    }
+    .card-bot { display: flex; justify-content: space-between; align-items: flex-end; }
+    .card-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem; letter-spacing: 0.1em;
+      color: rgba(200,169,106,0.48); line-height: 1.7;
+    }
+    .card-num strong {
+      display: block; font-size: 0.7rem; font-weight: 400;
+      color: rgba(200,169,106,0.82);
+    }
+    .card-valid {
+      font-family: 'DM Mono', monospace; font-size: 0.52rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(200,169,106,0.38); text-align: right;
+    }
+    .card-valid strong {
+      display: block; font-size: 0.7rem; font-weight: 400;
+      color: rgba(200,169,106,0.62);
+    }
+
+    /* CARD CTA */
+    .card-cta-wrap {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 0.6rem;
+      margin-top: 1.5rem;
+    }
+    .card-cta {
+      display: inline-block;
+      padding: 0.75rem 1.75rem;
+      background: var(--ink); color: var(--canvas);
+      border-radius: 2px; text-decoration: none;
+      font-family: 'DM Mono', monospace; font-size: 0.7rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      transition: background 0.2s; width: 100%; text-align: center;
+    }
+    .card-cta:hover { background: var(--copper); }
+    .card-cta-meta {
+      font-family: 'DM Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.07em; text-transform: uppercase;
+      color: var(--ink-xs); text-align: center;
+    }
+    .card-cta-meta .spots { color: var(--copper); }
+
+    /* URGENCY */
+    .urgency-line {
+      display: none;
+      font-family: 'DM Mono', monospace; font-size: 0.68rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: #c8a96a; margin-top: 0.5rem; text-align: right;
+    }
+
+    /* SECTION LAYOUT */
+    .rule { max-width: 1100px; margin: 0 auto; padding: 0 2.5rem; border-top: 1px solid var(--border); }
+
+    .section-row {
+      max-width: 1100px; margin: 0 auto;
+      padding: 72px 2.5rem;
+      display: grid; grid-template-columns: 240px 1fr;
+      gap: 5rem; align-items: start;
+    }
+    .row-label {
+      font-family: 'DM Mono', monospace; font-size: 0.66rem;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--ink-xs); padding-top: 0.4rem;
+    }
+    .row-body h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.9rem; font-weight: 400;
+      line-height: 1.2; margin-bottom: 1.1rem;
+    }
+    .row-body p {
+      font-size: 0.93rem; font-weight: 300;
+      line-height: 1.8; color: var(--ink-lt);
+      max-width: 560px; margin-bottom: 1rem;
+    }
+    .row-body p:last-child { margin-bottom: 0; }
+
+    /* BENEFITS GRID */
+    .benefits-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;
+    }
+    .benefit {
+      padding: 1.6rem 1.5rem;
+      background: var(--canvas);
+      border: 1px solid var(--border); border-radius: 3px;
+    }
+    .benefit-num {
+      font-family: 'DM Mono', monospace; font-size: 0.58rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--copper); margin-bottom: 0.7rem;
+    }
+    .benefit h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem; font-weight: 500;
+      margin-bottom: 0.4rem; line-height: 1.3;
+    }
+    .benefit p {
+      font-size: 0.8rem; font-weight: 300;
+      line-height: 1.7; color: var(--ink-lt);
+      margin: 0 !important; max-width: none !important;
+    }
+
+    /* SCARCITY BAND */
+    .scarcity-band { background: var(--ink); padding: 40px 2.5rem; }
+    .scarcity-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 2rem;
+    }
+    .scarcity-copy {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem; font-weight: 300;
+      color: #e8d5b0; line-height: 1.4;
+    }
+    .scarcity-stat { text-align: right; }
+    .scarcity-n {
+      font-family: 'DM Mono', monospace;
+      font-size: 2.2rem; font-weight: 300;
+      color: #c8a96a; line-height: 1; margin-bottom: 0.25rem;
+    }
+    .scarcity-lbl {
+      font-family: 'DM Mono', monospace; font-size: 0.58rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: rgba(232,213,176,0.38);
+    }
+
+    /* REQUIREMENTS NOTICE */
+    .requirements {
+      background: #fdf8f2;
+      border: 1px solid rgba(168,105,46,0.2);
+      border-left: 3px solid var(--copper);
+      border-radius: 3px;
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 2.5rem;
+    }
+    .req-title {
+      font-family: 'DM Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--copper); margin-bottom: 1rem;
+    }
+    .req-list {
+      list-style: none; display: flex; flex-direction: column; gap: 0.6rem;
+    }
+    .req-list li {
+      font-size: 0.85rem; font-weight: 400;
+      color: var(--ink-lt); line-height: 1.5;
+      display: flex; align-items: flex-start; gap: 0.65rem;
+    }
+    .req-list li::before {
+      content: '→';
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem; color: var(--copper);
+      margin-top: 0.05rem; flex-shrink: 0;
+    }
+    .req-list li strong { color: var(--ink); font-weight: 500; }
+
+    /* STEPS */
+    .steps {
+      display: flex; flex-direction: column; gap: 0;
+      margin-bottom: 2.5rem;
+    }
+    .step {
+      display: flex; gap: 1.25rem; align-items: flex-start;
+      padding: 1.1rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .step:last-child { border-bottom: none; }
+    .step-n {
+      font-family: 'DM Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.1em; color: var(--copper);
+      width: 28px; flex-shrink: 0; padding-top: 0.05rem;
+    }
+    .step-text {
+      font-size: 0.88rem; font-weight: 300;
+      line-height: 1.6; color: var(--ink-lt);
+    }
+    .step-text strong { color: var(--ink); font-weight: 500; }
+
+    /* FORM */
+    .form-wrap { max-width: 540px; }
+    .form-section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem; font-weight: 400;
+      line-height: 1.2; margin-bottom: 0.7rem;
+    }
+    .form-section-sub {
+      font-size: 0.88rem; font-weight: 300;
+      color: var(--ink-lt); line-height: 1.7; margin-bottom: 2rem;
+    }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .field { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.9rem; }
+    .field label {
+      font-family: 'DM Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-xs);
+    }
+    .field input, .field select {
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border); border-radius: 2px;
+      background: white;
+      font-family: 'DM Sans', sans-serif; font-size: 0.88rem;
+      font-weight: 300; color: var(--ink);
+      outline: none; transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+    .field input:focus, .field select:focus { border-color: var(--copper); }
+    .field input::placeholder { color: #b8b0a8; }
+
+    /* UPLOAD ZONE */
+    .upload-section { margin-bottom: 0.9rem; }
+    .upload-label {
+      font-family: 'DM Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--ink-xs); display: block; margin-bottom: 0.35rem;
+    }
+    .upload-required {
+      color: var(--copper); font-size: 0.58rem; margin-left: 0.3rem;
+    }
+    .upload-zone {
+      border: 1.5px dashed rgba(168,105,46,0.35);
+      border-radius: 3px; padding: 2rem 1.5rem;
+      background: #fdf8f2;
+      text-align: center; cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--copper);
+      background: #faf3e8;
+    }
+    .upload-zone.has-file {
+      border-color: var(--green);
+      background: #f2f7f4;
+      border-style: solid;
+    }
+    .upload-zone input[type="file"] {
+      position: absolute; inset: 0;
+      opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .upload-icon {
+      font-size: 1.5rem; margin-bottom: 0.6rem; line-height: 1;
+      color: var(--copper);
+    }
+    .upload-zone.has-file .upload-icon { color: var(--green); }
+    .upload-main-text {
+      font-size: 0.88rem; font-weight: 400;
+      color: var(--ink-lt); margin-bottom: 0.3rem;
+    }
+    .upload-sub-text {
+      font-family: 'DM Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.06em; color: var(--ink-xs);
+    }
+    .upload-filename {
+      font-family: 'DM Mono', monospace; font-size: 0.72rem;
+      color: var(--green); font-weight: 400;
+      margin-top: 0.3rem;
+    }
+
+    /* REDACTION NOTICE */
+    .redaction-notice {
+      display: flex; gap: 0.75rem; align-items: flex-start;
+      padding: 0.9rem 1rem;
+      background: var(--canvas-dk);
+      border: 1px solid var(--border); border-radius: 2px;
+      margin-top: 0.75rem; margin-bottom: 0.9rem;
+    }
+    .redaction-icon {
+      font-size: 0.85rem; flex-shrink: 0; margin-top: 0.05rem;
+    }
+    .redaction-text {
+      font-size: 0.75rem; font-weight: 300;
+      color: var(--ink-lt); line-height: 1.65;
+    }
+    .redaction-text strong { color: var(--ink); font-weight: 500; }
+
+    /* RECENCY CHECKBOX */
+    .recency-check {
+      display: flex; align-items: flex-start; gap: 0.9rem;
+      padding: 1.1rem 1.25rem;
+      border: 1px solid var(--border); border-radius: 2px;
+      background: white; cursor: pointer;
+      margin-bottom: 0.9rem; transition: border-color 0.2s;
+    }
+    .recency-check:has(input:checked) { border-color: var(--copper); }
+    .recency-check input[type="checkbox"] {
+      width: 16px; height: 16px; flex-shrink: 0;
+      margin-top: 0.15rem; accent-color: var(--copper);
+      cursor: pointer;
+    }
+    .recency-check-label {
+      font-size: 0.85rem; font-weight: 300;
+      line-height: 1.6; color: var(--ink-lt); cursor: pointer;
+    }
+    .recency-check-label strong { color: var(--ink); font-weight: 500; }
+
+    /* CONSENT */
+    .consent-box {
+      font-size: 0.72rem; font-weight: 300;
+      color: var(--ink-xs); line-height: 1.65;
+      padding: 1rem 1.1rem;
+      background: var(--canvas-dk);
+      border: 1px solid var(--border); border-radius: 2px;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn-submit {
+      width: 100%; padding: 1rem 2rem;
+      background: var(--ink); color: var(--canvas);
+      border: none; border-radius: 2px;
+      font-family: 'DM Mono', monospace; font-size: 0.7rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .btn-submit:hover { background: var(--copper); }
+    .btn-submit:disabled {
+      background: #c4bdb6; cursor: not-allowed;
+    }
+    .form-note {
+      margin-top: 0.9rem;
+      font-family: 'DM Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.06em; color: var(--ink-xs); text-align: center;
+    }
+
+    /* VALIDATION ERROR */
+    .field-error {
+      font-family: 'DM Mono', monospace; font-size: 0.6rem;
+      color: var(--red); letter-spacing: 0.04em; margin-top: 0.3rem;
+      display: none;
+    }
+    .field-error.show { display: block; }
+
+    /* SUCCESS STATE */
+    .success {
+      display: none;
+      border: 1px solid var(--border); border-radius: 3px;
+      overflow: hidden;
+    }
+    .success.show { display: block; }
+    .success-header {
+      background: var(--ink); padding: 2.5rem;
+      text-align: center;
+    }
+    .success-prov {
+      font-family: 'DM Mono', monospace; font-size: 0.58rem;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: rgba(200,169,106,0.6); margin-bottom: 0.75rem;
+    }
+    .success-number {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3.5rem; font-weight: 300;
+      color: #c8a96a; line-height: 1; margin-bottom: 0.5rem;
+    }
+    .success-name-label {
+      font-family: 'DM Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: rgba(232,213,176,0.45);
+    }
+    .success-body {
+      background: var(--canvas-dk); padding: 2rem 2.5rem;
+    }
+    .success-headline {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem; font-weight: 400;
+      margin-bottom: 0.75rem; color: var(--ink);
+    }
+    .success-sub {
+      font-size: 0.88rem; font-weight: 300;
+      color: var(--ink-lt); line-height: 1.75;
+      margin-bottom: 1.5rem;
+    }
+    .success-steps {
+      list-style: none; display: flex; flex-direction: column; gap: 0.5rem;
+      margin-bottom: 1.75rem;
+    }
+    .success-steps li {
+      font-size: 0.82rem; font-weight: 300;
+      color: var(--ink-lt); display: flex;
+      align-items: flex-start; gap: 0.6rem; line-height: 1.5;
+    }
+    .success-steps li::before {
+      content: '✓';
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; color: var(--green);
+      flex-shrink: 0; margin-top: 0.1rem;
+    }
+
+    /* FOOTER */
+    .footer-inner {
+      max-width: 1100px; margin: 0 auto;
+      padding: 2.5rem; display: flex;
+      align-items: center; justify-content: space-between; gap: 2rem;
+      border-top: 1px solid var(--border);
+    }
+    .footer-brand {
+      font-family: 'DM Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-xs);
+    }
+    .footer-links { display: flex; gap: 2rem; list-style: none; }
+    .footer-links a {
+      font-family: 'DM Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--ink-xs); text-decoration: none; transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--copper); }
+    .footer-legal {
+      max-width: 1100px; margin: 0 auto;
+      padding: 0 2.5rem 2.5rem;
+      font-family: 'DM Mono', monospace; font-size: 0.58rem;
+      line-height: 1.75; color: var(--ink-xs);
+      border-top: 1px solid var(--border); padding-top: 1.5rem;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 860px) {
+      nav { padding: 0 1.5rem; }
+      .nav-links { display: none; }
+      .hero { grid-template-columns: 1fr; gap: 3rem; padding: 112px 1.5rem 56px; }
+      .card-wrap { order: -1; }
+      .mem-card { width: 100%; max-width: 300px; height: 188px; }
+      .section-row { grid-template-columns: 1fr; gap: 1.75rem; padding: 56px 1.5rem; }
+      .benefits-grid { grid-template-columns: 1fr; }
+      .scarcity-inner { flex-direction: column; text-align: center; }
+      .scarcity-stat { text-align: center; }
+      .field-row { grid-template-columns: 1fr; }
+      .footer-inner { flex-direction: column; gap: 1.5rem; text-align: center; }
+      .footer-links { flex-wrap: wrap; justify-content: center; }
+      .footer-legal { padding: 1.25rem 1.5rem 2rem; }
+    }
+  </style>
 </head>
 <body>
 
 <!-- NAV -->
 <nav>
-  <div style="display:flex;align-items:center">
-    <a href="index.html" class="nav-logo">LeaseCheck</a>
-    <span class="nav-region">NJ Beta</span>
-  </div>
-  <div class="nav-right">
-    <a href="index.html" class="nav-link">Home</a>
-    <a href="intake.html" class="nav-link">Check a Deal</a>
-    <div class="spots-pill">
-      <div class="spots-dot"></div>
-      <span class="spots-text" id="spotsNav">153 of 1,000 claimed</span>
-    </div>
-  </div>
+  <a href="index.html" class="nav-logo">
+    <span class="nav-wordmark">LeaseCheck</span>
+    <span class="nav-badge">NJ</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="index.html#how-it-works">How it works</a></li>
+    <li><a href="intake.html" class="nav-cta">Check a deal →</a></li>
+  </ul>
 </nav>
 
 <!-- HERO -->
-<section class="founder-hero">
-  <div class="hero-inner">
-
-    <!-- LEFT -->
-    <div class="hero-left">
-      <div class="hero-kicker">Founding Member Gold · 1,000 Memberships Only</div>
-
-      <h1 class="hero-h1">
-        Early access.<br>
-        Permanent status.<br>
-        <em>No seat reserved twice.</em>
-      </h1>
-
-      <p class="hero-body">
-        LeaseCheck is built on real deal data submitted by real NJ drivers. The first 1,000 members who submit a qualifying deal receive <strong>Founding Member Gold status</strong> — lifetime premium access and a numbered Platinum membership card, with priority consideration for any member perks introduced as the platform grows.
-      </p>
-
-      <!-- ── FOUNDER AUDIO PLAYER ── -->
-      <div class="audio-player" id="founderPlayer">
-        <div class="ap-top">
-          <button class="ap-play-btn" onclick="togglePlay('founder')" id="founderPlayBtn">▶</button>
-          <div class="ap-info">
-            <div class="ap-label">Founding Members · 90 sec</div>
-            <div class="ap-title">Why joining now is different — and what it means</div>
-          </div>
-          <div class="ap-duration">1:32</div>
-        </div>
-
-        <!-- Waveform bars -->
-        <div class="ap-waveform" id="founderWave"></div>
-
-        <div class="ap-track" onclick="seekAudio('founder', event)">
-          <div class="ap-progress" id="founderProgress"></div>
-        </div>
-
-        <div class="ap-bottom">
-          <div class="ap-time" id="founderTime">0:00 / 1:32</div>
-          <div class="ap-placeholder-note">
-            <div class="placeholder-dot"></div>
-            Audio ready to drop in
-          </div>
-        </div>
-      </div>
-
-      <div style="display:flex;align-items:center;gap:10px;margin-top:8px">
-        <div style="height:1px;flex:1;background:var(--border)"></div>
-        <div style="font-family:var(--f-mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-5)">Generated with NotebookLM</div>
-        <div style="height:1px;flex:1;background:var(--border)"></div>
-      </div>
-    </div>
-
-    <!-- RIGHT: SIGNUP CARD -->
-    <div class="hero-right">
-      <div class="signup-card" id="signupCard">
-        <div class="card-top">
-          <div class="card-eyebrow">Founding Member Gold</div>
-          <div class="card-title">Reserve your <em>membership.</em></div>
-          <div class="card-subtitle">Submit a qualifying deal. Receive permanent member status and lifetime premium access.</div>
-
-          <div class="spots-counter">
-            <div>
-              <div class="spots-remaining" id="spotsNum">153</div>
-              <div style="font-family:var(--f-mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(248,245,240,0.3);margin-top:3px">Memberships claimed</div>
-            </div>
-            <div class="spots-info">
-              <div class="spots-of">of 1,000 total</div>
-              <div class="spots-bar-track">
-                <div class="spots-bar-fill" id="spotsBarFill"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-body">
-
-          <!-- Perks -->
-          <div class="perks-list">
-            <div class="perk-item">
-              <div class="perk-icon">♾</div>
-              <div class="perk-content">
-                <div class="perk-title">Lifetime premium access</div>
-                <div class="perk-desc">Every LeaseCheck feature — deal scoring, county benchmarks, dealer report cards, timing tools — free for life. No subscription. No exceptions.</div>
-              </div>
-            </div>
-            <div class="perk-item">
-              <div class="perk-icon">💳</div>
-              <div class="perk-content">
-                <div class="perk-title">Numbered Platinum membership card</div>
-                <div class="perk-desc">A physical card bearing your founding member number. Issued once, never reissued. May provide preferred eligibility for member perks if introduced in future, subject to availability and separate terms.</div>
-              </div>
-            </div>
-            <div class="perk-item">
-              <div class="perk-icon">✦</div>
-              <div class="perk-content">
-                <div class="perk-title">Permanent Gold member status</div>
-                <div class="perk-desc">Priority access to every new feature before public release. Founding member badge on your profile. Listed in the LeaseCheck founding member directory.</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Form -->
-          <div class="signup-form" id="signupForm">
-            <div class="sf-row">
-              <div class="sf-group">
-                <label class="sf-label">First Name</label>
-                <input class="sf-input" type="text" id="sf-first" placeholder="Sarah" oninput="checkForm()">
-              </div>
-              <div class="sf-group">
-                <label class="sf-label">Last Name</label>
-                <input class="sf-input" type="text" id="sf-last" placeholder="Chen" oninput="checkForm()">
-              </div>
-            </div>
-
-            <div class="sf-group">
-              <label class="sf-label">Email Address</label>
-              <input class="sf-input" type="email" id="sf-email" placeholder="you@email.com" oninput="checkForm()">
-            </div>
-
-            <div class="sf-group">
-              <label class="sf-label">Your NJ Town</label>
-              <select class="town-select" id="sf-town" onchange="checkForm()">
-                <option value="">Select your town</option>
-                <optgroup label="Bergen County">
-                  <option>Paramus</option><option>Ramsey</option><option>Hackensack</option>
-                  <option>Ridgewood</option><option>Fort Lee</option><option>Tenafly</option>
-                </optgroup>
-                <optgroup label="Essex County">
-                  <option>Millburn / Short Hills</option><option>Livingston</option>
-                  <option>Montclair</option><option>Maplewood</option><option>West Orange</option>
-                </optgroup>
-                <optgroup label="Morris County">
-                  <option>Chatham</option><option>Madison</option><option>Morristown</option>
-                  <option>Florham Park</option>
-                </optgroup>
-                <optgroup label="Union County">
-                  <option>Westfield</option><option>Summit</option><option>Scotch Plains</option>
-                </optgroup>
-                <optgroup label="Monmouth County">
-                  <option>Freehold</option><option>Marlboro</option><option>Holmdel</option>
-                </optgroup>
-                <optgroup label="Middlesex County">
-                  <option>Edison</option><option>Woodbridge</option><option>Metuchen</option>
-                </optgroup>
-                <optgroup label="Somerset County">
-                  <option>Princeton area</option><option>Bernardsville</option><option>Basking Ridge</option>
-                </optgroup>
-                <option value="other">Other NJ town</option>
-              </select>
-            </div>
-
-            <div class="consent-row">
-              <input type="checkbox" class="consent-check" id="sf-consent" onchange="checkForm()">
-              <label for="sf-consent" class="consent-text">
-                I agree to the <a href="#">Founding Member Terms</a>. I understand that Founding Member Gold is a membership status program, not a financial product. Any future member perks are discretionary, subject to availability, and governed by separate terms if introduced.
-              </label>
-            </div>
-
-            <button class="submit-btn" id="submitBtn" onclick="submitFounder()" disabled>
-              <span>Claim My Founding Membership</span>
-              <span style="opacity:0.5">✦</span>
-            </button>
-            <div class="submit-sub">No payment · Subject to qualifying deal submission</div>
-          </div>
-
-            <div class="success-state" id="successState">
-              <div class="success-icon">💳</div>
-              <div class="success-title">Membership confirmed.</div>
-              <div class="success-body">You're one of the first 1,000. Your Founding Member Gold status is permanent. Your numbered Platinum card will be prepared once your qualifying deal is verified.</div>
-
-              <div class="success-coins" style="background:linear-gradient(135deg,#2a2420,#1a1512);border-color:rgba(196,160,100,0.25);">
-                <div class="coins-num" style="background:linear-gradient(135deg,#e8d098,#c8a050,#f0dca0,#b08030);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Gold</div>
-                <div class="coins-label" style="color:rgba(196,160,100,0.7);">Founding Member · Numbered Card · Lifetime Access</div>
-              </div>
-
-              <div class="success-number">Member <strong>#<span id="founderNum">153</span></strong> of 1,000</div>
-
-            <a href="intake.html" class="success-cta">Submit My Qualifying Deal →</a>
-
-            <div class="referral-box" onclick="copyReferral()">
-              <div class="referral-url" id="referralUrl">leasecheck.nj/join?ref=LC0153</div>
-              <div class="referral-copy">Copy Link</div>
-            </div>
-            <div class="referral-hint">Share with other NJ drivers · Help build the dataset</div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-
+<section class="hero">
+  <div>
+    <div class="hero-eyebrow">Founding Membership</div>
+    <h1>Join the First<br>1,000 <em>Founding</em><br>Members.</h1>
+    <p class="hero-sub">
+      Founding Members help build the benchmark for fair lease pricing in New Jersey. In return, they lock in premium access and early-member status from day one.
+    </p>
+    <p class="hero-counter"><span id="claimedCount">153</span> of 1,000 spots claimed</p>
   </div>
-</section>
-
-<!-- MILESTONES -->
-<section class="milestones-section">
-  <div class="milestones-inner">
-    <div class="reveal">
-      <div class="section-label">Platform Roadmap</div>
-      <h2 class="section-h2">Where we're <em>going.</em><br><span class="muted">What that means for you.</span></h2>
-      <p class="section-body">As LeaseCheck grows, Founding Members are first in line — for every tool, every market, and every opportunity we introduce.</p>
-    </div>
-
-    <div class="milestone-timeline">
-
-      <div class="milestone-item done reveal">
-        <div class="milestone-marker"></div>
-        <div class="milestone-content">
-          <div class="milestone-trigger">✓ Now · Founding period open</div>
-          <div class="milestone-title">Membership status confirmed</div>
-          <div class="milestone-desc">Your Founding Member Gold status is recorded immediately upon submission of a qualifying deal. Your member number is permanent and your profile is marked accordingly.</div>
-        </div>
+  <div class="card-wrap">
+    <div class="mem-card">
+      <div class="card-top">
+        <div class="card-chip"></div>
+        <div class="card-issuer">LeaseCheck &middot; NJ</div>
       </div>
-
-      <div class="milestone-item next reveal">
-        <div class="milestone-marker"></div>
-        <div class="milestone-content">
-          <div class="milestone-trigger">→ Building toward · 5,000 members</div>
-          <div class="milestone-title">Expanded platform coverage</div>
-          <div class="milestone-desc">At 5,000 members, LeaseCheck expands county coverage, adds more vehicle segments, and unlocks advanced deal scoring tools. Founding Members get access first — before any public rollout.</div>
-        </div>
-      </div>
-
-      <div class="milestone-item locked reveal">
-        <div class="milestone-marker"></div>
-        <div class="milestone-content">
-          <div class="milestone-trigger">10,000 members</div>
-          <div class="milestone-title">Full analytics suite — included for Gold members</div>
-          <div class="milestone-desc">County-level benchmarking, dealer report cards, seasonal timing tools, and advanced money factor analysis — all included for Founding Members at no charge, as features are developed and released.</div>
-        </div>
-      </div>
-
-      <div class="milestone-item locked reveal">
-        <div class="milestone-marker"></div>
-        <div class="milestone-content">
-          <div class="milestone-trigger">25,000 members</div>
-          <div class="milestone-title">Member perks program — if introduced</div>
-          <div class="milestone-desc">At significant scale, LeaseCheck may introduce a member perks program in partnership with relevant NJ businesses. Founding Members would receive priority consideration for any such program. Any perks would be subject to availability and governed by separate terms.</div>
-        </div>
-      </div>
-
-      <div class="milestone-item locked reveal">
-        <div class="milestone-marker"></div>
-        <div class="milestone-content">
-          <div class="milestone-trigger">50,000 members</div>
-          <div class="milestone-title">Multi-state expansion</div>
-          <div class="milestone-desc">LeaseCheck expands beyond New Jersey. Founding Members carry their Gold status into every new market — with first access to new regional tools and any programs introduced in expanded coverage areas.</div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ECONOMICS -->
-<section class="economics-section reveal" style="background:var(--ink);padding:100px 48px;">
-  <div style="max-width:1200px;margin:0 auto;">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;">
-
-      <!-- Card display -->
-      <div style="display:flex;align-items:center;justify-content:center;">
-        <div class="card-scene-embed" id="cardSceneEmbed">
-          <div class="card-embed" id="cardEmbed">
-            <div class="card-glow-embed"></div>
-            <div class="card-face-embed">
-              <div class="ce-grain"></div>
-              <div class="ce-sheen"></div>
-              <div class="ce-stripe"></div>
-              <div class="ce-geo"></div>
-              <div class="ce-chip">
-                <div class="ce-chip-lines"><div></div><div></div><div></div></div>
-                <div class="ce-chip-center"></div>
-              </div>
-              <div class="ce-brand">LeaseCheck</div>
-              <div class="ce-logo-mark"><div class="ce-diamond"></div></div>
-              <div class="ce-tier">
-                <div class="ce-tier-label">Founder</div>
-                <div class="ce-tier-name">Platinum</div>
-              </div>
-              <div class="ce-number">
-                <span class="ce-num-grp">LC</span>
-                <span class="ce-num-grp">••••</span>
-                <span class="ce-num-grp">••••</span>
-                <span class="ce-num-grp ce-num-hi">0001</span>
-              </div>
-              <div class="ce-rule"></div>
-              <div class="ce-holder">
-                <div>
-                  <div class="ce-holder-label">Founder</div>
-                  <div class="ce-holder-name">First 1,000</div>
-                </div>
-                <div style="text-align:right">
-                  <div class="ce-valid-label">Valid For Life</div>
-                  <div class="ce-valid-value">∞</div>
-                </div>
-              </div>
-              <div class="ce-network">
-                <div class="ce-net-c"></div><div class="ce-net-c"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card description -->
       <div>
-        <div class="exp-kicker" style="color:var(--copper-lt)">Numbered Platinum Card</div>
-        <h2 class="exp-h2" style="font-size:clamp(36px,4.5vw,56px)">One number.<br><em>Yours permanently.</em></h2>
-        <p class="exp-body">Every Founding Member receives a numbered Platinum membership card — a physical record of your place in the first 1,000. Issued once. Never reissued.</p>
-
-        <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:32px;">
-          <div class="flow-step">
-            <div class="flow-num">✦</div>
-            <div class="flow-text"><strong>Limited to the first 1,000.</strong> When the founding period closes, numbered cards are no longer issued. Your member number does not change.</div>
-          </div>
-          <div class="flow-step">
-            <div class="flow-num">◎</div>
-            <div class="flow-text"><strong>Priority consideration for future perks.</strong> If a member perks program is introduced with NJ partners, Platinum card holders receive first access. Subject to availability and separate terms.</div>
-          </div>
-          <div class="flow-step">
-            <div class="flow-num">♾</div>
-            <div class="flow-text"><strong>Lifetime premium access — included.</strong> All current and future LeaseCheck features included for Gold members at no charge, for as long as the platform operates.</div>
-          </div>
-          <div class="flow-step">
-            <div class="flow-num">✦</div>
-            <div class="flow-text"><strong>Permanent place in the founding directory.</strong> Your name, member number, and NJ town, recorded in the founding member registry.</div>
-          </div>
+        <div class="card-role">Founding Member</div>
+        <div class="card-name">Premium Access</div>
+      </div>
+      <div class="card-bot">
+        <div class="card-num">
+          Member No.
+          <strong>#153 of 1,000</strong>
         </div>
-
-        <div style="background:rgba(248,245,240,0.04);border:1px solid rgba(248,245,240,0.1);border-radius:14px;padding:20px 24px;">
-          <div style="font-family:var(--f-mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(196,160,100,0.5);margin-bottom:8px;">Potential Partner Categories — If a Perks Program Is Introduced</div>
-          <div style="display:flex;flex-wrap:wrap;gap:8px;">
-            <span style="background:rgba(248,245,240,0.06);border:1px solid rgba(248,245,240,0.1);border-radius:20px;padding:5px 12px;font-size:12px;color:rgba(248,245,240,0.45);font-family:var(--f-mono);font-size:10px;letter-spacing:0.06em;">Auto Mechanics</span>
-            <span style="background:rgba(248,245,240,0.06);border:1px solid rgba(248,245,240,0.1);border-radius:20px;padding:5px 12px;font-size:12px;color:rgba(248,245,240,0.45);font-family:var(--f-mono);font-size:10px;letter-spacing:0.06em;">Car Washes</span>
-            <span style="background:rgba(248,245,240,0.06);border:1px solid rgba(248,245,240,0.1);border-radius:20px;padding:5px 12px;font-size:12px;color:rgba(248,245,240,0.45);font-family:var(--f-mono);font-size:10px;letter-spacing:0.06em;">Restaurants</span>
-            <span style="background:rgba(248,245,240,0.06);border:1px solid rgba(248,245,240,0.1);border-radius:20px;padding:5px 12px;font-size:12px;color:rgba(248,245,240,0.45);font-family:var(--f-mono);font-size:10px;letter-spacing:0.06em;">Tire Shops</span>
-            <span style="background:rgba(248,245,240,0.06);border:1px solid rgba(248,245,240,0.1);border-radius:20px;padding:5px 12px;font-size:12px;color:rgba(248,245,240,0.45);font-family:var(--f-mono);font-size:10px;letter-spacing:0.06em;">Auto Insurance</span>
-            <span style="background:rgba(248,245,240,0.06);border:1px solid rgba(248,245,240,0.1);border-radius:20px;padding:5px 12px;font-size:12px;color:rgba(248,245,240,0.45);font-family:var(--f-mono);font-size:10px;letter-spacing:0.06em;">Coffee & More</span>
-          </div>
+        <div class="card-valid">
+          Valid
+          <strong>For Life</strong>
         </div>
       </div>
-
+    <div class="card-cta-wrap">
+      <a href="#apply" class="card-cta">Claim My Founding Membership →</a>
+      <span class="card-cta-meta">
+        No payment required &nbsp;·&nbsp; <span class="spots"><span id="heroRemaining">847</span> spots remaining</span>
+      </span>
     </div>
   </div>
 </section>
 
-<!-- CUSTOMER EXPLAINER (dark section) -->
-<section class="explainer-section">
-  <div class="explainer-inner">
+<div class="rule"></div>
 
-    <div class="explainer-left reveal">
-      <div class="exp-kicker">For Every NJ Driver</div>
-      <h2 class="exp-h2">Know your <em>number.</em><br>In 60 seconds.</h2>
-      <p class="exp-body">LeaseCheck is free for every NJ driver — member or not. Submit your lease deal, get an instant score, and find out exactly where you stood in the market when you signed.</p>
+<!-- WHAT IT MEANS -->
+<div class="section-row">
+  <div class="row-label">What it means</div>
+  <div class="row-body">
+    <h2>What is a Founding Member?</h2>
+    <p>
+      Founding Members are the earliest users helping LeaseCheck build its benchmark dataset with real New Jersey lease submissions and product feedback.
+    </p>
+    <p>
+      They are early contributors, early believers, and early benchmark builders — people who help make the comparisons more accurate and useful for every NJ driver who comes after them.
+    </p>
+  </div>
+</div>
 
-      <div class="step-flow">
-        <div class="flow-step">
-          <div class="flow-num">1</div>
-          <div class="flow-text"><strong>Photograph your lease document.</strong> We cover your personal details automatically before reading anything.</div>
-        </div>
-        <div class="flow-step">
-          <div class="flow-num">2</div>
-          <div class="flow-text"><strong>Get your Deal Score instantly.</strong> A–F grade, compared against real NJ deals in your county.</div>
-        </div>
-        <div class="flow-step">
-          <div class="flow-num">3</div>
-          <div class="flow-text"><strong>Read your full report.</strong> Cost breakdown, negotiation range, lease vs. finance analysis, and a checklist for next time.</div>
-        </div>
+<div class="rule"></div>
+
+<!-- WHAT YOU RECEIVE -->
+<div style="background: var(--canvas-dk); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <div class="section-row">
+    <div class="row-label">What you receive</div>
+    <div class="benefits-grid">
+      <div class="benefit">
+        <div class="benefit-num">01 &mdash; Access</div>
+        <h3>Lifetime Premium Access</h3>
+        <p>Full access to LeaseCheck deal reports, benchmarks, and county analytics — permanently, at no cost.</p>
+      </div>
+      <div class="benefit">
+        <div class="benefit-num">02 &mdash; Status</div>
+        <h3>Numbered Founding Membership</h3>
+        <p>A permanent Founding Member number, assigned in order of acceptance. First 1,000 members only.</p>
+      </div>
+      <div class="benefit">
+        <div class="benefit-num">03 &mdash; Priority</div>
+        <h3>Early-Member Status</h3>
+        <p>Priority access to selected new features and product updates as LeaseCheck expands across New Jersey.</p>
+      </div>
+      <div class="benefit">
+        <div class="benefit-num">04 &mdash; Future</div>
+        <h3>Member Perks Access</h3>
+        <p>Early access to any future member perks program, if introduced. Subject to availability and separate terms.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WHY IT MATTERS -->
+<div class="section-row">
+  <div class="row-label">Why it matters</div>
+  <div class="row-body">
+    <h2>Every verified deal makes the benchmark smarter.</h2>
+    <p>
+      Right now, most NJ drivers have no reliable way to know whether the lease they signed — or are about to sign — is fair. They rely on gut feel, forum posts, and whatever the dealer presents.
+    </p>
+    <p>
+      LeaseCheck changes that by building a real benchmark from real NJ lease data. Founding Members are the first people contributing to that dataset. The more verified deals, the more precise and useful the comparisons become for everyone who comes after.
+    </p>
+  </div>
+</div>
+
+<!-- SCARCITY BAND -->
+<div class="scarcity-band">
+  <div class="scarcity-inner">
+    <div class="scarcity-copy">
+      Limited to the first 1,000 accepted members.<br>No exceptions.
+    </div>
+    <div class="scarcity-stat">
+      <div class="scarcity-n" id="remainingCount">847</div>
+      <div class="scarcity-lbl">Spots remaining</div>
+      <div class="urgency-line" id="urgencyLine">Fewer than 50 spots remaining.</div>
+    </div>
+  </div>
+</div>
+
+<!-- APPLICATION FORM -->
+<div class="section-row" id="apply">
+  <div class="row-label">Apply now</div>
+  <div>
+
+    <!-- REQUIREMENTS BLOCK -->
+    <div class="requirements">
+      <div class="req-title">Membership requirements</div>
+      <ul class="req-list">
+        <li><strong>A lease document is required.</strong> Manual entry of deal numbers is not accepted for Founding Membership applications.</li>
+        <li><strong>New Jersey lease only.</strong> The vehicle must have been leased through an NJ dealership.</li>
+        <li><strong>Signed within the last 36 months.</strong> Older leases are not accepted.</li>
+        <li>Accepted formats: PDF, JPG, or PNG. Your document is processed to extract deal terms only.</li>
+      </ul>
+    </div>
+
+    <!-- HOW IT WORKS STEPS -->
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">01</div>
+        <div class="step-text"><strong>Complete the form</strong> with your name, email, and NJ town.</div>
+      </div>
+      <div class="step">
+        <div class="step-n">02</div>
+        <div class="step-text"><strong>Upload your lease document.</strong> PDF, photo, or screenshot — all accepted.</div>
+      </div>
+      <div class="step">
+        <div class="step-n">03</div>
+        <div class="step-text"><strong>Receive your provisional member number instantly.</strong> Your number is held while your document is verified.</div>
+      </div>
+      <div class="step">
+        <div class="step-n">04</div>
+        <div class="step-text"><strong>Verification within 48 hours.</strong> Once confirmed, your number is permanently assigned and your membership is active.</div>
       </div>
     </div>
 
-    <div class="explainer-right reveal">
-      <!-- Dark audio player for customer explainer -->
-      <div class="audio-player-dark">
-        <div class="apd-top">
-          <button class="apd-play-btn" onclick="togglePlay('customer')" id="customerPlayBtn">▶</button>
-          <div class="ap-info">
-            <div class="apd-label">How It Works · 60 seconds</div>
-            <div class="apd-title">How LeaseCheck works — and what you get</div>
-          </div>
-          <div class="ap-duration" style="color:rgba(248,245,240,0.3);font-family:var(--f-mono);font-size:11px">1:02</div>
+    <!-- THE FORM -->
+    <div class="form-wrap" id="formWrap">
+      <h2 class="form-section-title">Begin your application.</h2>
+      <p class="form-section-sub">Your provisional member number is reserved at submission. It becomes permanent once your document is verified.</p>
+
+      <!-- NAME -->
+      <div class="field-row">
+        <div class="field">
+          <label for="fn">First name</label>
+          <input type="text" id="fn" placeholder="First name" autocomplete="given-name">
+        </div>
+        <div class="field">
+          <label for="ln">Last name</label>
+          <input type="text" id="ln" placeholder="Last name" autocomplete="family-name">
+        </div>
+      </div>
+
+      <!-- EMAIL -->
+      <div class="field">
+        <label for="em">Email address</label>
+        <input type="email" id="em" placeholder="you@email.com" autocomplete="email">
+        <span class="field-error" id="emailError">Please enter a valid email address.</span>
+      </div>
+
+      <!-- NJ TOWN -->
+      <div class="field">
+        <label for="town">NJ town or city</label>
+        <input type="text" id="town" placeholder="e.g. Ramsey, Paramus, Hoboken">
+      </div>
+
+      <!-- DOCUMENT UPLOAD -->
+      <div class="upload-section">
+        <span class="upload-label">
+          Lease document
+          <span class="upload-required">Required</span>
+        </span>
+
+        <div class="upload-zone" id="uploadZone">
+          <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFileSelect(this)">
+          <div class="upload-icon" id="uploadIcon">📄</div>
+          <div class="upload-main-text" id="uploadMainText">Drop your lease document here, or click to browse</div>
+          <div class="upload-sub-text" id="uploadSubText">PDF · JPG · PNG accepted</div>
+          <div class="upload-filename" id="uploadFilename"></div>
         </div>
 
-        <div class="apd-waveform" id="customerWave"></div>
+        <span class="field-error" id="fileError">Please upload your lease document to continue.</span>
 
-        <div class="apd-track" onclick="seekAudio('customer', event)">
-          <div class="apd-progress" id="customerProgress"></div>
-        </div>
-
-        <div class="apd-bottom">
-          <div class="apd-time" id="customerTime">0:00 / 1:02</div>
-          <div class="apd-note">
-            <div class="placeholder-dot" style="background:var(--sage-lt)"></div>
-            Audio ready to drop in
+        <!-- REDACTION NOTICE -->
+        <div class="redaction-notice">
+          <div class="redaction-icon">🔒</div>
+          <div class="redaction-text">
+            <strong>Your privacy is protected.</strong> Documents are processed to extract deal terms only — monthly payment, money factor, residual, and vehicle details. Your <strong>name, address, and VIN are automatically redacted</strong> and are not stored in our database.
           </div>
         </div>
       </div>
 
-      <div style="margin-top:16px;text-align:center">
-        <div style="font-family:var(--f-mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(248,245,240,0.2)">Generated with NotebookLM · Replace src with your MP3</div>
+      <!-- RECENCY DECLARATION -->
+      <label class="recency-check">
+        <input type="checkbox" id="recencyCheck">
+        <span class="recency-check-label">
+          I confirm this is a <strong>real, signed New Jersey lease document</strong> that was executed <strong>within the last 36 months</strong>. I understand that submitting documents that do not meet this criteria will result in my application being declined.
+        </span>
+      </label>
+
+      <!-- CONSENT -->
+      <div class="consent-box">
+        By submitting this application, you agree to LeaseCheck's Terms of Service and Privacy Policy. Founding Member status is a program designation only and does not constitute a financial instrument, investment, or contractual obligation. Any future member perks are discretionary, subject to separate terms if introduced, and may be modified with reasonable notice. Your lease document will be processed for deal-term extraction only; personal identifying information is not retained.
       </div>
 
-      <!-- CTA -->
-      <div style="margin-top:32px;background:rgba(248,245,240,0.04);border:1px solid rgba(248,245,240,0.08);border-radius:16px;padding:28px 28px;">
-        <div style="font-family:var(--f-display);font-size:26px;font-weight:300;color:#f8f5f0;margin-bottom:8px;line-height:1.2;">Check your deal — free.</div>
-        <div style="font-size:13px;font-weight:300;color:rgba(248,245,240,0.45);line-height:1.7;margin-bottom:20px;">No account required. No personal data stored. 60 seconds to know where your deal stands.</div>
-        <a href="intake.html" style="display:block;background:#f8f5f0;color:var(--ink);font-family:var(--f-body);font-size:14px;font-weight:500;padding:14px 24px;border-radius:10px;text-decoration:none;text-align:center;transition:background 0.2s;" onmouseover="this.style.background='var(--copper-bg)'" onmouseout="this.style.background='#f8f5f0'">
-          Check My Lease Deal →
-        </a>
+      <button class="btn-submit" id="submitBtn" onclick="handleSubmit()">
+        Submit Application &amp; Reserve My Spot →
+      </button>
+      <p class="form-note">No payment required &middot; Provisional number assigned immediately &middot; Verified within 48 hours</p>
+    </div>
+
+    <!-- SUCCESS STATE -->
+    <div class="success" id="successBox">
+      <div class="success-header">
+        <div class="success-prov">Provisional Founding Member</div>
+        <div class="success-number" id="successNumber">#154</div>
+        <div class="success-name-label" id="successName">of 1,000</div>
+      </div>
+      <div class="success-body">
+        <h2 class="success-headline">Your spot is reserved.</h2>
+        <p class="success-sub">
+          Your provisional Founding Member number has been assigned. It becomes permanent once your lease document is verified — typically within 48 hours. We'll email you when it's confirmed.
+        </p>
+        <ul class="success-steps">
+          <li>Application received and provisional number assigned</li>
+          <li>Lease document submitted for verification</li>
+          <li>Confirmation email sent to <span id="successEmail"></span></li>
+          <li>Permanent membership active within 48 hours</li>
+        </ul>
       </div>
     </div>
 
   </div>
-</section>
+</div>
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-logo">LeaseCheck</div>
-  <ul class="footer-links">
-    <li><a href="index.html">Home</a></li>
-    <li><a href="intake.html">Check a Deal</a></li>
-    <li><a href="#">Founding Member Terms</a></li>
-    <li><a href="#">Privacy</a></li>
-    <li><a href="#">Contact</a></li>
-  </ul>
-  <div class="footer-copy">© 2026 LeaseCheck NJ</div>
+  <div class="footer-inner">
+    <span class="footer-brand">LeaseCheck &middot; New Jersey &middot; &copy; 2026</span>
+    <ul class="footer-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="intake.html">Check a deal</a></li>
+      <li><a href="privacy.html">Privacy</a></li>
+      <li><a href="terms.html">Terms</a></li>
+    </ul>
+  </div>
+  <div class="footer-legal">
+    LeaseCheck is an independent lease benchmarking service. Not affiliated with any dealership, manufacturer, or financial institution. Founding Member status is a program designation only and does not constitute a financial instrument, investment, or contractual obligation. All membership benefits are subject to platform availability and may be modified with reasonable notice.
+  </div>
 </footer>
-<div style="background:var(--canvas-2);border-top:1px solid var(--border);padding:16px 48px;text-align:center;">
-  <p style="font-family:var(--f-mono);font-size:9px;letter-spacing:0.08em;color:var(--ink-5);line-height:1.8;max-width:900px;margin:0 auto;">Founding Member Gold is a promotional membership status program, not a financial product, investment, or security. Lifetime premium access applies to LeaseCheck features as currently offered and is subject to continued platform operation. Any future member perks, partner programs, or benefits are discretionary, not guaranteed, and would be subject to availability and separate terms if introduced. LeaseCheck makes no promise of monetary value, discounts, or economic return in connection with membership.</p>
-</div>
 
 <script>
+  // Counter — Session 3: replace loadCounter() body with live Supabase query:
+  //
+  //   const { count } = await supabase
+  //     .from('founders')
+  //     .select('*', { count: 'exact', head: true })
+  //   updateCounterUI(count);
+  //
+  const TOTAL_SPOTS = 1000;
 
-// ── WAVEFORM GENERATION ────────────────────────────
-function generateWave(containerId, barClass, count = 48) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-  for (let i = 0; i < count; i++) {
-    const bar = document.createElement('div');
-    bar.className = barClass;
-    const h = 20 + Math.random() * 60;
-    bar.style.height = h + '%';
-    bar.dataset.idx = i;
-    container.appendChild(bar);
-  }
-}
+  function updateCounterUI(claimed) {
+    const remaining = TOTAL_SPOTS - claimed;
 
-generateWave('founderWave', 'wave-bar');
-generateWave('customerWave', 'apd-bar');
+    document.getElementById('claimedCount').textContent = claimed;
+    document.getElementById('remainingCount').textContent = remaining.toLocaleString();
+    document.getElementById('heroRemaining').textContent = remaining.toLocaleString();
 
-// ── AUDIO PLAYERS (placeholder — swap in real MP3) ─
-// To connect real audio: set audioSrc below to your MP3 URL
-// e.g. const founderAudio = new Audio('https://your-cdn.com/founder-explainer.mp3');
-
-const players = {
-  founder: {
-    audio: null, // new Audio('YOUR_FOUNDER_MP3_URL.mp3'),
-    playing: false,
-    progress: 0,
-    duration: 92,
-    progressEl: 'founderProgress',
-    timeEl: 'founderTime',
-    waveEl: 'founderWave',
-    btnEl: 'founderPlayBtn',
-    barClass: 'wave-bar'
-  },
-  customer: {
-    audio: null, // new Audio('YOUR_CUSTOMER_MP3_URL.mp3'),
-    playing: false,
-    progress: 0,
-    duration: 62,
-    progressEl: 'customerProgress',
-    timeEl: 'customerTime',
-    waveEl: 'customerWave',
-    btnEl: 'customerPlayBtn',
-    barClass: 'apd-bar'
-  }
-};
-
-// Demo playback simulation
-let founderTimer = null, customerTimer = null;
-
-function formatTime(s) {
-  const m = Math.floor(s / 60);
-  const sec = Math.floor(s % 60);
-  return m + ':' + String(sec).padStart(2,'0');
-}
-
-function togglePlay(id) {
-  const p = players[id];
-  const btn = document.getElementById(p.btnEl);
-  const totalSec = p.duration;
-
-  if (p.audio) {
-    // Real audio
-    if (p.playing) { p.audio.pause(); p.playing = false; btn.textContent = '▶'; }
-    else { p.audio.play(); p.playing = true; btn.textContent = '⏸'; }
-  } else {
-    // Demo simulation
-    if (p.playing) {
-      clearInterval(id === 'founder' ? founderTimer : customerTimer);
-      p.playing = false; btn.textContent = '▶';
-    } else {
-      p.playing = true; btn.textContent = '⏸';
-      const interval = setInterval(() => {
-        if (!p.playing) { clearInterval(interval); return; }
-        p.progress = Math.min(100, p.progress + (100 / totalSec / 10));
-        const elapsed = (p.progress / 100) * totalSec;
-        document.getElementById(p.progressEl).style.width = p.progress + '%';
-        document.getElementById(p.timeEl).textContent = formatTime(elapsed) + ' / ' + formatTime(totalSec);
-        const bars = document.getElementById(p.waveEl).querySelectorAll('.' + p.barClass);
-        const playedCount = Math.floor((p.progress / 100) * bars.length);
-        bars.forEach((b, i) => {
-          b.classList.toggle('played', i < playedCount);
-        });
-        if (p.progress >= 100) {
-          clearInterval(interval); p.playing = false;
-          btn.textContent = '▶'; p.progress = 0;
-        }
-      }, 100);
-      if (id === 'founder') founderTimer = interval;
-      else customerTimer = interval;
+    // Urgency trigger at 50 spots remaining
+    if (remaining <= 50) {
+      document.getElementById('remainingCount').style.color = '#c8a96a';
+      document.getElementById('urgencyLine').style.display = 'block';
+      document.getElementById('heroRemaining').style.color = '#a8692e';
     }
   }
-}
 
-function seekAudio(id, e) {
-  const p = players[id];
-  const track = e.currentTarget;
-  const rect = track.getBoundingClientRect();
-  const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-  p.progress = pct * 100;
-  document.getElementById(p.progressEl).style.width = p.progress + '%';
-  if (p.audio) p.audio.currentTime = pct * p.duration;
-}
+  // Hardcoded until Session 3 — replace with async loadCounter()
+  updateCounterUI(153);
 
-// ── SPOTS COUNTER ──────────────────────────────────
-let membersClaimed = 153;
+  // Drag and drop
+  const zone = document.getElementById('uploadZone');
 
-function updateSpots(claimed) {
-  membersClaimed = claimed;
-  document.getElementById('spotsNum').textContent = claimed.toLocaleString();
-  document.getElementById('spotsNav').textContent = claimed.toLocaleString() + ' of 1,000 claimed';
-  const fillPct = (claimed / 1000) * 100;
-  document.getElementById('spotsBarFill').style.width = fillPct + '%';
-}
-
-updateSpots(153);
-
-// ── FORM VALIDATION ────────────────────────────────
-function checkForm() {
-  const first  = document.getElementById('sf-first').value.trim();
-  const last   = document.getElementById('sf-last').value.trim();
-  const email  = document.getElementById('sf-email').value.trim();
-  const town   = document.getElementById('sf-town').value;
-  const consent = document.getElementById('sf-consent').checked;
-  const valid = first && last && email.includes('@') && town && consent;
-  document.getElementById('submitBtn').disabled = !valid;
-}
-
-// ── SUBMIT ─────────────────────────────────────────
-let founderNumber = null;
-
-function submitFounder() {
-  const btn = document.getElementById('submitBtn');
-  btn.textContent = 'Claiming your spot…';
-  btn.disabled = true;
-
-  // Generate founder number
-  founderNumber = membersClaimed + 1;
-
-  setTimeout(() => {
-    // Save to session
-    const data = {
-      firstName: document.getElementById('sf-first').value.trim(),
-      lastName: document.getElementById('sf-last').value.trim(),
-      email: document.getElementById('sf-email').value.trim(),
-      town: document.getElementById('sf-town').value,
-      founderNum: founderNumber,
-      coins: 2000,
-      joinedAt: new Date().toISOString()
-    };
-    sessionStorage.setItem('founderData', JSON.stringify(data));
-
-    // Show success
-    document.getElementById('signupForm').style.display = 'none';
-    document.getElementById('successState').style.display = 'block';
-    document.getElementById('founderNum').textContent = String(founderNumber).padStart(3, '0');
-    document.getElementById('referralUrl').textContent = 'leasecheck.nj/join?ref=LC' + String(founderNumber).padStart(4,'0');
-
-    // Increment claimed count
-    updateSpots(membersClaimed + 1);
-  }, 1400);
-}
-
-function copyReferral() {
-  const url = document.getElementById('referralUrl').textContent;
-  navigator.clipboard.writeText('https://' + url).then(() => {
-    document.querySelector('.referral-copy').textContent = '✓ Copied!';
-    setTimeout(() => document.querySelector('.referral-copy').textContent = 'Copy Link', 2000);
+  zone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    zone.classList.add('drag-over');
   });
-}
-
-// ── PLATINUM CARD PARALLAX ─────────────────────────
-const cardScene = document.getElementById('cardSceneEmbed');
-const cardEl = document.getElementById('cardEmbed');
-if (cardScene && cardEl) {
-  cardScene.addEventListener('mousemove', (e) => {
-    const rect = cardScene.getBoundingClientRect();
-    const dx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
-    const dy = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
-    cardEl.style.animation = 'none';
-    cardEl.style.transform = `rotateX(${-dy * 14}deg) rotateY(${dx * 18}deg)`;
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    zone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) applyFile(file);
   });
-  cardScene.addEventListener('mouseleave', () => {
-    cardEl.style.animation = 'cardFloat 6s ease-in-out infinite';
-    cardEl.style.transform = '';
-  });
-}
 
-// ── SCROLL REVEAL ──────────────────────────────────
-const obs = new IntersectionObserver((entries) => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: 0.08 });
-document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+  function handleFileSelect(input) {
+    if (input.files && input.files[0]) {
+      applyFile(input.files[0]);
+    }
+  }
 
-const milestoneObs = new IntersectionObserver((entries) => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: 0.1 });
-document.querySelectorAll('.milestone-item').forEach(el => milestoneObs.observe(el));
+  function applyFile(file) {
+    const allowed = ['application/pdf', 'image/jpeg', 'image/png'];
+    if (!allowed.includes(file.type)) {
+      alert('Please upload a PDF, JPG, or PNG file.');
+      return;
+    }
+    zone.classList.add('has-file');
+    document.getElementById('uploadIcon').textContent = '✓';
+    document.getElementById('uploadMainText').textContent = 'Document ready';
+    document.getElementById('uploadSubText').textContent = '';
+    document.getElementById('uploadFilename').textContent = file.name;
+    document.getElementById('fileError').classList.remove('show');
+  }
+
+  function handleSubmit() {
+    let valid = true;
+
+    const fn    = document.getElementById('fn').value.trim();
+    const ln    = document.getElementById('ln').value.trim();
+    const em    = document.getElementById('em').value.trim();
+    const town  = document.getElementById('town').value.trim();
+    const file  = document.getElementById('fileInput').files[0];
+    const check = document.getElementById('recencyCheck').checked;
+
+    // Email validation
+    document.getElementById('emailError').classList.remove('show');
+    if (!fn) { alert('Please enter your first name.'); return; }
+    if (!em || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) {
+      document.getElementById('emailError').classList.add('show');
+      valid = false;
+    }
+
+    // File validation
+    document.getElementById('fileError').classList.remove('show');
+    if (!file) {
+      document.getElementById('fileError').classList.add('show');
+      valid = false;
+    }
+
+    // Recency check
+    if (!check) {
+      alert('Please confirm that your lease document meets the requirements before submitting.');
+      return;
+    }
+
+    if (!valid) return;
+
+    // Session 3: wire to Supabase — insert into founders table + upload file to storage
+    // For now: assign provisional number and show success state
+    const provisionalNumber = 153 + 1; // Session 3: use live count from Supabase
+
+    document.getElementById('successNumber').textContent = '#' + provisionalNumber;
+    document.getElementById('successEmail').textContent = em;
+    document.getElementById('formWrap').style.display = 'none';
+    document.getElementById('successBox').classList.add('show');
+    window.scrollTo({
+      top: document.getElementById('successBox').offsetTop - 100,
+      behavior: 'smooth'
+    });
+  }
 </script>
+
 </body>
 </html>
