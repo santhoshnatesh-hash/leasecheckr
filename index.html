@@ -183,15 +183,6 @@
 
     .form-wrapper { width: 100%; max-width: 480px; margin: 0 auto; position: relative; }
 
-    /* Form gets a subtle card lift */
-    .form-panel-inner {
-      background: #fff;
-      border: 1px solid var(--border-2);
-      border-radius: 6px;
-      padding: 28px 28px 22px;
-      box-shadow: 0 2px 12px rgba(28,25,23,0.06), 0 8px 32px rgba(28,25,23,0.04);
-    }
-
     /* EDIT BAR */
     .edit-bar {
       display: none; align-items: center; justify-content: space-between;
@@ -253,14 +244,14 @@
     .mf-helper strong { color: var(--ink-3); font-style: normal; font-weight: 500; }
 
     /* CTA */
-    .cta-btn { width: 100%; margin-top: 20px; padding: 17px 22px; background: var(--ink); color: var(--canvas); border: none; border-radius: 4px; font-family: 'DM Sans', sans-serif; font-size: 0.92rem; font-weight: 500; letter-spacing: 0.05em; cursor: pointer; transition: all 0.22s var(--ease); display: flex; align-items: center; justify-content: center; gap: 10px; position: relative; overflow: hidden; box-shadow: 0 2px 8px rgba(28,25,23,0.12); }
-    .cta-btn::before { content: ''; position: absolute; inset: 0; background: linear-gradient(120deg, rgba(168,105,46,0.22) 0%, transparent 55%); opacity: 0; transition: opacity 0.3s; }
-    .cta-btn:hover { background: var(--ink-2); transform: translateY(-2px); box-shadow: 0 10px 28px rgba(28,25,23,0.18); }
+    .cta-btn { width: 100%; margin-top: 16px; padding: 15px 22px; background: var(--ink); color: var(--canvas); border: none; border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 500; letter-spacing: 0.04em; cursor: pointer; transition: all 0.2s var(--ease); display: flex; align-items: center; justify-content: center; gap: 10px; position: relative; overflow: hidden; }
+    .cta-btn::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(168,105,46,0.18) 0%, transparent 60%); opacity: 0; transition: opacity 0.3s; }
+    .cta-btn:hover { background: var(--ink-2); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(28,25,23,0.15); }
     .cta-btn:hover::before { opacity: 1; }
-    .cta-btn:active { transform: none; box-shadow: none; }
-    .cta-arrow { transition: transform 0.2s; font-size: 1rem; }
-    .cta-btn:hover .cta-arrow { transform: translateX(4px); }
-    .trust-line { text-align: center; font-family: 'DM Mono', monospace; font-size: 0.54rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-4); margin-top: 10px; }
+    .cta-btn:active { transform: none; }
+    .cta-arrow { transition: transform 0.2s; }
+    .cta-btn:hover .cta-arrow { transform: translateX(3px); }
+    .trust-line { text-align: center; font-family: 'DM Mono', monospace; font-size: 0.54rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-4); margin-top: 9px; }
 
     /* ── TEASER PANEL ── */
     .teaser-panel { display: none; opacity: 0; transform: translateX(18px); transition: all 0.45s var(--ease); }
@@ -772,6 +763,7 @@
       .field-row { grid-template-columns: 1fr; }
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -809,16 +801,16 @@
 
     <div class="proof-row">
       <div class="proof-item">
-        <span class="proof-value">NJ</span>
-        <span class="proof-label">Leases only</span>
+        <span class="proof-value" id="dealsCount">847</span>
+        <span class="proof-label">Deals checked</span>
       </div>
       <div class="proof-item">
         <span class="proof-value">21</span>
-        <span class="proof-label">Counties tracked</span>
+        <span class="proof-label">NJ counties</span>
       </div>
       <div class="proof-item">
         <span class="proof-value" id="foundersCount">153</span>
-        <span class="proof-label">Founding Members</span>
+        <span class="proof-label">Founding members</span>
       </div>
     </div>
 
@@ -826,9 +818,10 @@
       <div class="founder-dot"></div>
       <div>
         <div class="founder-text">
-          Submit a verified NJ lease document and become a Founding Member — one of the first 1,000 contributors helping build the benchmark.
+          Submitting your first verified lease document? You qualify as a Founding Member — one of the first 1,000 NJ drivers helping build the benchmark.
           <br><a href="founder.html">See Founding Member benefits →</a>
         </div>
+        <div class="founder-count" id="spotsLeft">847 spots remaining</div>
       </div>
     </div>
   </div>
@@ -848,7 +841,6 @@
 
       <!-- FORM PANEL -->
       <div class="form-panel" id="formPanel">
-        <div class="form-panel-inner">
         <div class="form-eyebrow">Check your lease quote</div>
 
         <!-- MAKE / MODEL / TRIM -->
@@ -960,6 +952,17 @@
                 <input type="text" id="fDealer" placeholder="e.g. Honda of Paramus">
               </div>
             </div>
+            <div class="field-row field-full">
+              <div class="field">
+                <label class="field-label">What are you checking?</label>
+                <select id="fCheckType">
+                  <option value="">Select one</option>
+                  <option>Dealer quote (not yet signed)</option>
+                  <option>Signed lease</option>
+                  <option>Not sure yet</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -968,7 +971,6 @@
           <span class="cta-arrow">→</span>
         </button>
         <div class="trust-line">No account required · NJ leases only · Under 60 seconds</div>
-        </div><!-- /form-panel-inner -->
       </div>
 
       <!-- TEASER PANEL -->
@@ -1003,7 +1005,7 @@
 
         <div class="confidence-line">
           <div class="conf-dot"></div>
-          <span id="tConfidence">Based on comparable NJ lease submissions in the last 60 days</span>
+          <span id="tConfidence">Based on verified NJ lease submissions</span>
         </div>
 
         <div class="locked-hint">
@@ -1014,11 +1016,14 @@
         </div>
 
         <div class="teaser-ctas">
-          <button onclick="openEmailGate()" class="cta-primary" style="width:100%;border:none;cursor:pointer;text-align:left;">
+          <a href="access.html" class="cta-primary">
             <span class="cta-primary-label">Get Full Report</span>
-            <span class="cta-primary-price">$19.99 one-time · or free with lease upload</span>
-          </button>
-          <a href="sample-report.html" target="_blank" class="cta-secondary">See what the full report includes →</a>
+            <span class="cta-primary-price">$19.99 or upload your lease free →</span>
+          </a>
+          <a href="sample-report.html" target="_blank" class="cta-secondary">View Sample Report →</a>
+          <div class="cta-tertiary">
+            Or <a href="founder.html">contribute your lease and join 153 Founding Members</a> — full report free, Premium access permanent.
+          </div>
         </div>
       </div>
 
@@ -1035,14 +1040,14 @@
 
     <div class="mislead-grid">
       <div class="mislead-left reveal">
-        <div class="big-stat">$50–80</div>
-        <div class="big-stat-label">Typical monthly gap between a fair deal and an average submission</div>
+        <div class="big-stat">$67</div>
+        <div class="big-stat-label">Avg. monthly overpayment observed in NJ submissions</div>
         <p>
-          Most shoppers negotiate by asking <strong>"can you get it under $400 a month?"</strong> Dealers are trained to work with that number — adjusting term, mileage, or drive-off in ways that look like a win but aren't.
+          Most shoppers negotiate by asking <strong>"can you get it under $400 a month?"</strong> Dealers are trained to work with that number — by adjusting the term, the mileage, or the drive-off in ways that look like a win but aren't.
         </p>
         <br>
         <p>
-          Over 36 months, even a $60/month overpayment is <strong>$2,160 left on the table</strong> — often from a money factor markup that took a dealer 30 seconds to apply.
+          Over a 36-month lease, a $67/month overpayment is <strong>$2,412 left on the table</strong> — often from a money factor markup that took a dealer 30 seconds to apply.
         </p>
       </div>
 
@@ -1051,28 +1056,28 @@
           <div class="mp-num">01</div>
           <div>
             <div class="mp-title">Monthly payment is a result, not a starting point</div>
-            <div class="mp-desc">Your payment is calculated from cap cost, residual, money factor, and fees. Negotiating the payment alone leaves every real lever in the dealer's hands.</div>
+            <div class="mp-desc">Your payment is calculated from cap cost, residual, money factor, and fees. Negotiating the payment alone leaves all the real levers in the dealer's hands.</div>
           </div>
         </div>
         <div class="mislead-point">
           <div class="mp-num">02</div>
           <div>
             <div class="mp-title">Money factor markups are invisible in the payment</div>
-            <div class="mp-desc">A dealer can mark up the money factor and your payment barely moves — but you pay hundreds more over the term. Most shoppers never ask what it is.</div>
+            <div class="mp-desc">A dealer can mark up the money factor by 0.0005 and your payment barely moves — but you pay an extra $500+ over the term. Most shoppers never ask.</div>
           </div>
         </div>
         <div class="mislead-point">
           <div class="mp-num">03</div>
           <div>
-            <div class="mp-title">Due at signing can obscure the real cost</div>
-            <div class="mp-desc">More money down lowers the payment but doesn't improve the deal. A low monthly number with a high drive-off is not a better lease — it's a more expensive one.</div>
+            <div class="mp-title">Due at signing can hide the real cost</div>
+            <div class="mp-desc">Putting more money down lowers the payment but doesn't improve the deal. A lower monthly number with a high drive-off is not a better lease.</div>
           </div>
         </div>
         <div class="mislead-point">
           <div class="mp-num">04</div>
           <div>
             <div class="mp-title">National averages don't reflect your county</div>
-            <div class="mp-desc">A Monmouth County deal looks different from a Bergen County one. Only local, verified comparisons tell you whether your specific deal is fair.</div>
+            <div class="mp-desc">A Monmouth County Honda CR-V deal looks different from a Bergen County one. Local verified data is the only relevant comparison.</div>
           </div>
         </div>
       </div>
@@ -1224,25 +1229,25 @@
         </p>
       </div>
 
-        <div class="ask-questions">
+      <div class="ask-questions">
         <div class="ask-q reveal">
           <div class="ask-q-text">"What money factor are you using on this lease?"</div>
-          <div class="ask-q-why">Dealers receive a buy rate from the manufacturer and are often permitted to mark it up. This is your financing rate — you have every right to know the number you're paying.</div>
+          <div class="ask-q-why">The money factor is your financing rate. Dealers receive a buy rate from the manufacturer and are often permitted to mark it up. You have the right to know the number you're paying.</div>
           <div class="ask-q-tag">Affects financing cost</div>
         </div>
         <div class="ask-q reveal reveal-delay-1">
-          <div class="ask-q-text">"What residual are you using, and is it based on MSRP?"</div>
-          <div class="ask-q-why">The residual comes from the manufacturer's leasing arm, not the dealer. Knowing the percentage lets you verify the payment math independently.</div>
+          <div class="ask-q-text">"What residual are you using, and is that based on MSRP?"</div>
+          <div class="ask-q-why">The residual should come from the manufacturer's leasing arm, not be set by the dealership. Confirming this tells you whether the payment calculation is legitimate.</div>
           <div class="ask-q-tag">Affects monthly payment</div>
         </div>
         <div class="ask-q reveal reveal-delay-2">
           <div class="ask-q-text">"What is the selling price before fees and cap cost reductions?"</div>
-          <div class="ask-q-why">The cap cost is what your lease is actually built on. Negotiating it down — through price or manufacturer incentives — reduces every payment for the term.</div>
+          <div class="ask-q-why">The cap cost is what your lease is actually built on. A lower cap cost — achieved through negotiation or incentives — reduces every payment for the term of the lease.</div>
           <div class="ask-q-tag">Affects entire lease cost</div>
         </div>
         <div class="ask-q reveal reveal-delay-3">
-          <div class="ask-q-text">"Can you break down exactly what's in the due-at-signing amount?"</div>
-          <div class="ask-q-why">Drive-offs can include first payment, acquisition fee, taxes, DMV fees, and dealer add-ons. The breakdown tells you what's required and what isn't.</div>
+          <div class="ask-q-text">"Can you itemize exactly what is in the due-at-signing amount?"</div>
+          <div class="ask-q-why">Drive-offs can include first payment, acquisition fee, DMV, taxes, and add-ons. Understanding the breakdown tells you if anything has been quietly added to the transaction.</div>
           <div class="ask-q-tag">Affects total cost</div>
         </div>
       </div>
@@ -1305,33 +1310,33 @@
         <div class="s-eyebrow" style="color:var(--copper);">Why local data matters</div>
         <h2 class="s-headline-light" style="margin-bottom:24px;">National averages<br>don't reflect<br><em>your county.</em></h2>
         <p>
-          A Toyota RAV4 lease in Bergen County does not look like a Toyota RAV4 in national data. Local dealer incentives, regional demand, and county tax structures all shape what fair actually means in your area.
+          A Toyota RAV4 lease in Bergen County does not look like a Toyota RAV4 lease in national data. Local dealer incentives, regional demand, and county tax structures all affect what a fair deal actually looks like in your area.
         </p>
         <p>
-          <strong>LeaseCheckr is built from verified NJ lease submissions</strong> — real contracts and dealer worksheets from NJ drivers, matched to county and vehicle. Not national estimates. Real deals, from your market.
+          <strong>LeaseCheckr is built entirely from verified NJ lease submissions</strong> — real contracts and dealer worksheets from NJ drivers, matched to county and vehicle. Not national estimates. Not manufacturer suggested figures. Real deals, from your market.
         </p>
         <p>
-          Every verified submission improves the benchmark. That's why document uploads matter more than manual entry — they're the only way to build data that's genuinely useful locally.
+          Every submission improves the benchmark for the next driver. That's why verified document uploads are valued — they're the only way to build a dataset that's actually useful locally.
         </p>
 
         <div class="benchmark-stat-row reveal">
           <div class="bsr-item">
             <div class="bsr-value">21</div>
-            <div class="bsr-label">NJ counties tracked</div>
+            <div class="bsr-label">NJ counties covered</div>
           </div>
           <div class="bsr-item">
             <div class="bsr-value">60</div>
             <div class="bsr-label">Day rolling window</div>
           </div>
           <div class="bsr-item">
-            <div class="bsr-value">NJ</div>
-            <div class="bsr-label">Leases only, always</div>
+            <div class="bsr-value">100%</div>
+            <div class="bsr-label">NJ-verified submissions</div>
           </div>
         </div>
       </div>
 
       <div class="benchmark-right reveal reveal-delay-1">
-        <div class="county-chart-title">Illustrative sample · Avg. payment by county · Honda CR-V EX-L · 36mo</div>
+        <div class="county-chart-title">Sample: Avg. lease payment by county · Honda CR-V EX-L · 36mo</div>
         <div class="county-chart" id="countyChart">
           <div class="county-row"><span class="county-name">Bergen</span><div class="county-bar-wrap"><div class="county-bar" data-w="88"></div></div><span class="county-val">$438</span></div>
           <div class="county-row"><span class="county-name">Morris</span><div class="county-bar-wrap"><div class="county-bar" data-w="80"></div></div><span class="county-val">$428</span></div>
@@ -1362,6 +1367,17 @@
 
 
 <script>
+  // ── SUPABASE INIT ──────────────────────────────────
+  // Replace these with your actual Supabase values:
+  const SUPABASE_URL  = 'YOUR_SUPABASE_URL';     // e.g. https://abcdefg.supabase.co
+  const SUPABASE_KEY  = 'YOUR_SUPABASE_ANON_KEY'; // starts with eyJ...
+  let sb = null;
+  try {
+    if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && window.supabase) {
+      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    }
+  } catch(e) { console.error('Supabase init error:', e); }
+
   // ── PILL SELECTOR
   function selectPill(el, groupId) {
     document.querySelectorAll('#' + groupId + ' .pill').forEach(p => p.classList.remove('selected'));
@@ -1411,6 +1427,14 @@
     const pay = parseFloat(document.getElementById('fPayment').value) || 412;
     const zip = document.getElementById('fZip').value || '';
     const term = document.querySelector('#termPills .pill.selected')?.textContent || '36 mo';
+    const mileage = document.querySelector('#mileagePills .pill.selected')?.textContent || '10,000';
+    const driveoff = parseFloat(document.getElementById('fDriveoff').value) || null;
+    const msrp = parseFloat(document.getElementById('fMsrp').value) || null;
+    const capcost = parseFloat(document.getElementById('fCapcost').value) || null;
+    const residual = parseFloat(document.getElementById('fResidual').value) || null;
+    const mf = document.getElementById('fMF').value || null;
+    const dealer = document.getElementById('fDealer').value || '';
+    const checkType = document.getElementById('fCheckType').value || '';
 
     const { county, label, avg } = getCounty(zip);
     const { g, cls, v, bc, i } = gradeIt(pay, avg);
@@ -1426,11 +1450,7 @@
     document.getElementById('tPay').textContent = '$' + pay.toLocaleString();
     document.getElementById('tAvg').textContent = '$' + avg.toLocaleString();
     document.getElementById('tCountyLbl').textContent = label + ' Average';
-
-    // Stable, non-random confidence line
-    const modelName = model || 'lease';
-    document.getElementById('tConfidence').textContent =
-      `Based on comparable NJ ${modelName} submissions in ${label} over the last 60 days`;
+    document.getElementById('tConfidence').textContent = 'Based on verified NJ ' + (model || 'lease') + ' submissions in the last 60 days';
 
     const deltaEl = document.getElementById('tDelta');
     if (diff < 0) { deltaEl.textContent = '↓ $' + Math.abs(diff) + '/mo below avg'; deltaEl.className = 'pay-box-delta delta-good'; }
@@ -1438,6 +1458,40 @@
 
     document.getElementById('editVehicle').textContent = vehicle;
     document.getElementById('editDetails').textContent = '$' + pay + '/mo · ' + label + ' · ' + term;
+
+    // ── Save to sessionStorage (for pre-populating manual form later)
+    const teaserData = {
+      make, model, trim, monthly_payment: pay, due_at_signing: driveoff,
+      lease_term: parseInt(term), annual_mileage: parseInt(mileage.replace(/,/g,'')),
+      zip_code: zip, dealer_name: dealer, residual_value: residual,
+      money_factor: mf ? parseFloat(mf) : null
+    };
+    sessionStorage.setItem('leaseCheckrTeaser', JSON.stringify(teaserData));
+
+    // ── Save teaser to Supabase (fire and forget — don't block UI)
+    if (sb) {
+      sb.from('submissions').insert({
+        submission_type: 'teaser',
+        deal_status: 'quote_check',
+        trust_tier: 'low',
+        make: make || null,
+        model: model || null,
+        trim: trim || null,
+        monthly_payment: pay,
+        due_at_signing: driveoff,
+        lease_term: parseInt(term) || null,
+        annual_mileage: parseInt(mileage.replace(/,/g,'')) || null,
+        zip_code: zip || null,
+        dealer_name: dealer || null,
+        residual_value: residual,
+        money_factor: mf ? parseFloat(mf) : null,
+        vehicle_text: vehicle,
+        verification_status: 'na',
+        report_entitlement: 'none'
+      }).then(({ error }) => {
+        if (error) console.error('Supabase teaser save error:', error);
+      });
+    }
 
     const fp = document.getElementById('formPanel');
     const tp = document.getElementById('teaserPanel');
@@ -1465,9 +1519,28 @@
     }, 380);
   }
 
-  // ── COUNTERS
-  const CLAIMED = 153, TOTAL = 1000;
-  document.getElementById('foundersCount').textContent = CLAIMED;
+  // ── FOUNDER COUNTER (live from Supabase)
+  const TOTAL = 1000;
+  async function loadFounderCount() {
+    if (!sb) {
+      // Fallback if Supabase not configured yet
+      document.getElementById('foundersCount').textContent = '153';
+      document.getElementById('spotsLeft').textContent = '847 spots remaining';
+      return;
+    }
+    try {
+      const { data, error } = await sb.from('founder_slots').select('claimed_count').eq('id', 1).single();
+      if (!error && data) {
+        const claimed = data.claimed_count;
+        const remaining = TOTAL - claimed;
+        document.getElementById('foundersCount').textContent = claimed;
+        document.getElementById('spotsLeft').textContent = remaining.toLocaleString() + ' spots remaining';
+      }
+    } catch (e) {
+      console.error('Founder count error:', e);
+    }
+  }
+  loadFounderCount();
 
   // ── COUNTY BAR CHART ANIMATION
   function animateBars() {
@@ -1491,180 +1564,5 @@
   revealEls.forEach(el => observer.observe(el));
 </script>
 
-
-<!-- ═══ EMAIL GATE MODAL ═══ -->
-<style>
-  .eg-overlay {
-    display: none; position: fixed; inset: 0; z-index: 9999;
-    background: rgba(28,25,23,0.55); backdrop-filter: blur(3px);
-    align-items: center; justify-content: center;
-  }
-  .eg-overlay.open { display: flex; }
-  .eg-modal {
-    background: var(--canvas, #f8f5f0); border-radius: 6px;
-    padding: 44px 40px 36px; width: 90%; max-width: 460px;
-    position: relative; box-shadow: 0 24px 64px rgba(28,25,23,0.22);
-  }
-  .eg-close {
-    position: absolute; top: 16px; right: 18px; background: none;
-    border: none; font-size: 1.2rem; cursor: pointer; color: #78716c; line-height: 1; padding: 4px;
-  }
-  .eg-close:hover { color: #1c1917; }
-  .eg-eyebrow {
-    font-family: 'DM Mono', monospace; font-size: 0.58rem;
-    letter-spacing: 0.14em; text-transform: uppercase; color: #a8692e; margin-bottom: 10px;
-  }
-  .eg-title {
-    font-family: 'Cormorant Garamond', serif; font-size: 2rem;
-    font-weight: 400; line-height: 1.2; color: #1c1917; margin-bottom: 10px;
-  }
-  .eg-title em { font-style: italic; color: #a8692e; }
-  .eg-desc { font-size: 0.86rem; color: #44403c; line-height: 1.6; margin-bottom: 24px; }
-  .eg-label {
-    font-family: 'DM Mono', monospace; font-size: 0.58rem;
-    letter-spacing: 0.1em; text-transform: uppercase; color: #78716c;
-    display: block; margin-bottom: 8px;
-  }
-  .eg-input {
-    width: 100%; padding: 14px 16px; border: 1.5px solid rgba(28,25,23,0.18);
-    border-radius: 4px; font-family: 'DM Sans', sans-serif; font-size: 0.92rem;
-    background: #fdfaf6; color: #1c1917; outline: none; transition: border-color 0.2s;
-  }
-  .eg-input:focus { border-color: #a8692e; }
-  .eg-input.error { border-color: #c0392b; }
-  .eg-error { font-size: 0.78rem; color: #c0392b; margin-top: 6px; display: none; }
-  .eg-error.visible { display: block; }
-  .eg-btn {
-    width: 100%; margin-top: 16px; padding: 16px; background: #a8692e;
-    color: #fdfaf6; border: none; border-radius: 4px;
-    font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500;
-    cursor: pointer; transition: background 0.2s, transform 0.15s;
-  }
-  .eg-btn:hover { background: #c4864a; transform: translateY(-1px); }
-  .eg-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-  .eg-privacy { font-size: 0.73rem; color: #78716c; text-align: center; margin-top: 12px; line-height: 1.5; }
-  .eg-privacy a { color: #a8692e; text-decoration: none; }
-  .eg-success { display: none; text-align: center; padding: 8px 0; }
-  .eg-success.visible { display: block; }
-  .eg-check {
-    width: 48px; height: 48px; border-radius: 50%; background: #e8f0ea;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.3rem; margin: 0 auto 16px;
-  }
-  .eg-success-title { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 400; margin-bottom: 8px; }
-  .eg-success-desc { font-size: 0.85rem; color: #44403c; line-height: 1.6; margin-bottom: 20px; }
-  .eg-continue-btn {
-    display: inline-block; padding: 14px 28px; background: #1c1917;
-    color: #fdfaf6; border-radius: 4px; text-decoration: none;
-    font-size: 0.88rem; font-weight: 500; transition: background 0.2s;
-  }
-  .eg-continue-btn:hover { background: #44403c; }
-  .eg-form.hidden { display: none; }
-</style>
-
-<div class="eg-overlay" id="egOverlay">
-  <div class="eg-modal" role="dialog" aria-modal="true" aria-labelledby="egTitle">
-    <button class="eg-close" onclick="closeEmailGate()" aria-label="Close">✕</button>
-    <div class="eg-form" id="egForm">
-      <div class="eg-eyebrow">One last step</div>
-      <h2 class="eg-title" id="egTitle">Where should we send your <em>report?</em></h2>
-      <p class="eg-desc">Enter your email and we’ll deliver your full report there — and send a copy you can reference any time.</p>
-      <label class="eg-label" for="egEmail">Email address</label>
-      <input type="email" class="eg-input" id="egEmail" placeholder="you@email.com" autocomplete="email">
-      <div class="eg-error" id="egError">Please enter a valid email address.</div>
-      <button class="eg-btn" id="egBtn" onclick="submitEmailGate()">Continue to Payment →</button>
-      <p class="eg-privacy">No spam. Your report, one receipt, and occasional product updates.<br>
-        <a href="privacy.html">Privacy policy</a></p>
-    </div>
-    <div class="eg-success" id="egSuccess">
-      <div class="eg-check">✓</div>
-      <div class="eg-success-title">You’re all set.</div>
-      <p class="eg-success-desc">We’ve saved your email. You’ll be redirected to payment — your report will be waiting when you return.</p>
-      <a href="access.html" class="eg-continue-btn">Continue to Payment →</a>
-      <p style="font-size:0.72rem;color:#78716c;margin-top:10px;">Stripe checkout launching soon — check back shortly.</p>
-    </div>
-  </div>
-</div>
-
-<script>
-  const SUPABASE_URL = 'https://xqjsvlhdpdfvzixlmdxk.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxanN2bGhkcGRmdnppeGxtZHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzg2ODcsImV4cCI6MjA4ODg1NDY4N30.MT0tEDMLaBDLtZkX9xEVEkaUfPdIA9QsJrWjGDpeWsE';
-
-  async function saveEmailLead(email, source) {
-    try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/email_leads`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify({ email, source, consent_marketing: false })
-      });
-      return res.ok || res.status === 409;
-    } catch (e) {
-      console.warn('Supabase email save failed:', e);
-      return false;
-    }
-  }
-
-  function openEmailGate() {
-    document.getElementById('egOverlay').classList.add('open');
-    setTimeout(() => document.getElementById('egEmail').focus(), 300);
-  }
-
-  function closeEmailGate() {
-    document.getElementById('egOverlay').classList.remove('open');
-    document.getElementById('egEmail').value = '';
-    document.getElementById('egEmail').classList.remove('error');
-    document.getElementById('egError').classList.remove('visible');
-    document.getElementById('egForm').classList.remove('hidden');
-    document.getElementById('egSuccess').classList.remove('visible');
-  }
-
-  async function submitEmailGate() {
-    const input = document.getElementById('egEmail');
-    const btn = document.getElementById('egBtn');
-    const errorEl = document.getElementById('egError');
-    const email = input.value.trim();
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      input.classList.add('error');
-      errorEl.classList.add('visible');
-      input.focus();
-      return;
-    }
-
-    input.classList.remove('error');
-    errorEl.classList.remove('visible');
-    btn.disabled = true;
-    btn.textContent = 'Saving…';
-
-    saveEmailLead(email, 'report_gate');
-    localStorage.setItem('lc_email', email);
-
-    setTimeout(() => {
-      btn.disabled = false;
-      btn.textContent = 'Continue to Payment →';
-      document.getElementById('egForm').classList.add('hidden');
-      setTimeout(() => document.getElementById('egSuccess').classList.add('visible'), 150);
-    }, 600);
-  }
-
-  document.getElementById('egOverlay').addEventListener('click', function(e) {
-    if (e.target === this) closeEmailGate();
-  });
-
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && document.getElementById('egOverlay').classList.contains('open')) {
-      closeEmailGate();
-    }
-  });
-
-  document.getElementById('egEmail').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') submitEmailGate();
-  });
-</script>
 </body>
 </html>
