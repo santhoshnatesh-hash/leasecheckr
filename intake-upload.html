@@ -1,582 +1,1566 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Get Full Access — LeaseCheckr</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --canvas: #f8f5f0;
-      --ink: #1c1917;
-      --ink-light: #44403c;
-      --ink-muted: #78716c;
-      --copper: #a8692e;
-      --copper-lt: #c4864a;
-      --copper-pale: #f0e4d4;
-      --sage: #5c7a65;
-      --sage-pale: #e8f0ea;
-      --cream: #fdfaf6;
-      --border: rgba(28,25,23,0.11);
-      --border-strong: rgba(28,25,23,0.22);
-    }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--canvas);
-      color: var(--ink);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* NAV */
-    nav {
-      padding: 0 48px;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border);
-      background: var(--canvas);
-    }
-
-    .nav-logo {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.35rem;
-      font-weight: 500;
-      color: var(--ink);
-      text-decoration: none;
-    }
-
-    .nav-logo span { color: var(--copper); }
-
-    .nav-back {
-      font-size: 0.78rem;
-      color: var(--ink-muted);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: color 0.2s;
-    }
-
-    .nav-back:hover { color: var(--ink); }
-
-    /* MAIN */
-    main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 60px 48px 80px;
-    }
-
-    /* HEADER */
-    .page-header {
-      text-align: center;
-      margin-bottom: 56px;
-      max-width: 540px;
-    }
-
-    .page-eyebrow {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--copper);
-      margin-bottom: 16px;
-    }
-
-    .page-header h1 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(2.2rem, 4vw, 3rem);
-      font-weight: 400;
-      line-height: 1.15;
-      color: var(--ink);
-      margin-bottom: 14px;
-    }
-
-    .page-header h1 em {
-      font-style: italic;
-      color: var(--copper);
-    }
-
-    .page-header p {
-      font-size: 0.95rem;
-      color: var(--ink-muted);
-      line-height: 1.7;
-    }
-
-    /* CARDS */
-    .cards {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      width: 100%;
-      max-width: 860px;
-      min-width: 0;
-      align-items: stretch;
-      position: relative;
-    }
-
-    .cards::after {
-      content: 'or';
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: var(--canvas);
-      border: 1px solid var(--border-strong);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.08em;
-      color: var(--ink-muted);
-      z-index: 10;
-      pointer-events: none;
-    }
-
-    /* OPTION CARD BASE */
-    .option-card {
-      border-radius: 4px;
-      padding: 44px 40px;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      overflow: hidden;
-      transition: transform 0.2s;
-    }
-
-    .option-card:hover { transform: translateY(-2px); }
-
-    /* PAY CARD — dark */
-    .card-pay {
-      background: var(--ink);
-      color: var(--canvas);
-    }
-
-    .card-pay::before {
-      content: '';
-      position: absolute;
-      top: -80px; right: -80px;
-      width: 260px; height: 260px;
-      background: radial-gradient(circle, rgba(168,105,46,0.18) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    /* CONTRIBUTE CARD — light */
-    .card-contribute {
-      background: var(--cream);
-      border: 1px solid var(--border-strong);
-      color: var(--ink);
-    }
-
-    .card-contribute::before {
-      content: '';
-      position: absolute;
-      top: -60px; right: -60px;
-      width: 220px; height: 220px;
-      background: radial-gradient(circle, rgba(92,122,101,0.08) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    /* OR DIVIDER */
-    .or-divider {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-
-    .or-circle {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: var(--canvas);
-      border: 1px solid var(--border-strong);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.08em;
-      color: var(--ink-muted);
-      z-index: 2;
-      flex-shrink: 0;
-    }
-
-    /* CARD INNER */
-    .card-tag {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      margin-bottom: 20px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .card-pay .card-tag { color: var(--copper-lt); }
-    .card-contribute .card-tag { color: var(--sage); }
-
-    .card-tag-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-    }
-
-    .card-pay .card-tag-dot { background: var(--copper-lt); }
-    .card-contribute .card-tag-dot { background: var(--sage); }
-
-    .card-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.9rem;
-      font-weight: 400;
-      line-height: 1.15;
-      margin-bottom: 12px;
-    }
-
-    .card-pay .card-title { color: var(--canvas); }
-    .card-contribute .card-title { color: var(--ink); }
-
-    .card-pay .card-title em { font-style: italic; color: var(--copper-lt); }
-    .card-contribute .card-title em { font-style: italic; color: var(--sage); }
-
-    .card-desc {
-      font-size: 0.88rem;
-      line-height: 1.7;
-      margin-bottom: 28px;
-      flex: 1;
-    }
-
-    .card-pay .card-desc { color: rgba(253,250,246,0.6); }
-    .card-contribute .card-desc { color: var(--ink-muted); }
-
-    /* FEATURE LIST */
-    .card-features {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 9px;
-      margin-bottom: 32px;
-    }
-
-    .card-features li {
-      font-size: 0.83rem;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .card-pay .card-features li { color: rgba(253,250,246,0.75); }
-    .card-contribute .card-features li { color: var(--ink-light); }
-
-    .feat-check {
-      width: 18px; height: 18px;
-      border-radius: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.65rem;
-      flex-shrink: 0;
-    }
-
-    .card-pay .feat-check {
-      background: rgba(168,105,46,0.2);
-      color: var(--copper-lt);
-    }
-
-    .card-contribute .feat-check {
-      background: var(--sage-pale);
-      color: var(--sage);
-    }
-
-    /* PRICE */
-    .card-price {
-      margin-bottom: 24px;
-      padding-top: 20px;
-      border-top: 1px solid;
-    }
-
-    .card-pay .card-price { border-color: rgba(253,250,246,0.1); }
-    .card-contribute .card-price { border-color: var(--border); }
-
-    .price-row {
-      display: flex;
-      align-items: baseline;
-      gap: 4px;
-      margin-bottom: 4px;
-    }
-
-    .price-currency {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.3rem;
-      font-weight: 300;
-    }
-
-    .card-pay .price-currency { color: var(--copper-lt); }
-    .card-contribute .price-currency { color: var(--sage); }
-
-    .price-amount {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 3rem;
-      font-weight: 300;
-      line-height: 1;
-    }
-
-    .card-pay .price-amount { color: var(--canvas); }
-    .card-contribute .price-amount { color: var(--ink); }
-
-    .price-label {
-      font-size: 0.78rem;
-      margin-left: 4px;
-    }
-
-    .card-pay .price-label { color: rgba(253,250,246,0.4); }
-    .card-contribute .price-label { color: var(--ink-muted); }
-
-    .price-note {
-      font-size: 0.75rem;
-      font-style: italic;
-    }
-
-    .card-pay .price-note { color: rgba(253,250,246,0.35); }
-    .card-contribute .price-note { color: var(--ink-muted); }
-
-    /* BUTTONS */
-    .card-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 16px 28px;
-      border-radius: 2px;
-      font-size: 0.8rem;
-      font-weight: 500;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      text-decoration: none;
-      transition: all 0.2s;
-      cursor: pointer;
-      border: none;
-      width: 100%;
-    }
-
-    .btn-pay {
-      background: var(--copper);
-      color: var(--canvas);
-    }
-
-    .btn-pay:hover { background: var(--copper-lt); }
-
-    .btn-contribute {
-      background: var(--ink);
-      color: var(--canvas);
-    }
-
-    .btn-contribute:hover { background: var(--ink-light); }
-
-    .coming-soon {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.55rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      background: rgba(168,105,46,0.25);
-      color: var(--copper-lt);
-      border: 1px solid rgba(168,105,46,0.3);
-      padding: 3px 8px;
-      border-radius: 2px;
-    }
-
-    .btn-sub-note {
-      text-align: center;
-      margin-top: 10px;
-      font-size: 0.72rem;
-    }
-
-    .card-pay .btn-sub-note { color: rgba(253,250,246,0.3); }
-    .card-contribute .btn-sub-note { color: var(--ink-muted); }
-
-    /* FOUNDING MEMBER NUDGE */
-    .founder-nudge {
-      margin-top: 48px;
-      text-align: center;
-      max-width: 480px;
-      padding: 24px 32px;
-      border: 1px solid var(--border-strong);
-      border-radius: 3px;
-      background: var(--cream);
-      position: relative;
-    }
-
-    .founder-nudge::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 3px;
-      background: var(--copper);
-      border-radius: 3px 0 0 3px;
-    }
-
-    .founder-nudge-eyebrow {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--copper);
-      margin-bottom: 8px;
-    }
-
-    .founder-nudge p {
-      font-size: 0.85rem;
-      color: var(--ink-muted);
-      line-height: 1.65;
-      margin-bottom: 14px;
-    }
-
-    .founder-nudge p strong { color: var(--ink); font-weight: 500; }
-
-    .founder-nudge a {
-      font-size: 0.78rem;
-      font-weight: 500;
-      color: var(--copper);
-      text-decoration: none;
-      border-bottom: 1px solid rgba(168,105,46,0.3);
-      padding-bottom: 1px;
-      transition: border-color 0.2s;
-    }
-
-    .founder-nudge a:hover { border-color: var(--copper); }
-
-    /* ANIMATIONS */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .animate { opacity: 0; animation: fadeUp 0.5s ease forwards; }
-    .d1 { animation-delay: 0.05s; }
-    .d2 { animation-delay: 0.15s; }
-    .d3 { animation-delay: 0.25s; }
-    .d4 { animation-delay: 0.35s; }
-
-    @media (max-width: 540px) {
-      nav { padding: 0 20px; }
-      .cards { grid-template-columns: 1fr; }
-      .or-divider { display: none; }
-      .option-card { padding: 32px 28px; }
-      .page-header { margin-bottom: 40px; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>LeaseCheckr — Upload Your Lease</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; height: 100%; }
+
+:root {
+  --canvas:      #f8f5f0;
+  --canvas-2:    #f2ede4;
+  --canvas-3:    #ece6db;
+  --white:       #ffffff;
+  --ink:         #1c1917;
+  --ink-2:       #3d3830;
+  --ink-3:       #6b6259;
+  --ink-4:       #a89f94;
+  --ink-5:       #cfc8bf;
+  --copper:      #a8692e;
+  --copper-lt:   #c4864a;
+  --copper-bg:   #f5ebe0;
+  --copper-pale: #faf3ea;
+  --sage:        #5c7a65;
+  --sage-lt:     #7a9e85;
+  --sage-bg:     #eef4f0;
+  --rose:        #a85a4a;
+  --rose-bg:     #fdf0ee;
+  --border:      rgba(28,25,23,0.09);
+  --border-lt:   rgba(28,25,23,0.05);
+  --ease:        cubic-bezier(0.16, 1, 0.3, 1);
+  --f-display:   'Cormorant Garamond', Georgia, serif;
+  --f-body:      'DM Sans', system-ui, sans-serif;
+  --f-mono:      'DM Mono', monospace;
+}
+
+body {
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--f-body);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100%;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px;
+  background: rgba(248,245,240,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-logo {
+  font-family: var(--f-display);
+  font-size: 18px; font-weight: 400;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.nav-step-indicator {
+  display: flex; align-items: center; gap: 8px;
+}
+
+.step-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--ink-5);
+  transition: background 0.3s, transform 0.3s;
+}
+.step-dot.active { background: var(--copper); transform: scale(1.4); }
+.step-dot.done   { background: var(--sage); }
+
+/* ── PROGRESS BAR ── */
+.progress-bar {
+  position: fixed; top: 60px; left: 0; right: 0; z-index: 199;
+  height: 2px; background: var(--border);
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--copper), var(--copper-lt));
+  transition: width 0.6s var(--ease);
+  width: 0%;
+}
+
+/* ── MAIN WRAPPER ── */
+.flow-wrapper {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 100px 24px 80px;
+}
+
+/* ── STEP ── */
+.step {
+  display: none;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+}
+.step.active {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+.step.exiting {
+  opacity: 0;
+  transform: translateY(-12px);
+  pointer-events: none;
+}
+
+/* ── STEP HEADER ── */
+.step-kicker {
+  font-family: var(--f-mono);
+  font-size: 10px; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--copper);
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 10px;
+}
+.step-kicker::before { content: ''; width: 20px; height: 1px; background: var(--copper); }
+
+.step-title {
+  font-family: var(--f-display);
+  font-size: clamp(32px, 6vw, 48px);
+  font-weight: 300; line-height: 1.05;
+  letter-spacing: -0.01em; color: var(--ink);
+  margin-bottom: 10px;
+}
+.step-title em { font-style: italic; color: var(--copper); }
+
+.step-body {
+  font-size: 15px; font-weight: 300;
+  color: var(--ink-3); line-height: 1.75;
+  margin-bottom: 36px; max-width: 440px;
+}
+.step-body strong { color: var(--ink); font-weight: 500; }
+
+/* ── METHOD CHOICE ── */
+.method-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px; margin-bottom: 24px;
+}
+.method-grid-3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+@media (max-width: 500px) {
+  .method-grid-3 { grid-template-columns: 1fr; }
+}
+
+.method-card {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  padding: 28px 24px;
+  cursor: pointer;
+  transition: all 0.25s var(--ease);
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+
+.method-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, var(--copper-bg), transparent);
+  opacity: 0; transition: opacity 0.3s;
+}
+
+.method-card:hover { border-color: var(--copper-lt); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(168,105,46,0.1); }
+.method-card:hover::before { opacity: 1; }
+.method-card.selected { border-color: var(--copper); background: var(--copper-pale); }
+.method-card.selected::before { opacity: 1; }
+
+.method-icon {
+  width: 48px; height: 48px; border-radius: 14px;
+  background: var(--copper-bg);
+  border: 1px solid rgba(168,105,46,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; margin-bottom: 16px;
+  position: relative; z-index: 1;
+}
+
+.method-title {
+  font-family: var(--f-display);
+  font-size: 20px; font-weight: 400;
+  color: var(--ink); margin-bottom: 6px;
+  position: relative; z-index: 1;
+}
+
+.method-desc {
+  font-size: 12px; font-weight: 300;
+  color: var(--ink-3); line-height: 1.6;
+  position: relative; z-index: 1;
+}
+
+.method-badge {
+  position: absolute; top: 14px; right: 14px;
+  font-family: var(--f-mono); font-size: 9px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  background: var(--copper); color: white;
+  padding: 3px 8px; border-radius: 20px;
+  z-index: 1;
+}
+
+/* ── PRIVACY TRUST BAR ── */
+.trust-bar {
+  display: flex; align-items: center; gap: 20px;
+  padding: 14px 20px;
+  background: var(--sage-bg);
+  border: 1px solid rgba(92,122,101,0.2);
+  border-radius: 12px;
+  margin-bottom: 32px;
+  flex-wrap: wrap; gap: 12px;
+}
+
+.trust-item {
+  display: flex; align-items: center; gap: 7px;
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--sage);
+}
+
+.trust-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--sage-lt); flex-shrink: 0; }
+
+/* ── CAMERA PANEL ── */
+.camera-panel { margin-bottom: 24px; }
+
+.privacy-card {
+  background: var(--ink);
+  border-radius: 20px;
+  padding: 32px 32px 28px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.privacy-card::before {
+  content: '🔒';
+  position: absolute; right: 24px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 80px; opacity: 0.06;
+  pointer-events: none;
+}
+
+.privacy-eyebrow {
+  font-family: var(--f-mono); font-size: 9px;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--copper-lt); margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.privacy-eyebrow::before { content: ''; width: 16px; height: 1px; background: var(--copper-lt); }
+
+.privacy-headline {
+  font-family: var(--f-display); font-size: 24px;
+  font-weight: 300; color: #f8f5f0;
+  line-height: 1.3; margin-bottom: 16px;
+  font-style: italic;
+}
+
+.privacy-points {
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+.privacy-point {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 13px; font-weight: 300;
+  color: rgba(248,245,240,0.6); line-height: 1.6;
+}
+
+.privacy-check {
+  color: var(--sage-lt); font-size: 14px;
+  flex-shrink: 0; margin-top: 1px;
+}
+
+.camera-zone {
+  background: var(--white);
+  border: 1.5px dashed rgba(168,105,46,0.35);
+  border-radius: 20px;
+  padding: 40px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+
+.camera-zone:hover {
+  border-color: var(--copper);
+  background: var(--copper-pale);
+}
+
+.camera-zone.has-image {
+  border-style: solid;
+  border-color: var(--sage);
+  padding: 0;
+}
+
+#cameraPreview {
+  width: 100%; border-radius: 18px;
+  display: none; max-height: 320px;
+  object-fit: contain;
+}
+
+#uploadPreview {
+  width: 100%; border-radius: 18px;
+  display: none; max-height: 320px;
+  object-fit: contain;
+}
+
+.camera-zone.has-image #cameraPreview { display: block; }
+#uploadZone.has-image #cameraPreview { display: none; }
+.camera-zone.has-image #uploadPreview { display: block; }
+.camera-zone.has-image .camera-empty { display: none; }
+
+.camera-empty { }
+
+.camera-icon { font-size: 36px; margin-bottom: 14px; display: block; }
+
+.camera-title {
+  font-family: var(--f-display); font-size: 22px;
+  font-weight: 300; color: var(--ink);
+  margin-bottom: 6px;
+}
+
+.camera-hint {
+  font-size: 13px; font-weight: 300;
+  color: var(--ink-3); margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.camera-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--copper); color: white;
+  font-family: var(--f-body); font-size: 13px; font-weight: 500;
+  padding: 12px 24px; border-radius: 100px;
+  border: none; cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+.camera-btn:hover { background: var(--copper-lt); transform: scale(1.02); }
+
+.camera-formats {
+  margin-top: 12px;
+  font-family: var(--f-mono); font-size: 10px;
+  color: var(--ink-5); letter-spacing: 0.1em; text-transform: uppercase;
+}
+
+/* ── REDACTION OVERLAY ── */
+.redaction-panel {
+  display: none;
+  margin-bottom: 24px;
+}
+
+.redaction-panel.visible { display: block; }
+
+.redaction-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.redaction-title {
+  font-family: var(--f-display); font-size: 20px;
+  font-weight: 400; color: var(--ink);
+}
+
+.redaction-status {
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--sage); background: var(--sage-bg);
+  padding: 4px 10px; border-radius: 20px;
+  border: 1px solid rgba(92,122,101,0.2);
+}
+
+.redaction-canvas-wrap {
+  position: relative; border-radius: 16px;
+  overflow: hidden; background: var(--ink);
+  margin-bottom: 14px;
+}
+
+#redactionCanvas {
+  width: 100%; display: block; border-radius: 16px;
+  cursor: crosshair;
+}
+
+.redaction-instruction {
+  font-size: 12px; font-weight: 300;
+  color: var(--ink-3); line-height: 1.6;
+  text-align: center;
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+
+.redaction-actions {
+  display: flex; gap: 10px; margin-top: 16px;
+}
+
+/* ── EXTRACTING STATE ── */
+.extracting-panel {
+  display: none; text-align: center;
+  padding: 48px 24px;
+}
+.extracting-panel.visible { display: block; }
+
+.extracting-animation {
+  margin-bottom: 28px;
+}
+
+.extract-line {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 20px; margin-bottom: 8px;
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 10px; text-align: left;
+  opacity: 0; transform: translateX(-8px);
+  transition: all 0.4s var(--ease);
+}
+
+.extract-line.visible {
+  opacity: 1; transform: translateX(0);
+}
+
+.extract-line.done { border-color: rgba(92,122,101,0.3); background: var(--sage-bg); }
+
+.extract-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--ink-5); flex-shrink: 0;
+  transition: background 0.3s;
+}
+.extract-line.done .extract-dot { background: var(--sage); }
+
+.extract-text {
+  font-family: var(--f-mono); font-size: 11px;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-3); flex: 1;
+}
+.extract-line.done .extract-text { color: var(--sage); }
+
+.extract-value {
+  font-family: var(--f-display); font-size: 16px;
+  font-weight: 400; color: var(--ink);
+  opacity: 0; transition: opacity 0.3s 0.2s;
+}
+.extract-line.done .extract-value { opacity: 1; }
+
+/* ── MANUAL FORM ── */
+.manual-form { }
+
+.form-section { margin-bottom: 32px; }
+
+.form-section-title {
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--copper); margin-bottom: 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.form-section-title::after { content: ''; flex: 1; height: 1px; background: rgba(168,105,46,0.2); }
+
+.form-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group.full { grid-column: 1 / -1; }
+
+.form-label {
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.form-label .optional {
+  color: var(--ink-5); margin-left: 4px; font-size: 9px;
+}
+
+.form-control {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 13px 16px;
+  font-family: var(--f-body); font-size: 15px;
+  color: var(--ink); outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  appearance: none; width: 100%;
+}
+.form-control::placeholder { color: var(--ink-5); }
+.form-control:focus {
+  border-color: var(--copper);
+  box-shadow: 0 0 0 3px rgba(168,105,46,0.1);
+  background: var(--white);
+}
+.form-control.filled { border-color: rgba(92,122,101,0.4); background: var(--sage-bg); }
+.form-control.error { border-color: var(--rose); box-shadow: 0 0 0 3px rgba(168,90,74,0.1); }
+
+.form-control-wrap { position: relative; }
+.form-prefix {
+  position: absolute; left: 16px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 15px; color: var(--ink-3);
+  pointer-events: none;
+}
+.form-control.has-prefix { padding-left: 28px; }
+
+.form-error {
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.06em; color: var(--rose);
+  margin-top: 3px; display: none;
+}
+.form-group.has-error .form-error { display: block; }
+.form-group.has-error .form-control { border-color: var(--rose); }
+
+/* ── CONFIDENCE METER ── */
+.confidence-widget {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-top: 8px;
+  display: flex; align-items: center; gap: 14px;
+}
+
+.conf-icon { font-size: 18px; flex-shrink: 0; }
+
+.conf-content { flex: 1; }
+
+.conf-label {
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink-4); margin-bottom: 6px;
+  display: flex; justify-content: space-between;
+}
+
+.conf-track {
+  height: 5px; background: var(--canvas-2);
+  border-radius: 3px; overflow: hidden;
+}
+
+.conf-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--copper), var(--sage-lt));
+  border-radius: 3px; width: 25%;
+  transition: width 0.6s var(--ease);
+}
+
+.conf-message {
+  font-size: 12px; font-weight: 300;
+  color: var(--ink-3); margin-top: 5px; line-height: 1.5;
+}
+
+/* ── VERIFY STEP ── */
+.verify-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px; margin-bottom: 24px;
+}
+
+.verify-field {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 18px;
+  transition: border-color 0.2s;
+}
+
+.verify-field.auto-filled {
+  border-color: rgba(92,122,101,0.35);
+  background: var(--sage-bg);
+}
+
+.verify-field.full { grid-column: 1 / -1; }
+
+.vf-label {
+  font-family: var(--f-mono); font-size: 9px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-4); margin-bottom: 4px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.vf-auto-badge {
+  font-size: 8px; background: var(--sage);
+  color: white; padding: 2px 6px; border-radius: 4px;
+  letter-spacing: 0.08em;
+}
+
+.vf-value {
+  font-family: var(--f-display); font-size: 22px;
+  font-weight: 300; color: var(--ink);
+  line-height: 1;
+}
+
+.vf-edit {
+  width: 100%; border: none; background: none;
+  font-family: var(--f-display); font-size: 22px;
+  font-weight: 300; color: var(--ink);
+  outline: none; padding: 0; line-height: 1;
+}
+
+.vf-edit::placeholder { color: var(--ink-5); font-size: 16px; }
+
+.accuracy-banner {
+  background: var(--copper-pale);
+  border: 1px solid rgba(168,105,46,0.2);
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 24px;
+}
+
+.acc-icon { font-size: 20px; flex-shrink: 0; }
+
+.acc-text { font-size: 13px; font-weight: 300; color: var(--ink-2); line-height: 1.6; }
+.acc-text strong { color: var(--copper); font-weight: 500; }
+
+/* ── BUTTONS ── */
+.btn-primary {
+  width: 100%;
+  background: var(--ink); color: var(--canvas);
+  font-family: var(--f-body); font-size: 15px; font-weight: 500;
+  padding: 17px 24px; border: none; border-radius: 14px;
+  cursor: pointer; letter-spacing: 0.01em;
+  transition: background 0.25s, transform 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.btn-primary:hover { background: var(--ink-2); transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+.btn-primary:disabled { background: var(--ink-5); cursor: not-allowed; transform: none; }
+
+.btn-secondary {
+  flex: 1; background: var(--white);
+  border: 1px solid var(--border); border-radius: 12px;
+  color: var(--ink-2); font-family: var(--f-body);
+  font-size: 14px; font-weight: 400;
+  padding: 13px 20px; cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-secondary:hover { border-color: var(--copper); color: var(--copper); }
+
+.btn-copper {
+  flex: 1; background: var(--copper); color: white;
+  border: none; border-radius: 12px;
+  font-family: var(--f-body); font-size: 14px; font-weight: 500;
+  padding: 13px 20px; cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+.btn-copper:hover { background: var(--copper-lt); transform: translateY(-1px); }
+
+.btn-row { display: flex; gap: 10px; }
+
+.btn-sub {
+  text-align: center; margin-top: 12px;
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.back-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink-4); text-decoration: none;
+  cursor: pointer; margin-bottom: 28px;
+  transition: color 0.2s;
+}
+.back-link:hover { color: var(--copper); }
+
+/* ── SCORING ANIMATION ── */
+.scoring-state {
+  display: none; text-align: center; padding: 60px 0;
+}
+.scoring-state.visible { display: block; }
+
+.scoring-circle {
+  width: 80px; height: 80px; border-radius: 50%;
+  border: 2px solid var(--border);
+  border-top-color: var(--copper);
+  animation: spin 1s linear infinite;
+  margin: 0 auto 28px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.scoring-label {
+  font-family: var(--f-display); font-size: 28px;
+  font-weight: 300; color: var(--ink);
+  font-style: italic; margin-bottom: 8px;
+}
+
+.scoring-sub {
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+/* ── ANIMATIONS ── */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.step.active .step-kicker  { animation: rise 0.5s 0.05s var(--ease) both; }
+.step.active .step-title   { animation: rise 0.5s 0.1s  var(--ease) both; }
+.step.active .step-body    { animation: rise 0.5s 0.15s var(--ease) both; }
+.step.active .method-grid,
+.step.active .camera-panel,
+.step.active .manual-form,
+.step.active .verify-grid,
+.step.active .accuracy-banner { animation: rise 0.5s 0.2s var(--ease) both; }
+.step.active .trust-bar    { animation: rise 0.5s 0.25s var(--ease) both; }
+.step.active .btn-primary  { animation: rise 0.5s 0.3s  var(--ease) both; }
+</style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav>
-    <a href="index.html" class="nav-logo">Lease<span>Checkr</span></a>
-    <a href="pricing.html" class="nav-back">← Back to Pricing</a>
-  </nav>
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">Lease<span>Checkr</span></a>
+  <div class="nav-step-indicator">
+    <div class="step-dot active" id="dot1"></div>
+    <div class="step-dot" id="dot2"></div>
+    <div class="step-dot" id="dot3"></div>
+    <div class="step-dot" id="dot4"></div>
+  </div>
+</nav>
 
-  <main>
+<div class="progress-bar">
+  <div class="progress-fill" id="progressFill"></div>
+</div>
 
-    <!-- HEADER -->
-    <div class="page-header animate d1">
-      <p class="page-eyebrow">Full Report Access</p>
-      <h1>Two ways to get<br>your <em>full report.</em></h1>
-      <p>Pay once and get your complete deal analysis instantly — or contribute your verified lease and get full access free.</p>
+<!-- FLOW -->
+<div class="flow-wrapper">
+
+  <!-- ── STEP 1: METHOD CHOICE ── -->
+  <div class="step active" id="step1">
+    <div class="step-kicker">Free Access — Step 1 of 3</div>
+    <h1 class="step-title">Upload your lease.<br><em>Get your full report free.</em></h1>
+    <p class="step-body">To get free access to your full report, we need your actual lease document. Upload or photograph it — we auto-redact your personal details and extract all the deal terms instantly.</p>
+
+    <div class="method-grid">
+      <div class="method-card" id="card-photo" onclick="selectMethod('photo')">
+        <div class="method-badge">At the Dealer? Use This</div>
+        <div class="method-icon">📷</div>
+        <div class="method-title">Photograph Lease</div>
+        <div class="method-desc">Use your phone camera to photograph page 1. We auto-redact your personal details and extract all fields instantly.</div>
+      </div>
+      <div class="method-card" id="card-upload" onclick="selectMethod('upload')">
+        <div class="method-badge">Recommended</div>
+        <div class="method-icon">📄</div>
+        <div class="method-title">Upload Document</div>
+        <div class="method-desc">Upload a PDF or image of your lease from your device. Same privacy protection, same automatic extraction.</div>
+      </div>
     </div>
 
-    <!-- CARDS -->
-    <div class="cards animate d2">
+    <div class="trust-bar">
+      <div class="trust-item"><div class="trust-dot"></div>Never stored</div>
+      <div class="trust-item"><div class="trust-dot"></div>Read once, then gone</div>
+      <div class="trust-item"><div class="trust-dot"></div>No account needed</div>
+      <div class="trust-item"><div class="trust-dot"></div>Completely free</div>
+    </div>
 
-      <!-- OPTION 1: PAY -->
-      <div class="option-card card-pay">
-        <div class="card-tag">
-          <span class="card-tag-dot"></span>
-          Instant Access
+    <button class="btn-primary" id="step1btn" onclick="goToStep2()" disabled>
+      <span>Continue</span>
+      <span style="opacity:0.5">→</span>
+    </button>
+    <div class="btn-sub">Your data never leaves your device</div>
+  </div>
+
+  <!-- ── STEP 2A: PHOTO CAPTURE ── -->
+  <div class="step" id="step2photo">
+    <div class="back-link" onclick="goToStep1()">← Back</div>
+    <div class="step-kicker">Step 2 of 4 · Camera Capture</div>
+    <h2 class="step-title">Photograph your <em>lease.</em></h2>
+    <p class="step-body">Point your camera at page 1 of your NJ MVSC-1 contract. We'll automatically cover your personal details before reading anything.</p>
+
+    <!-- Privacy promise card -->
+    <div class="privacy-card">
+      <div class="privacy-eyebrow">Privacy First</div>
+      <div class="privacy-headline">"Your document is read once, then gone."</div>
+      <div class="privacy-points">
+        <div class="privacy-point">
+          <span class="privacy-check">✓</span>
+          Your document is processed entirely on this device — nothing is uploaded to a server
         </div>
-        <div class="card-title">Pay once.<br><em>Know everything.</em></div>
-        <p class="card-desc">Get your complete deal analysis immediately. No upload required, no waiting for verification.</p>
+        <div class="privacy-point">
+          <span class="privacy-check">✓</span>
+          We automatically cover your name, address, and SSN before reading any data
+        </div>
+        <div class="privacy-point">
+          <span class="privacy-check">✓</span>
+          After your score is generated, the image is permanently cleared from memory
+        </div>
+      </div>
+    </div>
 
-        <ul class="card-features">
-          <li><span class="feat-check">✓</span> Full deal breakdown — every number explained</li>
-          <li><span class="feat-check">✓</span> Money factor analysis vs. buy rate</li>
-          <li><span class="feat-check">✓</span> Comparable NJ deals on your vehicle</li>
-          <li><span class="feat-check">✓</span> Dealer pricing signals & flags</li>
-          <li><span class="feat-check">✓</span> Recent market trends by county</li>
-          <li><span class="feat-check">✓</span> Downloadable PDF report</li>
-        </ul>
+    <!-- Camera zone -->
+    <div class="camera-panel">
+      <div class="camera-zone" id="cameraZone" onclick="triggerCamera()">
+        <div class="camera-empty">
+          <span class="camera-icon">📷</span>
+          <div class="camera-title">Open your camera</div>
+          <p class="camera-hint">Align page 1 of your lease within frame.<br>Ensure the text is legible and well-lit.</p>
+          <button class="camera-btn" onclick="triggerCamera(); event.stopPropagation()">
+            <span>📷</span> Open Camera
+          </button>
+          <div class="camera-formats">Works on iPhone · Android · Any device with a camera</div>
+        </div>
+        <img id="cameraPreview" alt="Lease document preview">
+      </div>
+      <input type="file" id="fileInput" accept="image/*" capture="environment" style="display:none; pointer-events:none;" onchange="handleFileSelect(event, 'photo')">
+    </div>
 
-        <div class="card-price">
-          <div class="price-row">
-            <span class="price-currency">$</span>
-            <span class="price-amount">19</span>
-            <span class="price-label">.99 per report</span>
+    <!-- Redaction panel -->
+    <div class="redaction-panel" id="redactionPanel">
+      <div class="redaction-header">
+        <div class="redaction-title">Review Redactions</div>
+        <div class="redaction-status">✓ Personal details covered</div>
+      </div>
+      <div class="redaction-canvas-wrap">
+        <canvas id="redactionCanvas"></canvas>
+      </div>
+      <div class="redaction-instruction">Tap and drag to add redaction boxes · We've covered the standard sensitive zones</div>
+      <div class="redaction-actions">
+        <button class="btn-secondary" onclick="resetImage()">Retake Photo</button>
+        <button class="btn-copper" onclick="confirmRedactionAndExtract()">Looks Good — Extract Data →</button>
+      </div>
+    </div>
+
+    <!-- Extracting animation -->
+    <div class="extracting-panel" id="extractingPanel">
+      <div class="extracting-animation" id="extractLines">
+        <div class="extract-line" id="el1">
+          <div class="extract-dot"></div>
+          <div class="extract-text">Reading monthly payment</div>
+          <div class="extract-value">—</div>
+        </div>
+        <div class="extract-line" id="el2">
+          <div class="extract-dot"></div>
+          <div class="extract-text">Reading lease term</div>
+          <div class="extract-value">—</div>
+        </div>
+        <div class="extract-line" id="el3">
+          <div class="extract-dot"></div>
+          <div class="extract-text">Reading mileage allowance</div>
+          <div class="extract-value">—</div>
+        </div>
+        <div class="extract-line" id="el4">
+          <div class="extract-dot"></div>
+          <div class="extract-text">Reading dealer &amp; zip code</div>
+          <div class="extract-value">—</div>
+        </div>
+        <div class="extract-line" id="el5">
+          <div class="extract-dot"></div>
+          <div class="extract-text">Reading due at signing</div>
+          <div class="extract-value">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 2B: UPLOAD DOCUMENT ── -->
+  <div class="step" id="step2upload">
+    <div class="back-link" onclick="goToStep1()">← Back</div>
+    <div class="step-kicker">Step 2 of 4 · Document Upload</div>
+    <h2 class="step-title">Upload your <em>lease.</em></h2>
+    <p class="step-body">Select a PDF or image of your lease document from your device. We apply the same redaction and privacy protection before extracting any data.</p>
+
+    <div class="privacy-card">
+      <div class="privacy-eyebrow">Privacy First</div>
+      <div class="privacy-headline">"Your document is read once, then gone."</div>
+      <div class="privacy-points">
+        <div class="privacy-point">
+          <span class="privacy-check">✓</span>
+          PDF and image files are processed locally — never sent to external storage
+        </div>
+        <div class="privacy-point">
+          <span class="privacy-check">✓</span>
+          Your name, address, and SSN are automatically covered before any data is read
+        </div>
+        <div class="privacy-point">
+          <span class="privacy-check">✓</span>
+          File is cleared from memory immediately after your score is generated
+        </div>
+      </div>
+    </div>
+
+    <div class="camera-panel">
+      <div class="camera-zone" id="uploadZone" onclick="triggerUpload()">
+        <div class="camera-empty">
+          <span class="camera-icon">📂</span>
+          <div class="camera-title">Select your lease file</div>
+          <p class="camera-hint">Choose a PDF, JPG, or PNG of your lease document.<br>Page 1 of the MVSC-1 form is all we need.</p>
+          <button class="camera-btn" onclick="triggerUpload(); event.stopPropagation()">
+            <span>📂</span> Choose File
+          </button>
+          <div class="camera-formats">PDF · JPG · PNG — Max 10MB</div>
+        </div>
+        <img id="uploadPreview" alt="Uploaded lease document preview">
+      </div>
+      <input type="file" id="uploadInput" accept="image/*,.pdf" style="display:none; pointer-events:none;" onchange="handleFileSelect(event, 'upload')">
+    </div>
+
+    <!-- Redaction panel for upload -->
+    <div class="redaction-panel" id="redactionPanelUpload">
+      <div class="redaction-header">
+        <div class="redaction-title">Review Redactions</div>
+        <div class="redaction-status">✓ Personal details covered</div>
+      </div>
+      <div class="redaction-canvas-wrap">
+        <canvas id="redactionCanvasUpload"></canvas>
+      </div>
+      <div class="redaction-instruction">Drag to add additional redaction boxes if needed · Standard zones pre-covered</div>
+      <div class="redaction-actions">
+        <button class="btn-secondary" onclick="resetUpload()">Choose Different File</button>
+        <button class="btn-copper" onclick="confirmUploadAndExtract()">Looks Good — Extract Data →</button>
+      </div>
+    </div>
+
+    <!-- Extracting animation (reuses same animation, different IDs) -->
+    <div class="extracting-panel" id="extractingPanelUpload">
+      <div class="extracting-animation" id="extractLinesUpload">
+        <div class="extract-line" id="eu1"><div class="extract-dot"></div><div class="extract-text">Reading monthly payment</div><div class="extract-value">—</div></div>
+        <div class="extract-line" id="eu2"><div class="extract-dot"></div><div class="extract-text">Reading lease term</div><div class="extract-value">—</div></div>
+        <div class="extract-line" id="eu3"><div class="extract-dot"></div><div class="extract-text">Reading mileage allowance</div><div class="extract-value">—</div></div>
+        <div class="extract-line" id="eu4"><div class="extract-dot"></div><div class="extract-text">Reading dealer &amp; zip code</div><div class="extract-value">—</div></div>
+        <div class="extract-line" id="eu5"><div class="extract-dot"></div><div class="extract-text">Reading due at signing</div><div class="extract-value">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 2C: MANUAL ENTRY ── -->
+  <div class="step" id="step2manual">
+    <div class="back-link" onclick="goToStep1()">← Back</div>
+    <div class="step-kicker">Step 2 of 4 · Lease Details</div>
+    <h2 class="step-title">Tell us about your <em>deal.</em></h2>
+    <p class="step-body">Only your <strong>monthly payment</strong> is required. Each additional field improves your score accuracy — but never blocks you from getting a result.</p>
+
+    <div class="manual-form">
+
+      <div class="form-section">
+        <div class="form-section-title">Required</div>
+        <div class="form-grid">
+          <div class="form-group full" id="fg-vehicle">
+            <label class="form-label">Vehicle</label>
+            <select class="form-control" id="f-vehicle" onchange="handleInput('f-vehicle')">
+              <option value="">Year · Make · Model · Trim</option>
+              <optgroup label="Popular in NJ">
+                <option>2024 Honda CR-V EX-L</option>
+                <option>2024 Toyota RAV4 XLE Premium</option>
+                <option>2024 BMW X3 xDrive30i</option>
+                <option>2024 BMW X5 xDrive40i</option>
+                <option>2024 Mercedes-Benz GLE 350</option>
+                <option>2024 Tesla Model Y Long Range</option>
+                <option>2025 Honda Accord Sport</option>
+                <option>2024 Toyota Camry XSE</option>
+                <option>2024 Jeep Grand Cherokee L</option>
+                <option>2024 Hyundai Tucson Limited</option>
+              </optgroup>
+              <option value="other">Other vehicle</option>
+            </select>
+            <div class="form-error">Please select your vehicle</div>
           </div>
-          <p class="price-note">One-time. No subscription. Yours to keep.</p>
-        </div>
 
-        <a href="#" class="card-btn btn-pay">
-          Pay $19.99 &nbsp;<span class="coming-soon">Coming Soon</span>
-        </a>
-        <p class="btn-sub-note">Stripe payment — launching soon</p>
+          <div class="form-group full" id="fg-payment">
+            <label class="form-label">Monthly Payment *</label>
+            <div class="form-control-wrap">
+              <span class="form-prefix">$</span>
+              <input class="form-control has-prefix" type="number"
+                id="f-payment" placeholder="489"
+                min="100" max="3000"
+                oninput="handleInput('f-payment')" onchange="validatePayment()">
+            </div>
+            <div class="form-error">Please enter a monthly payment between $100 and $3,000</div>
+          </div>
+        </div>
       </div>
 
-      <!-- OPTION 2: CONTRIBUTE -->
-      <div class="option-card card-contribute">
-        <div class="card-tag">
-          <span class="card-tag-dot"></span>
-          Free via Contribution
-        </div>
-        <div class="card-title">Upload your lease.<br><em>Get access free.</em></div>
-        <p class="card-desc">Submit your verified NJ lease document and get full Premium access at no cost. You help build the benchmark — we give you the full picture in return.</p>
-
-        <ul class="card-features">
-          <li><span class="feat-check">✓</span> Everything in Premium — free</li>
-          <li><span class="feat-check">✓</span> Your data is redacted & anonymized</li>
-          <li><span class="feat-check">✓</span> Name, address & VIN never stored</li>
-          <li><span class="feat-check">✓</span> NJ lease signed within 36 months</li>
-          <li><span class="feat-check">✓</span> PDF, JPG, or PNG accepted</li>
-          <li><span class="feat-check">✓</span> Report ready after verification (48hrs)</li>
-        </ul>
-
-        <div class="card-price">
-          <div class="price-row">
-            <span class="price-currency">$</span>
-            <span class="price-amount">0</span>
-            <span class="price-label">with lease upload</span>
+      <div class="form-section">
+        <div class="form-section-title">Improves Your Score</div>
+        <div class="form-grid">
+          <div class="form-group" id="fg-term">
+            <label class="form-label">Lease Term <span class="optional">optional</span></label>
+            <select class="form-control" id="f-term" onchange="handleInput('f-term')">
+              <option value="">Select</option>
+              <option value="24">24 months</option>
+              <option value="36">36 months</option>
+              <option value="48">48 months</option>
+            </select>
           </div>
-          <p class="price-note">Requires a verified NJ lease document.</p>
-        </div>
 
-        <a href="intake-upload.html" class="card-btn btn-contribute">
-          Upload My Lease Contract →
-        </a>
-        <p class="btn-sub-note">Takes 2 minutes · Document required</p>
+          <div class="form-group" id="fg-zip">
+            <label class="form-label">NJ Zip Code <span class="optional">optional</span></label>
+            <input class="form-control" type="text" id="f-zip"
+              placeholder="07030" maxlength="5"
+              oninput="handleInput('f-zip')" onchange="validateZip()">
+            <div class="form-error">Enter a valid NJ zip code</div>
+          </div>
+
+          <div class="form-group" id="fg-mileage">
+            <label class="form-label">Annual Mileage <span class="optional">optional</span></label>
+            <select class="form-control" id="f-mileage" onchange="handleInput('f-mileage')">
+              <option value="">Select</option>
+              <option value="7500">7,500 miles</option>
+              <option value="10000">10,000 miles</option>
+              <option value="12000">12,000 miles</option>
+              <option value="15000">15,000 miles</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="fg-signing">
+            <label class="form-label">Due at Signing <span class="optional">optional</span></label>
+            <div class="form-control-wrap">
+              <span class="form-prefix">$</span>
+              <input class="form-control has-prefix" type="number"
+                id="f-signing" placeholder="1500"
+                oninput="handleInput('f-signing')">
+            </div>
+          </div>
+
+          <div class="form-group" id="fg-month">
+            <label class="form-label">Month Signed <span class="optional">optional</span></label>
+            <select class="form-control" id="f-month" onchange="handleInput('f-month')">
+              <option value="">Select</option>
+              <option>Jan 2025</option><option>Feb 2025</option><option>Mar 2025</option>
+              <option>Apr 2025</option><option>May 2025</option><option>Jun 2025</option>
+              <option>Jul 2025</option><option>Aug 2025</option><option>Sep 2025</option>
+              <option>Oct 2025</option><option>Nov 2025</option><option>Dec 2025</option>
+              <option>Jan 2026</option><option>Feb 2026</option><option>Mar 2026</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="fg-dealer">
+            <label class="form-label">Dealer Name <span class="optional">optional</span></label>
+            <input class="form-control" type="text" id="f-dealer"
+              placeholder="e.g. BMW of Ramsey"
+              oninput="handleInput('f-dealer')">
+          </div>
+        </div>
       </div>
 
+      <!-- Confidence meter -->
+      <div class="confidence-widget">
+        <div class="conf-icon" id="confIcon">📊</div>
+        <div class="conf-content">
+          <div class="conf-label">
+            <span>Score Accuracy</span>
+            <span id="confPctLabel" style="color:var(--copper)">Basic</span>
+          </div>
+          <div class="conf-track">
+            <div class="conf-fill" id="confFill"></div>
+          </div>
+          <div class="conf-message" id="confMessage">Add your vehicle and payment to get started.</div>
+        </div>
+      </div>
+
+    </div><!-- /manual-form -->
+
+    <br>
+    <button class="btn-primary" id="step2manualbtn" onclick="goToStep3FromManual()" disabled>
+      <span>Continue to Review</span>
+      <span style="opacity:0.5">→</span>
+    </button>
+    <div class="btn-sub">Only required fields needed · Optional fields improve accuracy</div>
+  </div>
+
+  <!-- ── STEP 3: VERIFY EXTRACTED DATA ── -->
+  <div class="step" id="step3">
+    <div class="back-link" onclick="goBack()">← Back</div>
+    <div class="step-kicker">Step 3 of 4 · Confirm Details</div>
+    <h2 class="step-title">Does this look <em>right?</em></h2>
+    <p class="step-body">Review the details below. Correct anything that looks off before we run your score.</p>
+
+    <div class="accuracy-banner" id="accuracyBanner">
+      <div class="acc-icon">⚡</div>
+      <div class="acc-text"><strong>87% extraction accuracy</strong> — We read 5 of 6 fields successfully. Review and correct any highlighted fields before continuing.</div>
     </div>
 
-    <!-- FOUNDING MEMBER NUDGE -->
-    <div class="founder-nudge animate d3">
-      <div class="founder-nudge-eyebrow">Better option</div>
-      <p>Founding Members get <strong>all future Premium reports free — forever.</strong> Only 847 spots remain. Submit one verified lease and lock in lifetime access.</p>
-      <a href="founder.html">Claim a Founding Member spot instead →</a>
+    <div class="verify-grid">
+      <div class="verify-field auto-filled full" id="vf-vehicle">
+        <div class="vf-label">Vehicle <span class="vf-auto-badge">Auto-filled</span></div>
+        <input class="vf-edit" type="text" id="vv-vehicle" value="2024 BMW X3 xDrive30i" placeholder="Year Make Model Trim">
+      </div>
+
+      <div class="verify-field auto-filled" id="vf-payment">
+        <div class="vf-label">Monthly Payment <span class="vf-auto-badge">Auto-filled</span></div>
+        <input class="vf-edit" type="text" id="vv-payment" value="$589 / mo" placeholder="$0 / mo">
+      </div>
+
+      <div class="verify-field auto-filled" id="vf-term">
+        <div class="vf-label">Term <span class="vf-auto-badge">Auto-filled</span></div>
+        <input class="vf-edit" type="text" id="vv-term" value="36 months" placeholder="36 months">
+      </div>
+
+      <div class="verify-field auto-filled" id="vf-mileage">
+        <div class="vf-label">Mileage <span class="vf-auto-badge">Auto-filled</span></div>
+        <input class="vf-edit" type="text" id="vv-mileage" value="10,000 / yr" placeholder="10,000 / yr">
+      </div>
+
+      <div class="verify-field auto-filled" id="vf-signing">
+        <div class="vf-label">Due at Signing <span class="vf-auto-badge">Auto-filled</span></div>
+        <input class="vf-edit" type="text" id="vv-signing" value="$2,800" placeholder="$0">
+      </div>
+
+      <div class="verify-field" id="vf-zip" style="border-color:rgba(168,105,46,0.4);background:var(--amber-bg,#fdf3e3)">
+        <div class="vf-label">Zip Code <span style="color:var(--copper);font-size:9px;font-family:var(--f-mono);letter-spacing:0.1em">PLEASE ADD</span></div>
+        <input class="vf-edit" type="text" id="vv-zip" value="" placeholder="07030" maxlength="5"
+          style="color:var(--copper)" oninput="checkVerifyComplete()">
+      </div>
+
+      <div class="verify-field auto-filled full" id="vf-dealer">
+        <div class="vf-label">Dealer <span class="vf-auto-badge">Auto-filled</span></div>
+        <input class="vf-edit" type="text" id="vv-dealer" value="BMW of Ramsey — Ramsey, NJ" placeholder="Dealer name">
+      </div>
     </div>
 
-  </main>
+    <button class="btn-primary" id="step3btn" onclick="goToStep4()">
+      <span>Score My Deal</span>
+      <span style="opacity:0.5">→</span>
+    </button>
+    <div class="btn-sub">Anonymous · No account needed · Free</div>
+  </div>
 
+  <!-- ── STEP 4: SCORING ── -->
+  <div class="step" id="step4">
+    <div class="scoring-state visible">
+      <div class="scoring-circle"></div>
+      <div class="scoring-label">Scoring your deal…</div>
+      <div class="scoring-sub">Comparing against 2,847 NJ submissions</div>
+    </div>
+  </div>
+
+</div><!-- /flow-wrapper -->
+
+<script>
+let selectedMethod = null;
+let currentStep = 1;
+let fromPhoto = false;
+let filledFields = new Set();
+
+// ── STEP NAVIGATION ────────────────────────────────
+function setProgress(pct) {
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+function updateDots(step) {
+  [1,2,3,4].forEach(i => {
+    const d = document.getElementById('dot'+i);
+    d.classList.remove('active','done');
+    if (i < step) d.classList.add('done');
+    else if (i === step) d.classList.add('active');
+  });
+}
+
+function showStep(id) {
+  document.querySelectorAll('.step').forEach(s => {
+    s.classList.remove('active','exiting');
+    s.style.display = 'none';
+  });
+  const el = document.getElementById(id);
+  el.style.display = 'block';
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => el.classList.add('active'));
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function selectMethod(method) {
+  selectedMethod = method;
+  document.getElementById('card-photo').classList.toggle('selected', method === 'photo');
+  document.getElementById('card-upload').classList.toggle('selected', method === 'upload');
+  document.getElementById('card-manual').classList.toggle('selected', method === 'manual');
+  document.getElementById('step1btn').disabled = false;
+}
+
+function goToStep1() {
+  currentStep = 1;
+  updateDots(1); setProgress(10);
+  showStep('step1');
+}
+
+function goToStep2() {
+  if (!selectedMethod) return;
+  currentStep = 2;
+  updateDots(2); setProgress(35);
+  if (selectedMethod === 'photo') {
+    fromPhoto = true;
+    showStep('step2photo');
+  } else if (selectedMethod === 'upload') {
+    fromPhoto = true;
+    showStep('step2upload');
+  } else {
+    fromPhoto = false;
+    showStep('step2manual');
+  }
+}
+
+function goBack() {
+  goToStep1();
+}
+
+function goToStep3FromManual() {
+  if (!validateManualRequired()) return;
+  populateVerifyFromManual();
+  currentStep = 3;
+  updateDots(3); setProgress(65);
+  document.getElementById('accuracyBanner').style.display = 'none';
+  showStep('step3');
+}
+
+function goToStep3FromPhoto() {
+  currentStep = 3;
+  updateDots(3); setProgress(65);
+  showStep('step3');
+}
+
+function goToStep4() {
+  currentStep = 4;
+  updateDots(4); setProgress(90);
+  showStep('step4');
+  setTimeout(() => {
+    setProgress(100);
+    saveToSession();
+    setTimeout(() => {
+      window.location.href = 'sample-report.html';
+    }, 1200);
+  }, 2800);
+}
+
+// ── CAMERA / FILE HANDLING ─────────────────────────
+function triggerCamera() {
+  document.getElementById('fileInput').click();
+}
+
+function triggerUpload() {
+  document.getElementById('uploadInput').click();
+}
+
+function handleFileSelect(e, source) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    sessionStorage.setItem('leaseImage', ev.target.result);
+    if (source === 'photo') {
+      const zone = document.getElementById('cameraZone');
+      const preview = document.getElementById('cameraPreview');
+      preview.src = ev.target.result;
+      zone.classList.add('has-image');
+      showRedaction(ev.target.result, 'redactionCanvas', 'redactionPanel');
+    } else {
+      const zone = document.getElementById('uploadZone');
+      const preview = document.getElementById('uploadPreview');
+      preview.src = ev.target.result;
+      zone.classList.add('has-image');
+      showRedaction(ev.target.result, 'redactionCanvasUpload', 'redactionPanelUpload');
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function resetImage() {
+  const zone = document.getElementById('cameraZone');
+  const preview = document.getElementById('cameraPreview');
+  zone.classList.remove('has-image');
+  preview.src = '';
+  document.getElementById('redactionPanel').classList.remove('visible');
+  document.getElementById('fileInput').value = '';
+  sessionStorage.removeItem('leaseImage');
+}
+
+function resetUpload() {
+  const zone = document.getElementById('uploadZone');
+  const preview = document.getElementById('uploadPreview');
+  zone.classList.remove('has-image');
+  preview.src = '';
+  document.getElementById('redactionPanelUpload').classList.remove('visible');
+  document.getElementById('uploadInput').value = '';
+  sessionStorage.removeItem('leaseImage');
+}
+
+function confirmUploadAndExtract() {
+  document.getElementById('redactionPanelUpload').classList.remove('visible');
+  document.getElementById('uploadZone').style.display = 'none';
+  const ep = document.getElementById('extractingPanelUpload');
+  ep.classList.add('visible');
+  runExtractionAnimation('eu');
+}
+
+// ── REDACTION ──────────────────────────────────────
+const redactions = [];
+let isDrawing = false;
+let drawStart = {};
+
+function showRedaction(src, canvasId, panelId) {
+  canvasId = canvasId || 'redactionCanvas';
+  panelId = panelId || 'redactionPanel';
+  const panel = document.getElementById(panelId);
+  const canvas = document.getElementById(canvasId);
+  const ctx = canvas.getContext('2d');
+  const img = new Image();
+
+  img.onload = function() {
+    const maxW = canvas.parentElement.offsetWidth;
+    const ratio = img.height / img.width;
+    canvas.width = maxW;
+    canvas.height = maxW * ratio;
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    // Default redaction zones for MVSC-1 (NJ standard lease)
+    redactions.length = 0;
+    const w = canvas.width, h = canvas.height;
+    redactions.push(
+      { x: 0.02, y: 0.06, w: 0.45, h: 0.06, label: 'Name / Address' },
+      { x: 0.55, y: 0.06, w: 0.43, h: 0.04, label: 'SSN' },
+      { x: 0.02, y: 0.88, w: 0.35, h: 0.06, label: 'Signature' }
+    );
+    drawRedactions(ctx, canvas.width, canvas.height);
+    panel.classList.add('visible');
+  };
+
+  img.src = src;
+
+  // Draw interactions
+  canvas.addEventListener('mousedown', startDraw);
+  canvas.addEventListener('mousemove', duringDraw);
+  canvas.addEventListener('mouseup', endDraw);
+  canvas.addEventListener('touchstart', e => { e.preventDefault(); startDraw(e.touches[0]); }, { passive: false });
+  canvas.addEventListener('touchmove', e => { e.preventDefault(); duringDraw(e.touches[0]); }, { passive: false });
+  canvas.addEventListener('touchend', e => { e.preventDefault(); endDraw(); }, { passive: false });
+}
+
+function getCanvasPos(e, canvas) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (e.clientX - rect.left) / rect.width,
+    y: (e.clientY - rect.top) / rect.height
+  };
+}
+
+function startDraw(e) {
+  const canvas = document.getElementById('redactionCanvas');
+  drawStart = getCanvasPos(e, canvas);
+  isDrawing = true;
+}
+
+function duringDraw(e) {
+  if (!isDrawing) return;
+  const canvas = document.getElementById('redactionCanvas');
+  const ctx = canvas.getContext('2d');
+  const pos = getCanvasPos(e, canvas);
+  redrawCanvas();
+  ctx.fillStyle = 'rgba(28,25,23,0.85)';
+  ctx.fillRect(
+    drawStart.x * canvas.width,
+    drawStart.y * canvas.height,
+    (pos.x - drawStart.x) * canvas.width,
+    (pos.y - drawStart.y) * canvas.height
+  );
+}
+
+function endDraw(e) {
+  if (!isDrawing) return;
+  isDrawing = false;
+  const canvas = document.getElementById('redactionCanvas');
+  const pos = getCanvasPos(e || { clientX: 0, clientY: 0 }, canvas);
+  if (Math.abs(pos.x - drawStart.x) > 0.02) {
+    redactions.push({
+      x: Math.min(drawStart.x, pos.x),
+      y: Math.min(drawStart.y, pos.y),
+      w: Math.abs(pos.x - drawStart.x),
+      h: Math.abs(pos.y - drawStart.y),
+      label: 'Custom'
+    });
+  }
+  redrawCanvas();
+}
+
+function redrawCanvas() {
+  const canvas = document.getElementById('redactionCanvas');
+  const ctx = canvas.getContext('2d');
+  const img = new Image();
+  img.src = sessionStorage.getItem('leaseImage');
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    drawRedactions(ctx, canvas.width, canvas.height);
+  };
+}
+
+function drawRedactions(ctx, w, h) {
+  redactions.forEach(r => {
+    ctx.fillStyle = 'rgba(28,25,23,0.88)';
+    ctx.fillRect(r.x * w, r.y * h, r.w * w, r.h * h);
+    ctx.fillStyle = 'rgba(248,245,240,0.4)';
+    ctx.font = `${Math.max(10, w * 0.018)}px DM Mono, monospace`;
+    ctx.fillText(r.label || '', r.x * w + 6, r.y * h + 16);
+  });
+}
+
+function confirmRedactionAndExtract() {
+  document.getElementById('redactionPanel').classList.remove('visible');
+  document.getElementById('cameraZone').style.display = 'none';
+  const ep = document.getElementById('extractingPanel');
+  ep.classList.add('visible');
+  runExtractionAnimation('el');
+}
+
+function runExtractionAnimation(prefix) {
+  prefix = prefix || 'el';
+  const data = [
+    { id: prefix+'1', value: '$589 / mo' },
+    { id: prefix+'2', value: '36 months' },
+    { id: prefix+'3', value: '10,000 / yr' },
+    { id: prefix+'4', value: 'BMW of Ramsey · 07446' },
+    { id: prefix+'5', value: '$2,800' },
+  ];
+
+  data.forEach((item, i) => {
+    setTimeout(() => {
+      const el = document.getElementById(item.id);
+      if (!el) return;
+      el.classList.add('visible');
+      setTimeout(() => {
+        el.classList.add('done');
+        el.querySelector('.extract-value').textContent = item.value;
+        if (i === data.length - 1) {
+          setTimeout(() => goToStep3FromPhoto(), 600);
+        }
+      }, 600);
+    }, i * 500 + 200);
+  });
+}
+
+// ── MANUAL FORM ────────────────────────────────────
+function handleInput(id) {
+  const el = document.getElementById(id);
+  if (el && el.value && el.value !== '') {
+    el.classList.add('filled');
+    filledFields.add(id);
+  } else {
+    el.classList.remove('filled');
+    filledFields.delete(id);
+  }
+  updateConfidence();
+  checkManualRequired();
+}
+
+const requiredFields = ['f-vehicle', 'f-payment'];
+const optionalFields = ['f-term', 'f-zip', 'f-mileage', 'f-signing', 'f-month', 'f-dealer'];
+
+function checkManualRequired() {
+  const allFilled = requiredFields.every(id => {
+    const el = document.getElementById(id);
+    return el && el.value && el.value !== '';
+  });
+  document.getElementById('step2manualbtn').disabled = !allFilled;
+}
+
+function validateManualRequired() {
+  let valid = true;
+  requiredFields.forEach(id => {
+    const fg = document.getElementById('fg-' + id.replace('f-',''));
+    const el = document.getElementById(id);
+    if (!el || !el.value || el.value === '') {
+      fg && fg.classList.add('has-error');
+      valid = false;
+    } else {
+      fg && fg.classList.remove('has-error');
+    }
+  });
+  return valid;
+}
+
+function validatePayment() {
+  const el = document.getElementById('f-payment');
+  const fg = document.getElementById('fg-payment');
+  const v = parseFloat(el.value);
+  if (v < 100 || v > 3000) {
+    fg.classList.add('has-error');
+  } else {
+    fg.classList.remove('has-error');
+  }
+}
+
+function validateZip() {
+  const el = document.getElementById('f-zip');
+  const fg = document.getElementById('fg-zip');
+  if (el.value && (el.value.length !== 5 || !/^\d+$/.test(el.value))) {
+    fg.classList.add('has-error');
+  } else {
+    fg.classList.remove('has-error');
+  }
+}
+
+function updateConfidence() {
+  const total = requiredFields.length + optionalFields.length;
+  const filled = [...requiredFields, ...optionalFields].filter(id => {
+    const el = document.getElementById(id);
+    return el && el.value && el.value !== '';
+  }).length;
+
+  const pct = Math.round((filled / total) * 100);
+  const display = Math.max(15, pct);
+  document.getElementById('confFill').style.width = display + '%';
+
+  const labels = ['Basic','Fair','Good','Strong','Full'];
+  const msgs = [
+    'Add your vehicle and payment to get started.',
+    'Good start. Add term and zip code to improve accuracy.',
+    'Solid data. Adding your signing date will sharpen the timing score.',
+    'Strong submission. Your score will be highly accurate.',
+    'Excellent. Full data set — your score will be our most accurate.'
+  ];
+  const idx = Math.min(4, Math.floor(pct / 20));
+  document.getElementById('confPctLabel').textContent = labels[idx];
+  document.getElementById('confMessage').textContent = msgs[idx];
+  document.getElementById('confIcon').textContent = ['📊','📊','📈','✅','⭐'][idx];
+}
+
+// ── VERIFY STEP ────────────────────────────────────
+function populateVerifyFromManual() {
+  const v = document.getElementById('f-vehicle').value;
+  const p = document.getElementById('f-payment').value;
+  const t = document.getElementById('f-term').value;
+  const m = document.getElementById('f-mileage').value;
+  const s = document.getElementById('f-signing').value;
+  const z = document.getElementById('f-zip').value;
+  const d = document.getElementById('f-dealer').value;
+
+  if (v) { document.getElementById('vv-vehicle').value = v; document.getElementById('vf-vehicle').classList.add('auto-filled'); }
+  if (p) { document.getElementById('vv-payment').value = '$' + p + ' / mo'; document.getElementById('vf-payment').classList.add('auto-filled'); }
+  if (t) { document.getElementById('vv-term').value = t + ' months'; document.getElementById('vf-term').classList.add('auto-filled'); }
+  if (m) { document.getElementById('vv-mileage').value = parseInt(m).toLocaleString() + ' / yr'; document.getElementById('vf-mileage').classList.add('auto-filled'); }
+  if (s) { document.getElementById('vv-signing').value = '$' + parseFloat(s).toLocaleString(); document.getElementById('vf-signing').classList.add('auto-filled'); }
+  if (z) { document.getElementById('vv-zip').value = z; document.getElementById('vf-zip').style.cssText = ''; document.getElementById('vf-zip').classList.add('auto-filled'); }
+  if (d) { document.getElementById('vv-dealer').value = d; document.getElementById('vf-dealer').classList.add('auto-filled'); }
+}
+
+function checkVerifyComplete() {
+  const zip = document.getElementById('vv-zip').value;
+  if (zip && zip.length === 5) {
+    document.getElementById('vf-zip').style.cssText = '';
+    document.getElementById('vf-zip').classList.add('auto-filled');
+  }
+}
+
+// ── SESSION STORAGE ────────────────────────────────
+function saveToSession() {
+  const data = {
+    vehicle:  document.getElementById('vv-vehicle')?.value || '',
+    payment:  document.getElementById('vv-payment')?.value || '',
+    term:     document.getElementById('vv-term')?.value || '',
+    mileage:  document.getElementById('vv-mileage')?.value || '',
+    signing:  document.getElementById('vv-signing')?.value || '',
+    zip:      document.getElementById('vv-zip')?.value || '',
+    dealer:   document.getElementById('vv-dealer')?.value || '',
+    method:   fromPhoto ? 'photo' : 'manual',
+    timestamp: new Date().toISOString()
+  };
+  sessionStorage.setItem('leaseData', JSON.stringify(data));
+}
+
+// Init
+setProgress(10);
+updateDots(1);
+</script>
 </body>
 </html>
