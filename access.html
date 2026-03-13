@@ -4,15 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Get Full Access — LeaseCheckr</title>
-  <meta name="description" content="Unlock your full LeaseCheckr report. Pay $19.99 for instant access — or upload your signed NJ lease document and get one full report free.">
-  <meta property="og:title" content="Get Full Access — LeaseCheckr">
-  <meta property="og:description" content="Unlock your full LeaseCheckr report. Pay $19.99 for instant access — or upload your signed NJ lease document and get one full report free.">
-  <meta property="og:url" content="https://leasecheckr.vercel.app/access.html">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="LeaseCheckr">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Get Full Access — LeaseCheckr">
-  <meta name="twitter:description" content="Unlock your full LeaseCheckr report. Pay $19.99 for instant access — or upload your signed NJ lease document and get one full report free.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
@@ -84,7 +75,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 60px 48px 80px;
+      padding: 60px 24px 80px;
     }
 
     /* HEADER */
@@ -130,7 +121,6 @@
       gap: 24px;
       width: 100%;
       max-width: 860px;
-      min-width: 0;
       align-items: stretch;
       position: relative;
     }
@@ -388,7 +378,20 @@
       color: var(--canvas);
     }
 
-    .btn-pay:hover { background: var(--copper-lt); }
+    .btn-pay:hover:not(:disabled) { background: var(--copper-lt); }
+    .btn-pay:disabled { opacity: 0.7; cursor: wait; }
+
+    .btn-spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: -2px;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     .btn-contribute {
       background: var(--ink);
@@ -396,18 +399,6 @@
     }
 
     .btn-contribute:hover { background: var(--ink-light); }
-
-    .coming-soon {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.55rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      background: rgba(168,105,46,0.25);
-      color: var(--copper-lt);
-      border: 1px solid rgba(168,105,46,0.3);
-      padding: 3px 8px;
-      border-radius: 2px;
-    }
 
     .btn-sub-note {
       text-align: center;
@@ -469,189 +460,6 @@
 
     .founder-nudge a:hover { border-color: var(--copper); }
 
-    /* ── EMAIL GATE MODAL ── */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(28,25,23,0.6);
-      backdrop-filter: blur(4px);
-      z-index: 500;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-    }
-    .modal-overlay.open { display: flex; }
-
-    .modal {
-      background: var(--canvas);
-      border-radius: 6px;
-      padding: 48px 44px;
-      max-width: 440px;
-      width: 100%;
-      position: relative;
-      animation: modalUp 0.3s cubic-bezier(0.16,1,0.3,1) forwards;
-    }
-
-    @keyframes modalUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .modal-close {
-      position: absolute;
-      top: 16px; right: 20px;
-      background: none; border: none;
-      font-size: 1.2rem; color: var(--ink-muted);
-      cursor: pointer; line-height: 1;
-      padding: 4px 8px;
-      transition: color 0.2s;
-    }
-    .modal-close:hover { color: var(--ink); }
-
-    .modal-eyebrow {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--copper);
-      margin-bottom: 14px;
-    }
-
-    .modal h2 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.9rem;
-      font-weight: 400;
-      line-height: 1.2;
-      color: var(--ink);
-      margin-bottom: 10px;
-    }
-
-    .modal h2 em { font-style: italic; color: var(--copper); }
-
-    .modal-desc {
-      font-size: 0.85rem;
-      color: var(--ink-muted);
-      line-height: 1.65;
-      margin-bottom: 28px;
-    }
-
-    .email-field {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 14px;
-    }
-
-    .email-field label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.58rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--ink-muted);
-    }
-
-    .email-field input {
-      width: 100%;
-      padding: 13px 16px;
-      border: 1px solid var(--border-strong);
-      border-radius: 3px;
-      background: white;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.95rem;
-      color: var(--ink);
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .email-field input:focus { border-color: var(--copper); }
-    .email-field input.error { border-color: #c0392b; }
-
-    .email-error {
-      font-size: 0.75rem;
-      color: #c0392b;
-      display: none;
-      margin-top: -4px;
-    }
-    .email-error.visible { display: block; }
-
-    .modal-btn {
-      width: 100%;
-      padding: 15px;
-      background: var(--copper);
-      color: var(--canvas);
-      border: none;
-      border-radius: 3px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 500;
-      letter-spacing: 0.04em;
-      cursor: pointer;
-      transition: background 0.2s;
-      margin-bottom: 10px;
-    }
-    .modal-btn:hover { background: var(--copper-lt); }
-    .modal-btn:disabled { background: var(--ink-muted); cursor: not-allowed; }
-
-    .modal-privacy {
-      text-align: center;
-      font-size: 0.72rem;
-      color: var(--ink-muted);
-      line-height: 1.5;
-    }
-    .modal-privacy a { color: var(--ink-muted); text-decoration: underline; }
-
-    /* SUCCESS STATE */
-    .modal-success {
-      display: none;
-      text-align: center;
-      padding: 12px 0;
-    }
-    .modal-success.visible { display: block; }
-    .modal-success-icon {
-      width: 48px; height: 48px;
-      border-radius: 50%;
-      background: #e8f0ea;
-      color: var(--sage);
-      font-size: 1.4rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 16px;
-    }
-    .modal-success h3 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.6rem;
-      font-weight: 400;
-      color: var(--ink);
-      margin-bottom: 10px;
-    }
-    .modal-success p {
-      font-size: 0.85rem;
-      color: var(--ink-muted);
-      line-height: 1.65;
-      margin-bottom: 24px;
-    }
-    .modal-success-btn {
-      display: inline-block;
-      padding: 14px 32px;
-      background: var(--ink);
-      color: var(--canvas);
-      border-radius: 3px;
-      font-size: 0.82rem;
-      font-weight: 500;
-      text-decoration: none;
-      transition: background 0.2s;
-    }
-    .modal-success-btn:hover { background: var(--ink-light); }
-
-    .modal-form-wrap { transition: opacity 0.2s; }
-    .modal-form-wrap.hidden { opacity: 0; pointer-events: none; }
-
-    @media (max-width: 480px) {
-      .modal { padding: 36px 28px; }
-    }
-
     /* ANIMATIONS */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(16px); }
@@ -664,22 +472,12 @@
     .d3 { animation-delay: 0.25s; }
     .d4 { animation-delay: 0.35s; }
 
-    @media (max-width: 540px) {
+    @media (max-width: 700px) {
       nav { padding: 0 20px; }
       .cards { grid-template-columns: 1fr; }
       .or-divider { display: none; }
       .option-card { padding: 32px 28px; }
       .page-header { margin-bottom: 40px; }
-    }
-    footer { border-top: 1px solid var(--border); padding: 28px 64px; display: flex; align-items: center; justify-content: space-between; background: var(--canvas); }
-    .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--ink-3); }
-    .footer-logo span { color: var(--copper); }
-    .footer-links { display: flex; gap: 24px; }
-    .footer-links a { font-size: 0.71rem; color: var(--ink-4); text-decoration: none; transition: color 0.2s; }
-    .footer-links a:hover { color: var(--ink); }
-    @media (max-width: 768px) {
-      footer { padding: 24px; flex-direction: column; gap: 16px; text-align: center; }
-      .footer-links { flex-wrap: wrap; justify-content: center; }
     }
   </style>
 </head>
@@ -730,10 +528,13 @@
           <p class="price-note">One-time. No subscription. Yours to keep.</p>
         </div>
 
-        <a href="#" class="card-btn btn-pay" onclick="event.preventDefault(); openModal();">
-          Pay $19.99 — Get Instant Access
-        </a>
-        <p class="btn-sub-note">Secure checkout · One-time payment · No subscription</p>
+        <button id="stripePayBtn" class="card-btn btn-pay" onclick="handleStripeCheckout()">
+          Pay $19.99 — Secure Checkout
+        </button>
+        <p class="btn-sub-note">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:4px;opacity:0.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Powered by Stripe · 256-bit encryption
+        </p>
       </div>
 
       <!-- OPTION 2: CONTRIBUTE -->
@@ -778,148 +579,101 @@
       <a href="founder.html">Claim a Founding Member spot instead →</a>
     </div>
 
-  </main>
-
-  <footer>
-    <span class="footer-logo">Lease<span>Checkr</span></span>
-    <div class="footer-links">
-      <a href="index.html">Home</a>
-      <a href="pricing.html">Pricing</a>
-      <a href="founder.html">Founding Member</a>
-      <a href="privacy.html">Privacy</a>
-      <a href="terms.html">Terms</a>
-    </div>
-  </footer>
-
-  <!-- ── EMAIL GATE MODAL ── -->
-  <div class="modal-overlay" id="emailOverlay">
-    <div class="modal">
-      <button class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
-
-      <!-- FORM STATE -->
-      <div class="modal-form-wrap" id="modalForm">
-        <div class="modal-eyebrow">One last step</div>
-        <h2>Where should we<br>send your <em>report?</em></h2>
-        <p class="modal-desc">Enter your email and we'll deliver your full report there — and send a copy you can reference any time.</p>
-
-        <div class="email-field">
-          <label for="gateEmail">Email address</label>
-          <input type="email" id="gateEmail" placeholder="you@email.com" autocomplete="email">
-          <div class="email-error" id="emailError">Please enter a valid email address.</div>
-        </div>
-
-        <button class="modal-btn" id="continueBtn" onclick="handleEmailSubmit()">
-          Continue to Payment →
-        </button>
-
-        <p class="modal-privacy">
-          No spam. Your report, one receipt, and occasional product updates.<br>
-          <a href="privacy.html">Privacy policy</a>
-        </p>
-      </div>
-
-      <!-- SUCCESS STATE -->
-      <div class="modal-success" id="modalSuccess">
-        <div class="modal-success-icon">✓</div>
-        <h3>You're all set.</h3>
-        <p>We've saved your email. You'll be redirected to payment — your report will be waiting when you return.</p>
-        <a href="#" class="modal-success-btn" id="stripeBtn">Continue to Payment →</a>
-        <p style="margin-top:14px;font-size:0.72rem;color:var(--ink-muted);">Stripe checkout launching soon — check back shortly.</p>
-      </div>
-
-    </div>
-  </div>
-
+  <!-- Stripe JS -->
+  <script src="https://js.stripe.com/v3/"></script>
   <script>
-    // ── Supabase config ──────────────────────────────────────────
-    const SUPABASE_URL = 'https://xqjsvlhdpdfvzixlmdxk.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxanN2bGhkcGRmdnppeGxtZHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzg2ODcsImV4cCI6MjA4ODg1NDY4N30.MT0tEDMLaBDLtZkX9xEVEkaUfPdIA9QsJrWjGDpeWsE';
+    // ══════════════════════════════════════════════════════
+    // STRIPE CONFIGURATION
+    // Replace these with your actual Stripe values:
+    //   1. YOUR_STRIPE_PUBLISHABLE_KEY  → from Stripe Dashboard > Developers > API keys
+    //   2. YOUR_PRICE_ID                → from Stripe Dashboard > Products > your $19.99 product > Price ID (starts with price_)
+    // ══════════════════════════════════════════════════════
+    const STRIPE_PK    = 'YOUR_STRIPE_PUBLISHABLE_KEY';   // pk_test_... or pk_live_...
+    const PRICE_ID     = 'YOUR_PRICE_ID';                 // price_...
+    const SUCCESS_URL  = window.location.origin + '/access.html?session_id={CHECKOUT_SESSION_ID}&status=success';
+    const CANCEL_URL   = window.location.origin + '/access.html?status=cancelled';
 
-    async function saveEmailToSupabase(email) {
-      try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/email_leads`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-            'Prefer': 'return=minimal'
-          },
-          body: JSON.stringify({
-            email: email,
-            source: 'report_gate',
-            consent_marketing: false
-          })
-        });
-        return res.ok || res.status === 409;
-      } catch (err) {
-        console.warn('Supabase write failed, falling back to localStorage', err);
-        return false;
-      }
-    }
-    // ────────────────────────────────────────────────────────────
-
-    function openModal() {
-      document.getElementById('emailOverlay').classList.add('open');
-      setTimeout(() => document.getElementById('gateEmail').focus(), 300);
+    // Initialize Stripe (only if key is set)
+    let stripe = null;
+    if (STRIPE_PK !== 'YOUR_STRIPE_PUBLISHABLE_KEY') {
+      stripe = Stripe(STRIPE_PK);
     }
 
-    function closeModal() {
-      document.getElementById('emailOverlay').classList.remove('open');
-      document.getElementById('gateEmail').value = '';
-      document.getElementById('gateEmail').classList.remove('error');
-      document.getElementById('emailError').classList.remove('visible');
-      document.getElementById('modalForm').classList.remove('hidden');
-      document.getElementById('modalSuccess').classList.remove('visible');
-    }
+    async function handleStripeCheckout() {
+      const btn = document.getElementById('stripePayBtn');
 
-    function isValidEmail(email) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
-
-    async function handleEmailSubmit() {
-      const emailInput = document.getElementById('gateEmail');
-      const btn = document.getElementById('continueBtn');
-      const errorEl = document.getElementById('emailError');
-      const email = emailInput.value.trim();
-
-      if (!isValidEmail(email)) {
-        emailInput.classList.add('error');
-        errorEl.classList.add('visible');
-        emailInput.focus();
+      // Guard: keys not configured yet
+      if (!stripe) {
+        btn.textContent = 'Payment setup in progress';
+        btn.style.opacity = '0.6';
+        setTimeout(() => {
+          btn.textContent = 'Pay $19.99 — Secure Checkout';
+          btn.style.opacity = '1';
+        }, 2000);
         return;
       }
 
-      emailInput.classList.remove('error');
-      errorEl.classList.remove('visible');
+      // Loading state
       btn.disabled = true;
-      btn.textContent = 'Saving…';
+      btn.innerHTML = '<span class="btn-spinner"></span> Redirecting to Stripe…';
 
-      // Write to Supabase + localStorage backup
-      saveEmailToSupabase(email);
-      localStorage.setItem('lc_email', email);
+      try {
+        const { error } = await stripe.redirectToCheckout({
+          lineItems: [{ price: PRICE_ID, quantity: 1 }],
+          mode: 'payment',
+          successUrl: SUCCESS_URL,
+          cancelUrl: CANCEL_URL,
+          billingAddressCollection: 'auto',
+        });
 
-      setTimeout(() => {
+        if (error) {
+          console.error('Stripe error:', error);
+          btn.disabled = false;
+          btn.textContent = 'Something went wrong — try again';
+          setTimeout(() => { btn.textContent = 'Pay $19.99 — Secure Checkout'; }, 3000);
+        }
+      } catch (err) {
+        console.error('Checkout error:', err);
         btn.disabled = false;
-        btn.textContent = 'Continue to Payment →';
-        document.getElementById('modalForm').classList.add('hidden');
-        setTimeout(() => {
-          document.getElementById('modalSuccess').classList.add('visible');
-        }, 200);
-      }, 600);
+        btn.textContent = 'Connection error — try again';
+        setTimeout(() => { btn.textContent = 'Pay $19.99 — Secure Checkout'; }, 3000);
+      }
     }
 
-    document.getElementById('emailOverlay').addEventListener('click', function(e) {
-      if (e.target === this) closeModal();
-    });
+    // ── Handle return from Stripe ──────────────────────
+    (function handleReturnStatus() {
+      const params = new URLSearchParams(window.location.search);
+      const status = params.get('status');
 
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') closeModal();
-    });
+      if (status === 'success') {
+        const main = document.querySelector('main');
+        main.innerHTML = `
+          <div style="text-align:center; max-width:520px; animation:fadeUp 0.5s ease forwards;">
+            <div style="width:72px;height:72px;border-radius:50%;background:var(--sage-pale);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:1.8rem;">✓</div>
+            <p style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--sage);margin-bottom:16px;">Payment Confirmed</p>
+            <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,2.8rem);font-weight:400;line-height:1.15;margin-bottom:16px;">Your full report<br>is <em style='color:var(--copper)'>on the way.</em></h1>
+            <p style="font-size:0.92rem;color:var(--ink-muted);line-height:1.7;margin-bottom:32px;">We're generating your complete lease analysis now. You'll receive it at the email address you provided during checkout.</p>
+            <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+              <a href="index.html" style="display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:var(--canvas);padding:14px 28px;border-radius:2px;font-size:0.78rem;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">← Back to Home</a>
+              <a href="sample-report.html" style="display:inline-flex;align-items:center;gap:8px;color:var(--copper);padding:14px 28px;border:1px solid rgba(168,105,46,0.3);border-radius:2px;font-size:0.78rem;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">View Sample Report</a>
+            </div>
+          </div>
+        `;
+        // Clean URL
+        window.history.replaceState({}, '', '/access.html');
+      }
 
-    document.getElementById('gateEmail').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') handleEmailSubmit();
-    });
+      if (status === 'cancelled') {
+        const header = document.querySelector('.page-header');
+        if (header) {
+          const notice = document.createElement('div');
+          notice.style.cssText = 'background:var(--copper-pale);border:1px solid rgba(168,105,46,0.2);border-radius:3px;padding:14px 20px;margin-bottom:24px;font-size:0.84rem;color:var(--ink-light);text-align:center;';
+          notice.textContent = 'Checkout was cancelled — no charge was made. Ready when you are.';
+          header.prepend(notice);
+        }
+        window.history.replaceState({}, '', '/access.html');
+      }
+    })();
   </script>
 
 </body>
