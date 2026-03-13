@@ -4,15 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>LeaseCheckr — Upload Your Lease</title>
-<meta name="description" content="Upload your NJ lease document to unlock one full report free. Your personal details are fully redacted before processing.">
-  <meta property="og:title" content="Upload Your Lease — LeaseCheckr">
-  <meta property="og:description" content="Upload your NJ lease document to unlock one full report free. Your personal details are fully redacted before processing.">
-  <meta property="og:url" content="https://leasecheckr.vercel.app/intake-upload.html">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="LeaseCheckr">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Upload Your Lease — LeaseCheckr">
-  <meta name="twitter:description" content="Upload your NJ lease document to unlock one full report free. Your personal details are fully redacted before processing.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -903,19 +894,19 @@ footer { border-top: 1px solid var(--border); padding: 28px 64px; display: flex;
     </div>
 
     <div class="camera-panel">
-      <div class="camera-zone" id="uploadZone" onclick="triggerUpload()">
-        <div class="camera-empty">
+      <div class="camera-zone" id="uploadZone">
+        <div class="camera-empty" id="uploadEmpty">
           <span class="camera-icon">📂</span>
           <div class="camera-title">Select your lease file</div>
           <p class="camera-hint">Choose a PDF, JPG, or PNG of your lease document.<br>Page 1 of the MVSC-1 form is all we need.</p>
-          <button class="camera-btn" onclick="triggerUpload(); event.stopPropagation()">
+          <button class="camera-btn" onclick="triggerUpload()">
             <span>📂</span> Choose File
           </button>
           <div class="camera-formats">PDF · JPG · PNG — Max 10MB</div>
         </div>
-        <img id="uploadPreview" alt="Uploaded lease document preview">
+        <img id="uploadPreview" alt="Uploaded lease document preview" style="display:none;">
       </div>
-      <input type="file" id="uploadInput" accept="image/*,.pdf" style="display:none; pointer-events:none;" onchange="handleFileSelect(event, 'upload')">
+      <input type="file" id="uploadInput" accept="image/*,.pdf" style="display:none;" onchange="handleFileSelect(event, 'upload')">
     </div>
 
     <!-- Redaction panel for upload -->
@@ -1184,9 +1175,10 @@ function showStep(id) {
 
 function selectMethod(method) {
   selectedMethod = method;
-  document.getElementById('card-photo').classList.toggle('selected', method === 'photo');
-  document.getElementById('card-upload').classList.toggle('selected', method === 'upload');
-  document.getElementById('card-manual').classList.toggle('selected', method === 'manual');
+  ['card-photo','card-upload','card-manual'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('selected', id === 'card-' + method);
+  });
   document.getElementById('step1btn').disabled = false;
 }
 
@@ -1256,21 +1248,46 @@ function triggerUpload() {
 function handleFileSelect(e, source) {
   const file = e.target.files[0];
   if (!file) return;
+
+  // Validate size (10MB max)
+  if (file.size > 10 * 1024 * 1024) {
+    alert('File is too large. Please choose a file under 10MB.');
+    e.target.value = '';
+    return;
+  }
+
   const reader = new FileReader();
   reader.onload = (ev) => {
-    sessionStorage.setItem('leaseImage', ev.target.result);
+    const dataUrl = ev.target.result;
+
     if (source === 'photo') {
-      const zone = document.getElementById('cameraZone');
+      const zone    = document.getElementById('cameraZone');
       const preview = document.getElementById('cameraPreview');
-      preview.src = ev.target.result;
+      preview.src = dataUrl;
       zone.classList.add('has-image');
-      showRedaction(ev.target.result, 'redactionCanvas', 'redactionPanel');
+      showRedaction(dataUrl, 'redactionCanvas', 'redactionPanel');
     } else {
-      const zone = document.getElementById('uploadZone');
+      // Upload flow: show file name + hide empty state
+      const empty   = document.getElementById('uploadEmpty');
       const preview = document.getElementById('uploadPreview');
-      preview.src = ev.target.result;
+      const zone    = document.getElementById('uploadZone');
+
+      if (file.type === 'application/pdf') {
+        // For PDFs: show a placeholder thumbnail with file name
+        empty.innerHTML = `
+          <span class="camera-icon">📄</span>
+          <div class="camera-title" style="color:var(--copper)">${file.name}</div>
+          <p class="camera-hint">PDF selected · Rendering first page for redaction review…</p>
+        `;
+        preview.style.display = 'none';
+      } else {
+        // Image: show preview
+        preview.src = dataUrl;
+        preview.style.display = 'block';
+        empty.style.display   = 'none';
+      }
       zone.classList.add('has-image');
-      showRedaction(ev.target.result, 'redactionCanvasUpload', 'redactionPanelUpload');
+      showRedaction(dataUrl, 'redactionCanvasUpload', 'redactionPanelUpload');
     }
   };
   reader.readAsDataURL(file);
@@ -1308,25 +1325,83 @@ function confirmUploadAndExtract() {
 const redactions = [];
 let isDrawing = false;
 let drawStart = {};
+let activeCanvasId = 'redactionCanvas'; // tracks which canvas is currently active
 
 function showRedaction(src, canvasId, panelId) {
   canvasId = canvasId || 'redactionCanvas';
-  panelId = panelId || 'redactionPanel';
-  const panel = document.getElementById(panelId);
+  panelId  = panelId  || 'redactionPanel';
+  activeCanvasId = canvasId;
+
+  const panel  = document.getElementById(panelId);
   const canvas = document.getElementById(canvasId);
-  const ctx = canvas.getContext('2d');
-  const img = new Image();
+  const ctx    = canvas.getContext('2d');
 
-  img.onload = function() {
-    const maxW = canvas.parentElement.offsetWidth;
-    const ratio = img.height / img.width;
-    canvas.width = maxW;
-    canvas.height = maxW * ratio;
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  function renderImage(imgSrc) {
+    const img = new Image();
+    img.onload = function() {
+      const maxW = canvas.parentElement.offsetWidth || 600;
+      const ratio = img.height / img.width;
+      canvas.width  = maxW;
+      canvas.height = maxW * ratio;
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      redactions.length = 0;
+      redactions.push(
+        { x: 0.02, y: 0.06, w: 0.45, h: 0.06, label: 'Name / Address' },
+        { x: 0.55, y: 0.06, w: 0.43, h: 0.04, label: 'SSN' },
+        { x: 0.02, y: 0.88, w: 0.35, h: 0.06, label: 'Signature' }
+      );
+      drawRedactions(ctx, canvas.width, canvas.height);
+      panel.classList.add('visible');
+      canvas.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    };
+    img.src = imgSrc;
+  }
 
-    // Default redaction zones for MVSC-1 (NJ standard lease)
+  // Route PDF vs image
+  if (src.indexOf('data:application/pdf') === 0 || src.indexOf('data:application/octet') === 0) {
+    renderPdfPage(src, canvas, ctx, panel);
+  } else {
+    sessionStorage.setItem('leaseImage', src);
+    renderImage(src);
+  }
+
+  // Re-bind draw events cleanly (clone removes old listeners)
+  const old = document.getElementById(canvasId);
+  const fresh = old.cloneNode(true);
+  old.parentNode.replaceChild(fresh, old);
+  fresh.addEventListener('mousedown', startDraw);
+  fresh.addEventListener('mousemove', duringDraw);
+  fresh.addEventListener('mouseup',   endDraw);
+  fresh.addEventListener('touchstart', e => { e.preventDefault(); startDraw(e.touches[0]); }, { passive: false });
+  fresh.addEventListener('touchmove',  e => { e.preventDefault(); duringDraw(e.touches[0]); }, { passive: false });
+  fresh.addEventListener('touchend',   e => { e.preventDefault(); endDraw(); }, { passive: false });
+}
+
+async function renderPdfPage(dataUrl, canvas, ctx, panel) {
+  try {
+    if (!window.pdfjsLib) {
+      await new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+        s.onload = res; s.onerror = rej;
+        document.head.appendChild(s);
+      });
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+    const raw  = atob(dataUrl.split(',')[1]);
+    const arr  = new Uint8Array(raw.length);
+    for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+    const pdf  = await window.pdfjsLib.getDocument({ data: arr }).promise;
+    const page = await pdf.getPage(1);
+    const maxW = canvas.parentElement.offsetWidth || 600;
+    const vp   = page.getViewport({ scale: maxW / page.getViewport({ scale: 1 }).width });
+    canvas.width  = vp.width;
+    canvas.height = vp.height;
+    await page.render({ canvasContext: ctx, viewport: vp }).promise;
+    // Cache as image for redraws
+    sessionStorage.setItem('leaseImage', canvas.toDataURL('image/jpeg', 0.92));
     redactions.length = 0;
-    const w = canvas.width, h = canvas.height;
     redactions.push(
       { x: 0.02, y: 0.06, w: 0.45, h: 0.06, label: 'Name / Address' },
       { x: 0.55, y: 0.06, w: 0.43, h: 0.04, label: 'SSN' },
@@ -1334,36 +1409,40 @@ function showRedaction(src, canvasId, panelId) {
     );
     drawRedactions(ctx, canvas.width, canvas.height);
     panel.classList.add('visible');
-  };
-
-  img.src = src;
-
-  // Draw interactions
-  canvas.addEventListener('mousedown', startDraw);
-  canvas.addEventListener('mousemove', duringDraw);
-  canvas.addEventListener('mouseup', endDraw);
-  canvas.addEventListener('touchstart', e => { e.preventDefault(); startDraw(e.touches[0]); }, { passive: false });
-  canvas.addEventListener('touchmove', e => { e.preventDefault(); duringDraw(e.touches[0]); }, { passive: false });
-  canvas.addEventListener('touchend', e => { e.preventDefault(); endDraw(); }, { passive: false });
+    canvas.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } catch(err) {
+    console.error('PDF render error:', err);
+    canvas.width = 480; canvas.height = 120;
+    ctx.fillStyle = '#f8f5f0';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#1c1917';
+    ctx.font = '13px DM Sans, sans-serif';
+    ctx.fillText('PDF loaded — standard redactions applied automatically.', 16, 56);
+    sessionStorage.setItem('leaseImage', canvas.toDataURL());
+    redactions.length = 0;
+    panel.classList.add('visible');
+  }
 }
 
 function getCanvasPos(e, canvas) {
   const rect = canvas.getBoundingClientRect();
   return {
     x: (e.clientX - rect.left) / rect.width,
-    y: (e.clientY - rect.top) / rect.height
+    y: (e.clientY - rect.top)  / rect.height
   };
 }
 
 function startDraw(e) {
-  const canvas = document.getElementById('redactionCanvas');
+  const canvas = document.getElementById(activeCanvasId);
+  if (!canvas) return;
   drawStart = getCanvasPos(e, canvas);
   isDrawing = true;
 }
 
 function duringDraw(e) {
   if (!isDrawing) return;
-  const canvas = document.getElementById('redactionCanvas');
+  const canvas = document.getElementById(activeCanvasId);
+  if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const pos = getCanvasPos(e, canvas);
   redrawCanvas();
@@ -1379,9 +1458,10 @@ function duringDraw(e) {
 function endDraw(e) {
   if (!isDrawing) return;
   isDrawing = false;
-  const canvas = document.getElementById('redactionCanvas');
-  const pos = getCanvasPos(e || { clientX: 0, clientY: 0 }, canvas);
-  if (Math.abs(pos.x - drawStart.x) > 0.02) {
+  const canvas = document.getElementById(activeCanvasId);
+  if (!canvas) return;
+  const pos = e ? getCanvasPos(e, canvas) : { x: drawStart.x, y: drawStart.y };
+  if (Math.abs(pos.x - drawStart.x) > 0.01) {
     redactions.push({
       x: Math.min(drawStart.x, pos.x),
       y: Math.min(drawStart.y, pos.y),
@@ -1394,21 +1474,24 @@ function endDraw(e) {
 }
 
 function redrawCanvas() {
-  const canvas = document.getElementById('redactionCanvas');
+  const canvas = document.getElementById(activeCanvasId);
+  if (!canvas) return;
   const ctx = canvas.getContext('2d');
+  const src = sessionStorage.getItem('leaseImage');
+  if (!src) return;
   const img = new Image();
-  img.src = sessionStorage.getItem('leaseImage');
   img.onload = () => {
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     drawRedactions(ctx, canvas.width, canvas.height);
   };
+  img.src = src;
 }
 
 function drawRedactions(ctx, w, h) {
   redactions.forEach(r => {
     ctx.fillStyle = 'rgba(28,25,23,0.88)';
     ctx.fillRect(r.x * w, r.y * h, r.w * w, r.h * h);
-    ctx.fillStyle = 'rgba(248,245,240,0.4)';
+    ctx.fillStyle = 'rgba(248,245,240,0.5)';
     ctx.font = `${Math.max(10, w * 0.018)}px DM Mono, monospace`;
     ctx.fillText(r.label || '', r.x * w + 6, r.y * h + 16);
   });
