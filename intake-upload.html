@@ -7,1788 +7,418 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 16px; height: 100%; }
-
-:root {
-  --canvas:      #f8f5f0;
-  --canvas-2:    #f2ede4;
-  --canvas-3:    #ece6db;
-  --white:       #ffffff;
-  --ink:         #1c1917;
-  --ink-2:       #3d3830;
-  --ink-3:       #6b6259;
-  --ink-4:       #a89f94;
-  --ink-5:       #cfc8bf;
-  --copper:      #a8692e;
-  --copper-lt:   #c4864a;
-  --copper-bg:   #f5ebe0;
-  --copper-pale: #faf3ea;
-  --sage:        #5c7a65;
-  --sage-lt:     #7a9e85;
-  --sage-bg:     #eef4f0;
-  --rose:        #a85a4a;
-  --rose-bg:     #fdf0ee;
-  --border:      rgba(28,25,23,0.09);
-  --border-lt:   rgba(28,25,23,0.05);
-  --ease:        cubic-bezier(0.16, 1, 0.3, 1);
-  --f-display:   'Cormorant Garamond', Georgia, serif;
-  --f-body:      'DM Sans', system-ui, sans-serif;
-  --f-mono:      'DM Mono', monospace;
-}
-
-body {
-  background: var(--canvas);
-  color: var(--ink);
-  font-family: var(--f-body);
-  -webkit-font-smoothing: antialiased;
-  min-height: 100%;
-}
-
-/* ── NAV ── */
-nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
-  height: 60px;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 32px;
-  background: rgba(248,245,240,0.92);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border);
-}
-
-.nav-logo {
-  font-family: var(--f-display);
-  font-size: 18px; font-weight: 400;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--ink);
-  text-decoration: none;
-}
-
-.nav-step-indicator {
-  display: flex; align-items: center; gap: 8px;
-}
-
-.step-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--ink-5);
-  transition: background 0.3s, transform 0.3s;
-}
-.step-dot.active { background: var(--copper); transform: scale(1.4); }
-.step-dot.done   { background: var(--sage); }
-
-/* ── PROGRESS BAR ── */
-.progress-bar {
-  position: fixed; top: 60px; left: 0; right: 0; z-index: 199;
-  height: 2px; background: var(--border);
-}
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--copper), var(--copper-lt));
-  transition: width 0.6s var(--ease);
-  width: 0%;
-}
-
-/* ── MAIN WRAPPER ── */
-.flow-wrapper {
-  max-width: 560px;
-  margin: 0 auto;
-  padding: 100px 24px 80px;
-}
-
-/* ── STEP ── */
-.step {
-  display: none;
-  opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
-}
-.step.active {
-  display: block;
-  opacity: 1;
-  transform: translateY(0);
-}
-.step.exiting {
-  opacity: 0;
-  transform: translateY(-12px);
-  pointer-events: none;
-}
-
-/* ── STEP HEADER ── */
-.step-kicker {
-  font-family: var(--f-mono);
-  font-size: 10px; letter-spacing: 0.22em;
-  text-transform: uppercase; color: var(--copper);
-  margin-bottom: 12px;
-  display: flex; align-items: center; gap: 10px;
-}
-.step-kicker::before { content: ''; width: 20px; height: 1px; background: var(--copper); }
-
-.step-title {
-  font-family: var(--f-display);
-  font-size: clamp(32px, 6vw, 48px);
-  font-weight: 300; line-height: 1.05;
-  letter-spacing: -0.01em; color: var(--ink);
-  margin-bottom: 10px;
-}
-.step-title em { font-style: italic; color: var(--copper); }
-
-.step-body {
-  font-size: 15px; font-weight: 300;
-  color: var(--ink-3); line-height: 1.75;
-  margin-bottom: 36px; max-width: 440px;
-}
-.step-body strong { color: var(--ink); font-weight: 500; }
-
-/* ── METHOD CHOICE ── */
-.method-grid {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 12px; margin-bottom: 24px;
-}
-.method-grid-3 {
-  grid-template-columns: 1fr 1fr 1fr;
-}
-@media (max-width: 500px) {
-  .method-grid-3 { grid-template-columns: 1fr; }
-}
-
-.method-card {
-  background: var(--white);
-  border: 1.5px solid var(--border);
-  border-radius: 20px;
-  padding: 28px 24px;
-  cursor: pointer;
-  transition: all 0.25s var(--ease);
-  text-align: left;
-  position: relative;
-  overflow: hidden;
-}
-
-.method-card::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(135deg, var(--copper-bg), transparent);
-  opacity: 0; transition: opacity 0.3s;
-}
-
-.method-card:hover { border-color: var(--copper-lt); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(168,105,46,0.1); }
-.method-card:hover::before { opacity: 1; }
-.method-card.selected { border-color: var(--copper); background: var(--copper-pale); }
-.method-card.selected::before { opacity: 1; }
-
-.method-icon {
-  width: 48px; height: 48px; border-radius: 14px;
-  background: var(--copper-bg);
-  border: 1px solid rgba(168,105,46,0.2);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; margin-bottom: 16px;
-  position: relative; z-index: 1;
-}
-
-.method-title {
-  font-family: var(--f-display);
-  font-size: 20px; font-weight: 400;
-  color: var(--ink); margin-bottom: 6px;
-  position: relative; z-index: 1;
-}
-
-.method-desc {
-  font-size: 12px; font-weight: 300;
-  color: var(--ink-3); line-height: 1.6;
-  position: relative; z-index: 1;
-}
-
-.method-badge {
-  position: absolute; top: 14px; right: 14px;
-  font-family: var(--f-mono); font-size: 9px;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  background: var(--copper); color: white;
-  padding: 3px 8px; border-radius: 20px;
-  z-index: 1;
-}
-
-/* ── PRIVACY TRUST BAR ── */
-.trust-bar {
-  display: flex; align-items: center; gap: 20px;
-  padding: 14px 20px;
-  background: var(--sage-bg);
-  border: 1px solid rgba(92,122,101,0.2);
-  border-radius: 12px;
-  margin-bottom: 32px;
-  flex-wrap: wrap; gap: 12px;
-}
-
-.trust-item {
-  display: flex; align-items: center; gap: 7px;
-  font-family: var(--f-mono); font-size: 10px;
-  letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--sage);
-}
-
-.trust-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--sage-lt); flex-shrink: 0; }
-
-/* ── CAMERA PANEL ── */
-.camera-panel { margin-bottom: 24px; }
-
-.privacy-card {
-  background: var(--ink);
-  border-radius: 20px;
-  padding: 32px 32px 28px;
-  margin-bottom: 20px;
-  position: relative;
-  overflow: hidden;
-}
-
-.privacy-card::before {
-  content: '🔒';
-  position: absolute; right: 24px; top: 50%;
-  transform: translateY(-50%);
-  font-size: 80px; opacity: 0.06;
-  pointer-events: none;
-}
-
-.privacy-eyebrow {
-  font-family: var(--f-mono); font-size: 9px;
-  letter-spacing: 0.22em; text-transform: uppercase;
-  color: var(--copper-lt); margin-bottom: 10px;
-  display: flex; align-items: center; gap: 8px;
-}
-.privacy-eyebrow::before { content: ''; width: 16px; height: 1px; background: var(--copper-lt); }
-
-.privacy-headline {
-  font-family: var(--f-display); font-size: 24px;
-  font-weight: 300; color: #f8f5f0;
-  line-height: 1.3; margin-bottom: 16px;
-  font-style: italic;
-}
-
-.privacy-points {
-  display: flex; flex-direction: column; gap: 10px;
-}
-
-.privacy-point {
-  display: flex; align-items: flex-start; gap: 10px;
-  font-size: 13px; font-weight: 300;
-  color: rgba(248,245,240,0.6); line-height: 1.6;
-}
-
-.privacy-check {
-  color: var(--sage-lt); font-size: 14px;
-  flex-shrink: 0; margin-top: 1px;
-}
-
-.camera-zone {
-  background: var(--white);
-  border: 1.5px dashed rgba(168,105,46,0.35);
-  border-radius: 20px;
-  padding: 40px 24px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.25s;
-  position: relative;
-  overflow: hidden;
-}
-
-.camera-zone:hover {
-  border-color: var(--copper);
-  background: var(--copper-pale);
-}
-
-.camera-zone.has-image {
-  border-style: solid;
-  border-color: var(--sage);
-  padding: 0;
-}
-
-#cameraPreview {
-  width: 100%; border-radius: 18px;
-  display: none; max-height: 320px;
-  object-fit: contain;
-}
-
-#uploadPreview {
-  width: 100%; border-radius: 18px;
-  display: none; max-height: 320px;
-  object-fit: contain;
-}
-
-.camera-zone.has-image #cameraPreview { display: block; }
-#uploadZone.has-image #cameraPreview { display: none; }
-.camera-zone.has-image #uploadPreview { display: block; }
-.camera-zone.has-image .camera-empty { display: none; }
-
-.camera-empty { }
-
-.camera-icon { font-size: 36px; margin-bottom: 14px; display: block; }
-
-.camera-title {
-  font-family: var(--f-display); font-size: 22px;
-  font-weight: 300; color: var(--ink);
-  margin-bottom: 6px;
-}
-
-.camera-hint {
-  font-size: 13px; font-weight: 300;
-  color: var(--ink-3); margin-bottom: 20px;
-  line-height: 1.6;
-}
-
-.camera-btn {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: var(--copper); color: white;
-  font-family: var(--f-body); font-size: 13px; font-weight: 500;
-  padding: 12px 24px; border-radius: 100px;
-  border: none; cursor: pointer;
-  transition: background 0.2s, transform 0.15s;
-}
-.camera-btn:hover { background: var(--copper-lt); transform: scale(1.02); }
-
-.camera-formats {
-  margin-top: 12px;
-  font-family: var(--f-mono); font-size: 10px;
-  color: var(--ink-5); letter-spacing: 0.1em; text-transform: uppercase;
-}
-
-/* ── REDACTION OVERLAY ── */
-.redaction-panel {
-  display: none;
-  margin-bottom: 24px;
-}
-
-.redaction-panel.visible { display: block; }
-
-.redaction-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 14px;
-}
-
-.redaction-title {
-  font-family: var(--f-display); font-size: 20px;
-  font-weight: 400; color: var(--ink);
-}
-
-.redaction-status {
-  font-family: var(--f-mono); font-size: 10px;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--sage); background: var(--sage-bg);
-  padding: 4px 10px; border-radius: 20px;
-  border: 1px solid rgba(92,122,101,0.2);
-}
-
-.redaction-canvas-wrap {
-  position: relative; border-radius: 16px;
-  overflow: hidden; background: var(--ink);
-  margin-bottom: 14px;
-}
-
-#redactionCanvas {
-  width: 100%; display: block; border-radius: 16px;
-  cursor: crosshair;
-}
-
-.redaction-instruction {
-  font-size: 12px; font-weight: 300;
-  color: var(--ink-3); line-height: 1.6;
-  text-align: center;
-  font-family: var(--f-mono); font-size: 10px;
-  letter-spacing: 0.06em; text-transform: uppercase;
-}
-
-.redaction-actions {
-  display: flex; gap: 10px; margin-top: 16px;
-}
-
-/* ── EXTRACTING STATE ── */
-.extracting-panel {
-  display: none; text-align: center;
-  padding: 48px 24px;
-}
-.extracting-panel.visible { display: block; }
-
-.extracting-animation {
-  margin-bottom: 28px;
-}
-
-.extract-line {
-  display: flex; align-items: center; gap: 12px;
-  padding: 12px 20px; margin-bottom: 8px;
-  background: var(--white); border: 1px solid var(--border);
-  border-radius: 10px; text-align: left;
-  opacity: 0; transform: translateX(-8px);
-  transition: all 0.4s var(--ease);
-}
-
-.extract-line.visible {
-  opacity: 1; transform: translateX(0);
-}
-
-.extract-line.done { border-color: rgba(92,122,101,0.3); background: var(--sage-bg); }
-
-.extract-dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: var(--ink-5); flex-shrink: 0;
-  transition: background 0.3s;
-}
-.extract-line.done .extract-dot { background: var(--sage); }
-
-.extract-text {
-  font-family: var(--f-mono); font-size: 11px;
-  letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--ink-3); flex: 1;
-}
-.extract-line.done .extract-text { color: var(--sage); }
-
-.extract-value {
-  font-family: var(--f-display); font-size: 16px;
-  font-weight: 400; color: var(--ink);
-  opacity: 0; transition: opacity 0.3s 0.2s;
-}
-.extract-line.done .extract-value { opacity: 1; }
-
-/* ── MANUAL FORM ── */
-.manual-form { }
-
-.form-section { margin-bottom: 32px; }
-
-.form-section-title {
-  font-family: var(--f-mono); font-size: 10px;
-  letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--copper); margin-bottom: 16px;
-  display: flex; align-items: center; gap: 10px;
-}
-.form-section-title::after { content: ''; flex: 1; height: 1px; background: rgba(168,105,46,0.2); }
-
-.form-grid {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-
-.form-group { display: flex; flex-direction: column; gap: 6px; }
-.form-group.full { grid-column: 1 / -1; }
-
-.form-label {
-  font-family: var(--f-mono); font-size: 10px;
-  letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--ink-3);
-}
-
-.form-label .optional {
-  color: var(--ink-5); margin-left: 4px; font-size: 9px;
-}
-
-.form-control {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 13px 16px;
-  font-family: var(--f-body); font-size: 15px;
-  color: var(--ink); outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-  appearance: none; width: 100%;
-}
-.form-control::placeholder { color: var(--ink-5); }
-.form-control:focus {
-  border-color: var(--copper);
-  box-shadow: 0 0 0 3px rgba(168,105,46,0.1);
-  background: var(--white);
-}
-.form-control.filled { border-color: rgba(92,122,101,0.4); background: var(--sage-bg); }
-.form-control.error { border-color: var(--rose); box-shadow: 0 0 0 3px rgba(168,90,74,0.1); }
-
-.form-control-wrap { position: relative; }
-.form-prefix {
-  position: absolute; left: 16px; top: 50%;
-  transform: translateY(-50%);
-  font-size: 15px; color: var(--ink-3);
-  pointer-events: none;
-}
-.form-control.has-prefix { padding-left: 28px; }
-
-.form-error {
-  font-family: var(--f-mono); font-size: 10px;
-  letter-spacing: 0.06em; color: var(--rose);
-  margin-top: 3px; display: none;
-}
-.form-group.has-error .form-error { display: block; }
-.form-group.has-error .form-control { border-color: var(--rose); }
-
-/* ── CONFIDENCE METER ── */
-.confidence-widget {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 18px 20px;
-  margin-top: 8px;
-  display: flex; align-items: center; gap: 14px;
-}
-
-.conf-icon { font-size: 18px; flex-shrink: 0; }
-
-.conf-content { flex: 1; }
-
-.conf-label {
-  font-family: var(--f-mono); font-size: 10px;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--ink-4); margin-bottom: 6px;
-  display: flex; justify-content: space-between;
-}
-
-.conf-track {
-  height: 5px; background: var(--canvas-2);
-  border-radius: 3px; overflow: hidden;
-}
-
-.conf-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--copper), var(--sage-lt));
-  border-radius: 3px; width: 25%;
-  transition: width 0.6s var(--ease);
-}
-
-.conf-message {
-  font-size: 12px; font-weight: 300;
-  color: var(--ink-3); margin-top: 5px; line-height: 1.5;
-}
-
-/* ── VERIFY STEP ── */
-.verify-grid {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 12px; margin-bottom: 24px;
-}
-
-.verify-field {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 16px 18px;
-  transition: border-color 0.2s;
-}
-
-.verify-field.auto-filled {
-  border-color: rgba(92,122,101,0.35);
-  background: var(--sage-bg);
-}
-
-.verify-field.full { grid-column: 1 / -1; }
-
-.vf-label {
-  font-family: var(--f-mono); font-size: 9px;
-  letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--ink-4); margin-bottom: 4px;
-  display: flex; align-items: center; justify-content: space-between;
-}
-
-.vf-auto-badge {
-  font-size: 8px; background: var(--sage);
-  color: white; padding: 2px 6px; border-radius: 4px;
-  letter-spacing: 0.08em;
-}
-
-.vf-value {
-  font-family: var(--f-display); font-size: 22px;
-  font-weight: 300; color: var(--ink);
-  line-height: 1;
-}
-
-.vf-edit {
-  width: 100%; border: none; background: none;
-  font-family: var(--f-display); font-size: 22px;
-  font-weight: 300; color: var(--ink);
-  outline: none; padding: 0; line-height: 1;
-}
-
-.vf-edit::placeholder { color: var(--ink-5); font-size: 16px; }
-
-.accuracy-banner {
-  background: var(--copper-pale);
-  border: 1px solid rgba(168,105,46,0.2);
-  border-radius: 12px;
-  padding: 16px 20px;
-  display: flex; align-items: center; gap: 14px;
-  margin-bottom: 24px;
-}
-
-.acc-icon { font-size: 20px; flex-shrink: 0; }
-
-.acc-text { font-size: 13px; font-weight: 300; color: var(--ink-2); line-height: 1.6; }
-.acc-text strong { color: var(--copper); font-weight: 500; }
-
-/* ── BUTTONS ── */
-.btn-primary {
-  width: 100%;
-  background: var(--ink); color: var(--canvas);
-  font-family: var(--f-body); font-size: 15px; font-weight: 500;
-  padding: 17px 24px; border: none; border-radius: 14px;
-  cursor: pointer; letter-spacing: 0.01em;
-  transition: background 0.25s, transform 0.15s;
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-}
-.btn-primary:hover { background: var(--ink-2); transform: translateY(-1px); }
-.btn-primary:active { transform: translateY(0); }
-.btn-primary:disabled { background: var(--ink-5); cursor: not-allowed; transform: none; }
-
-.btn-secondary {
-  flex: 1; background: var(--white);
-  border: 1px solid var(--border); border-radius: 12px;
-  color: var(--ink-2); font-family: var(--f-body);
-  font-size: 14px; font-weight: 400;
-  padding: 13px 20px; cursor: pointer;
-  transition: all 0.2s;
-}
-.btn-secondary:hover { border-color: var(--copper); color: var(--copper); }
-
-.btn-copper {
-  flex: 1; background: var(--copper); color: white;
-  border: none; border-radius: 12px;
-  font-family: var(--f-body); font-size: 14px; font-weight: 500;
-  padding: 13px 20px; cursor: pointer;
-  transition: background 0.2s, transform 0.15s;
-}
-.btn-copper:hover { background: var(--copper-lt); transform: translateY(-1px); }
-
-.btn-row { display: flex; gap: 10px; }
-
-.btn-sub {
-  text-align: center; margin-top: 12px;
-  font-family: var(--f-mono); font-size: 10px;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--ink-4);
-}
-
-.back-link {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-family: var(--f-mono); font-size: 10px;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--ink-4); text-decoration: none;
-  cursor: pointer; margin-bottom: 28px;
-  transition: color 0.2s;
-}
-.back-link:hover { color: var(--copper); }
-
-/* ── SCORING ANIMATION ── */
-.scoring-state {
-  display: none; text-align: center; padding: 60px 0;
-}
-.scoring-state.visible { display: block; }
-
-.scoring-circle {
-  width: 80px; height: 80px; border-radius: 50%;
-  border: 2px solid var(--border);
-  border-top-color: var(--copper);
-  animation: spin 1s linear infinite;
-  margin: 0 auto 28px;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
-
-.scoring-label {
-  font-family: var(--f-display); font-size: 28px;
-  font-weight: 300; color: var(--ink);
-  font-style: italic; margin-bottom: 8px;
-}
-
-.scoring-sub {
-  font-family: var(--f-mono); font-size: 10px;
-  letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--ink-4);
-}
-
-/* ── ANIMATIONS ── */
-@keyframes rise {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.step.active .step-kicker  { animation: rise 0.5s 0.05s var(--ease) both; }
-.step.active .step-title   { animation: rise 0.5s 0.1s  var(--ease) both; }
-.step.active .step-body    { animation: rise 0.5s 0.15s var(--ease) both; }
-.step.active .method-grid,
-.step.active .camera-panel,
-.step.active .manual-form,
-.step.active .verify-grid,
-.step.active .accuracy-banner { animation: rise 0.5s 0.2s var(--ease) both; }
-.step.active .trust-bar    { animation: rise 0.5s 0.25s var(--ease) both; }
-.step.active .btn-primary  { animation: rise 0.5s 0.3s  var(--ease) both; }
-footer { border-top: 1px solid var(--border); padding: 28px 64px; display: flex; align-items: center; justify-content: space-between; background: var(--canvas); margin-top: 48px; }
-.footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--ink-3); }
-.footer-logo span { color: var(--copper); }
-.footer-links { display: flex; gap: 24px; }
-.footer-links a { font-size: 0.71rem; color: var(--ink-4); text-decoration: none; transition: color 0.2s; }
-.footer-links a:hover { color: var(--ink); }
-@media (max-width: 768px) {
-  footer { padding: 24px; flex-direction: column; gap: 16px; text-align: center; }
-  .footer-links { flex-wrap: wrap; justify-content: center; }
-}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;height:100%}
+:root{--canvas:#f8f5f0;--canvas-2:#f2ede4;--white:#fff;--ink:#1c1917;--ink-2:#3d3830;--ink-3:#6b6259;--ink-4:#a89f94;--ink-5:#cfc8bf;--copper:#a8692e;--copper-lt:#c4864a;--copper-bg:#f5ebe0;--copper-pale:#faf3ea;--sage:#5c7a65;--sage-lt:#7a9e85;--sage-bg:#eef4f0;--border:rgba(28,25,23,0.09);--ease:cubic-bezier(0.16,1,0.3,1);--f-display:'Cormorant Garamond',Georgia,serif;--f-body:'DM Sans',system-ui,sans-serif;--f-mono:'DM Mono',monospace}
+body{background:var(--canvas);color:var(--ink);font-family:var(--f-body);-webkit-font-smoothing:antialiased;min-height:100%}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:rgba(248,245,240,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:var(--f-display);font-size:18px;font-weight:400;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink);text-decoration:none}
+.nav-logo span{color:var(--copper)}
+.progress-bar{position:fixed;top:60px;left:0;right:0;z-index:199;height:2px;background:var(--border)}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--copper),var(--copper-lt));transition:width 0.6s var(--ease);width:0%}
+.flow-wrapper{max-width:560px;margin:0 auto;padding:100px 24px 80px}
+.step{display:none;opacity:0;transform:translateY(16px);transition:opacity 0.5s var(--ease),transform 0.5s var(--ease)}
+.step.active{display:block;opacity:1;transform:translateY(0)}
+.step-kicker{font-family:var(--f-mono);font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:var(--copper);margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.step-kicker::before{content:'';width:20px;height:1px;background:var(--copper)}
+.step-title{font-family:var(--f-display);font-size:clamp(32px,6vw,48px);font-weight:300;line-height:1.05;color:var(--ink);margin-bottom:10px}
+.step-title em{font-style:italic;color:var(--copper)}
+.step-body{font-size:15px;font-weight:300;color:var(--ink-3);line-height:1.75;margin-bottom:28px;max-width:440px}
+.step-body strong{color:var(--ink);font-weight:500}
+.back-link{font-family:var(--f-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-4);cursor:pointer;margin-bottom:20px;display:inline-block}
+.back-link:hover{color:var(--ink)}
+.upload-zone{background:var(--white);border:1.5px dashed rgba(168,105,46,0.35);border-radius:20px;padding:40px 24px;text-align:center;cursor:pointer;transition:all 0.25s}
+.upload-zone:hover{border-color:var(--copper);background:var(--copper-pale)}
+.upload-zone.has-file{border-style:solid;border-color:var(--sage);padding:20px;cursor:default}
+.upload-icon{font-size:36px;margin-bottom:14px;display:block}
+.upload-title{font-family:var(--f-display);font-size:22px;font-weight:300;color:var(--ink);margin-bottom:6px}
+.upload-hint{font-size:13px;font-weight:300;color:var(--ink-3);margin-bottom:20px;line-height:1.6}
+.upload-btn{display:inline-flex;align-items:center;gap:8px;background:var(--copper);color:white;font-family:var(--f-body);font-size:13px;font-weight:500;padding:12px 24px;border-radius:100px;border:none;cursor:pointer;transition:background 0.2s}
+.upload-btn:hover{background:var(--copper-lt)}
+.upload-formats{margin-top:12px;font-family:var(--f-mono);font-size:10px;color:var(--ink-5);letter-spacing:0.1em;text-transform:uppercase}
+.file-info{display:flex;align-items:center;gap:12px;text-align:left}
+.file-info-icon{font-size:28px}
+.file-info-name{font-size:14px;font-weight:500;color:var(--ink)}
+.file-info-size{font-size:12px;color:var(--ink-4);font-family:var(--f-mono)}
+.privacy-card{background:var(--ink);border-radius:20px;padding:28px;margin-bottom:24px;position:relative;overflow:hidden}
+.privacy-card::before{content:'🔒';position:absolute;right:24px;top:50%;transform:translateY(-50%);font-size:72px;opacity:0.06;pointer-events:none}
+.privacy-eyebrow{font-family:var(--f-mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--copper-lt);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.privacy-eyebrow::before{content:'';width:16px;height:1px;background:var(--copper-lt)}
+.privacy-headline{font-family:var(--f-display);font-size:22px;font-weight:300;color:#f8f5f0;line-height:1.3;margin-bottom:14px;font-style:italic}
+.privacy-point{display:flex;align-items:flex-start;gap:10px;font-size:13px;font-weight:300;color:rgba(248,245,240,0.6);line-height:1.6;margin-bottom:8px}
+.privacy-check{color:var(--sage-lt);font-size:14px;flex-shrink:0}
+.canvas-wrap{position:relative;border-radius:16px;overflow:hidden;background:var(--ink);margin-bottom:14px}
+#redactCanvas{width:100%;display:block;border-radius:16px;cursor:crosshair}
+.redaction-hint{font-family:var(--f-mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-3);text-align:center;line-height:1.6}
+.redaction-legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;justify-content:center}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink-3)}
+.legend-dot{width:10px;height:10px;border-radius:2px}
+.legend-dot.auto{background:rgba(28,25,23,0.85)}
+.legend-dot.custom{background:rgba(168,105,46,0.7)}
+.btn-primary{width:100%;padding:16px 22px;background:var(--ink);color:var(--canvas);border:none;border-radius:12px;font-family:var(--f-body);font-size:15px;font-weight:500;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-primary:hover{background:var(--ink-2);transform:translateY(-1px)}
+.btn-primary:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+.btn-copper{padding:14px 22px;background:var(--copper);color:white;border:none;border-radius:12px;font-family:var(--f-body);font-size:14px;font-weight:500;cursor:pointer;flex:1;transition:background 0.2s}
+.btn-copper:hover{background:var(--copper-lt)}
+.btn-secondary{padding:14px 22px;background:var(--canvas-2);color:var(--ink-3);border:1px solid var(--border);border-radius:12px;font-family:var(--f-body);font-size:14px;font-weight:500;cursor:pointer;flex:1;transition:all 0.2s}
+.btn-secondary:hover{background:var(--white);color:var(--ink)}
+.btn-row{display:flex;gap:10px;margin-top:16px}
+.btn-sub{text-align:center;margin-top:10px;font-size:12px;color:var(--ink-4);font-family:var(--f-mono);letter-spacing:0.06em}
+.email-section{margin:24px 0;padding:20px;background:var(--copper-bg);border:1px solid rgba(168,105,46,0.2);border-radius:12px}
+.email-label{font-family:var(--f-mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:8px}
+.email-input{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:8px;font-family:var(--f-body);font-size:15px;background:var(--white);color:var(--ink)}
+.email-input:focus{outline:none;border-color:var(--copper)}
+.email-note{font-size:12px;color:var(--ink-4);margin-top:6px;line-height:1.5}
+.confirm-card{text-align:center;padding:48px 20px}
+.confirm-icon{width:72px;height:72px;border-radius:50%;background:var(--sage-bg);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:1.8rem}
+.confirm-label{font-family:var(--f-mono);font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--sage);margin-bottom:12px}
+.confirm-title{font-family:var(--f-display);font-size:28px;font-weight:300;margin-bottom:12px;line-height:1.2}
+.confirm-title em{color:var(--copper)}
+.confirm-body{font-size:15px;color:var(--ink-3);line-height:1.65;max-width:400px;margin:0 auto 24px}
+.confirm-link{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:var(--canvas);padding:14px 24px;border-radius:8px;font-size:13px;font-weight:500;letter-spacing:0.04em;text-decoration:none;transition:background 0.2s}
+.confirm-link:hover{background:var(--ink-2)}
+.scoring-wrap{text-align:center;padding:60px 20px}
+.scoring-circle{width:56px;height:56px;border:3px solid var(--border);border-top-color:var(--copper);border-radius:50%;margin:0 auto 20px;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.scoring-label{font-family:var(--f-display);font-size:22px;font-weight:300;color:var(--ink);margin-bottom:6px}
+.scoring-sub{font-size:13px;color:var(--ink-4)}
+.info-box{padding:16px;background:var(--sage-bg);border:1px solid rgba(92,122,101,0.2);border-radius:12px;margin-bottom:20px;font-size:13px;color:var(--ink-2);line-height:1.6}
+.info-box strong{color:var(--sage)}
+@media(max-width:500px){.flow-wrapper{padding:90px 16px 60px}nav{padding:0 16px}}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-
-<!-- NAV -->
 <nav>
   <a href="index.html" class="nav-logo">Lease<span>Checkr</span></a>
-  <div class="nav-step-indicator">
-    <div class="step-dot active" id="dot1"></div>
-    <div class="step-dot" id="dot2"></div>
-    <div class="step-dot" id="dot3"></div>
-    <div class="step-dot" id="dot4"></div>
-  </div>
 </nav>
-
-<div class="progress-bar">
-  <div class="progress-fill" id="progressFill"></div>
-</div>
-
-<!-- FLOW -->
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
 <div class="flow-wrapper">
 
-  <!-- ── STEP 1: METHOD CHOICE ── -->
+  <!-- STEP 1: UPLOAD -->
   <div class="step active" id="step1">
-    <div class="step-kicker">Free Access — Step 1 of 3</div>
-    <h1 class="step-title">Upload your lease.<br><em>Get your full report free.</em></h1>
-    <p class="step-body">To get free access to your full report, we need your actual lease document. Upload or photograph it — we auto-redact your personal details and extract all the deal terms instantly.</p>
-
-    <div class="method-grid">
-      <div class="method-card" id="card-photo" onclick="selectMethod('photo')">
-        <div class="method-badge">At the Dealer? Use This</div>
-        <div class="method-icon">📷</div>
-        <div class="method-title">Photograph Lease</div>
-        <div class="method-desc">Use your phone camera to photograph page 1. We auto-redact your personal details and extract all fields instantly.</div>
-      </div>
-      <div class="method-card" id="card-upload" onclick="selectMethod('upload')">
-        <div class="method-badge">Recommended</div>
-        <div class="method-icon">📄</div>
-        <div class="method-title">Upload Document</div>
-        <div class="method-desc">Upload a PDF or image of your lease from your device. Same privacy protection, same automatic extraction.</div>
-      </div>
-    </div>
-
-    <div class="trust-bar">
-      <div class="trust-item"><div class="trust-dot"></div>Never stored</div>
-      <div class="trust-item"><div class="trust-dot"></div>Read once, then gone</div>
-      <div class="trust-item"><div class="trust-dot"></div>No account needed</div>
-      <div class="trust-item"><div class="trust-dot"></div>Completely free</div>
-    </div>
-
-    <button class="btn-primary" id="step1btn" onclick="goToStep2()" disabled>
-      <span>Continue</span>
-      <span style="opacity:0.5">→</span>
-    </button>
-    <div class="btn-sub">Your data never leaves your device</div>
-  </div>
-
-  <!-- ── STEP 2A: PHOTO CAPTURE ── -->
-  <div class="step" id="step2photo">
-    <div class="back-link" onclick="goToStep1()">← Back</div>
-    <div class="step-kicker">Step 2 of 4 · Camera Capture</div>
-    <h2 class="step-title">Photograph your <em>lease.</em></h2>
-    <p class="step-body">Point your camera at page 1 of your NJ MVSC-1 contract. We'll automatically cover your personal details before reading anything.</p>
-
-    <!-- Privacy promise card -->
-    <div class="privacy-card">
-      <div class="privacy-eyebrow">Privacy First</div>
-      <div class="privacy-headline">"Your document is read once, then gone."</div>
-      <div class="privacy-points">
-        <div class="privacy-point">
-          <span class="privacy-check">✓</span>
-          Your document is processed entirely on this device — nothing is uploaded to a server
-        </div>
-        <div class="privacy-point">
-          <span class="privacy-check">✓</span>
-          We automatically cover your name, address, and SSN before reading any data
-        </div>
-        <div class="privacy-point">
-          <span class="privacy-check">✓</span>
-          After your score is generated, the image is permanently cleared from memory
-        </div>
-      </div>
-    </div>
-
-    <!-- Camera zone -->
-    <div class="camera-panel">
-      <div class="camera-zone" id="cameraZone" onclick="triggerCamera()">
-        <div class="camera-empty">
-          <span class="camera-icon">📷</span>
-          <div class="camera-title">Open your camera</div>
-          <p class="camera-hint">Align page 1 of your lease within frame.<br>Ensure the text is legible and well-lit.</p>
-          <button class="camera-btn" onclick="triggerCamera(); event.stopPropagation()">
-            <span>📷</span> Open Camera
-          </button>
-          <div class="camera-formats">Works on iPhone · Android · Any device with a camera</div>
-        </div>
-        <img id="cameraPreview" alt="Lease document preview">
-      </div>
-      <input type="file" id="fileInput" accept="image/*" capture="environment" style="display:none; pointer-events:none;" onchange="handleFileSelect(event, 'photo')">
-    </div>
-
-    <!-- Redaction panel -->
-    <div class="redaction-panel" id="redactionPanel">
-      <div class="redaction-header">
-        <div class="redaction-title">Review Redactions</div>
-        <div class="redaction-status">✓ Personal details covered</div>
-      </div>
-      <div class="redaction-canvas-wrap">
-        <canvas id="redactionCanvas"></canvas>
-      </div>
-      <div class="redaction-instruction">Tap and drag to add redaction boxes · We've covered the standard sensitive zones</div>
-      <div class="redaction-actions">
-        <button class="btn-secondary" onclick="resetImage()">Retake Photo</button>
-        <button class="btn-copper" onclick="confirmRedactionAndExtract()">Looks Good — Extract Data →</button>
-      </div>
-    </div>
-
-    <!-- Extracting animation -->
-    <div class="extracting-panel" id="extractingPanel">
-      <div class="extracting-animation" id="extractLines">
-        <div class="extract-line" id="el1">
-          <div class="extract-dot"></div>
-          <div class="extract-text">Reading monthly payment</div>
-          <div class="extract-value">—</div>
-        </div>
-        <div class="extract-line" id="el2">
-          <div class="extract-dot"></div>
-          <div class="extract-text">Reading lease term</div>
-          <div class="extract-value">—</div>
-        </div>
-        <div class="extract-line" id="el3">
-          <div class="extract-dot"></div>
-          <div class="extract-text">Reading mileage allowance</div>
-          <div class="extract-value">—</div>
-        </div>
-        <div class="extract-line" id="el4">
-          <div class="extract-dot"></div>
-          <div class="extract-text">Reading dealer &amp; zip code</div>
-          <div class="extract-value">—</div>
-        </div>
-        <div class="extract-line" id="el5">
-          <div class="extract-dot"></div>
-          <div class="extract-text">Reading due at signing</div>
-          <div class="extract-value">—</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── STEP 2B: UPLOAD DOCUMENT ── -->
-  <div class="step" id="step2upload">
-    <div class="back-link" onclick="goToStep1()">← Back</div>
-    <div class="step-kicker">Step 2 of 4 · Document Upload</div>
+    <div class="step-kicker">Step 1 of 3 · Upload</div>
     <h2 class="step-title">Upload your <em>lease.</em></h2>
-    <p class="step-body">Select a PDF or image of your lease document from your device. We apply the same redaction and privacy protection before extracting any data.</p>
-
+    <p class="step-body">Take a photo or upload an image of your lease document. In the next step, you'll review and redact any personal details <strong>before anything is submitted.</strong></p>
     <div class="privacy-card">
-      <div class="privacy-eyebrow">Privacy First</div>
-      <div class="privacy-headline">"Your document is read once, then gone."</div>
-      <div class="privacy-points">
-        <div class="privacy-point">
-          <span class="privacy-check">✓</span>
-          PDF and image files are processed locally — never sent to external storage
-        </div>
-        <div class="privacy-point">
-          <span class="privacy-check">✓</span>
-          Your name, address, and SSN are automatically covered before any data is read
-        </div>
-        <div class="privacy-point">
-          <span class="privacy-check">✓</span>
-          File is cleared from memory immediately after your score is generated
+      <div class="privacy-eyebrow">How Your Privacy Is Protected</div>
+      <div class="privacy-headline">"You control what we see."</div>
+      <div class="privacy-point"><span class="privacy-check">✓</span> Your image stays in your browser until you approve it</div>
+      <div class="privacy-point"><span class="privacy-check">✓</span> You draw black boxes over any personal info — name, address, SSN, phone, etc.</div>
+      <div class="privacy-point"><span class="privacy-check">✓</span> The black boxes permanently destroy the pixels underneath</div>
+      <div class="privacy-point"><span class="privacy-check">✓</span> Only the redacted version is ever uploaded — your original is never sent</div>
+    </div>
+    <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+      <div id="uploadEmpty">
+        <span class="upload-icon">📷</span>
+        <div class="upload-title">Select or photograph your lease</div>
+        <p class="upload-hint">On mobile: choose Take Photo, Photo Library, or Browse Files.<br>On desktop: select an image file from your computer.</p>
+        <button class="upload-btn" onclick="event.stopPropagation(); document.getElementById('fileInput').click()"><span>📷</span> Select Image</button>
+        <div class="upload-formats">JPG · PNG — on iPhone, photos are auto-converted to JPG</div>
+      </div>
+      <div id="fileInfo" style="display:none">
+        <div class="file-info">
+          <div class="file-info-icon">🖼️</div>
+          <div><div class="file-info-name" id="fileName"></div><div class="file-info-size" id="fileSize"></div></div>
         </div>
       </div>
     </div>
-
-    <div class="camera-panel">
-      <div class="camera-zone" id="uploadZone">
-        <div class="camera-empty" id="uploadEmpty">
-          <span class="camera-icon">📂</span>
-          <div class="camera-title">Select your lease file</div>
-          <p class="camera-hint">Choose a PDF, JPG, or PNG of your lease document.<br>Page 1 of the MVSC-1 form is all we need.</p>
-          <button class="camera-btn" onclick="triggerUpload()">
-            <span>📂</span> Choose File
-          </button>
-          <div class="camera-formats">PDF · JPG · PNG — Max 10MB</div>
-        </div>
-        <img id="uploadPreview" alt="Uploaded lease document preview" style="display:none;">
-      </div>
-      <input type="file" id="uploadInput" accept="image/*,.pdf" style="display:none;" onchange="handleFileSelect(event, 'upload')">
-    </div>
-
-    <!-- Redaction panel for upload -->
-    <div class="redaction-panel" id="redactionPanelUpload">
-      <div class="redaction-header">
-        <div class="redaction-title">Review Redactions</div>
-        <div class="redaction-status">✓ Personal details covered</div>
-      </div>
-      <div class="redaction-canvas-wrap">
-        <canvas id="redactionCanvasUpload"></canvas>
-      </div>
-      <div class="redaction-instruction">Drag to add additional redaction boxes if needed · Standard zones pre-covered</div>
-      <div class="redaction-actions">
-        <button class="btn-secondary" onclick="resetUpload()">Choose Different File</button>
-        <button class="btn-copper" onclick="confirmUploadAndExtract()">Looks Good — Extract Data →</button>
-      </div>
-    </div>
-
-    <!-- Extracting animation (reuses same animation, different IDs) -->
-    <div class="extracting-panel" id="extractingPanelUpload">
-      <div class="extracting-animation" id="extractLinesUpload">
-        <div class="extract-line" id="eu1"><div class="extract-dot"></div><div class="extract-text">Reading monthly payment</div><div class="extract-value">—</div></div>
-        <div class="extract-line" id="eu2"><div class="extract-dot"></div><div class="extract-text">Reading lease term</div><div class="extract-value">—</div></div>
-        <div class="extract-line" id="eu3"><div class="extract-dot"></div><div class="extract-text">Reading mileage allowance</div><div class="extract-value">—</div></div>
-        <div class="extract-line" id="eu4"><div class="extract-dot"></div><div class="extract-text">Reading dealer &amp; zip code</div><div class="extract-value">—</div></div>
-        <div class="extract-line" id="eu5"><div class="extract-dot"></div><div class="extract-text">Reading due at signing</div><div class="extract-value">—</div></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── STEP 2C: MANUAL ENTRY ── -->
-  <div class="step" id="step2manual">
-    <div class="back-link" onclick="goToStep1()">← Back</div>
-    <div class="step-kicker">Step 2 of 4 · Lease Details</div>
-    <h2 class="step-title">Tell us about your <em>deal.</em></h2>
-    <p class="step-body">Only your <strong>monthly payment</strong> is required. Each additional field improves your score accuracy — but never blocks you from getting a result.</p>
-
-    <div class="manual-form">
-
-      <div class="form-section">
-        <div class="form-section-title">Required</div>
-        <div class="form-grid">
-          <div class="form-group full" id="fg-vehicle">
-            <label class="form-label">Vehicle</label>
-            <select class="form-control" id="f-vehicle" onchange="handleInput('f-vehicle')">
-              <option value="">Year · Make · Model · Trim</option>
-              <optgroup label="Popular in NJ">
-                <option>2024 Honda CR-V EX-L</option>
-                <option>2024 Toyota RAV4 XLE Premium</option>
-                <option>2024 BMW X3 xDrive30i</option>
-                <option>2024 BMW X5 xDrive40i</option>
-                <option>2024 Mercedes-Benz GLE 350</option>
-                <option>2024 Tesla Model Y Long Range</option>
-                <option>2025 Honda Accord Sport</option>
-                <option>2024 Toyota Camry XSE</option>
-                <option>2024 Jeep Grand Cherokee L</option>
-                <option>2024 Hyundai Tucson Limited</option>
-              </optgroup>
-              <option value="other">Other vehicle</option>
-            </select>
-            <div class="form-error">Please select your vehicle</div>
-          </div>
-
-          <div class="form-group full" id="fg-payment">
-            <label class="form-label">Monthly Payment *</label>
-            <div class="form-control-wrap">
-              <span class="form-prefix">$</span>
-              <input class="form-control has-prefix" type="number"
-                id="f-payment" placeholder="489"
-                min="100" max="3000"
-                oninput="handleInput('f-payment')" onchange="validatePayment()">
-            </div>
-            <div class="form-error">Please enter a monthly payment between $100 and $3,000</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-section">
-        <div class="form-section-title">Improves Your Score</div>
-        <div class="form-grid">
-          <div class="form-group" id="fg-term">
-            <label class="form-label">Lease Term <span class="optional">optional</span></label>
-            <select class="form-control" id="f-term" onchange="handleInput('f-term')">
-              <option value="">Select</option>
-              <option value="24">24 months</option>
-              <option value="36">36 months</option>
-              <option value="48">48 months</option>
-            </select>
-          </div>
-
-          <div class="form-group" id="fg-zip">
-            <label class="form-label">NJ Zip Code <span class="optional">optional</span></label>
-            <input class="form-control" type="text" id="f-zip"
-              placeholder="07030" maxlength="5"
-              oninput="handleInput('f-zip')" onchange="validateZip()">
-            <div class="form-error">Enter a valid NJ zip code</div>
-          </div>
-
-          <div class="form-group" id="fg-mileage">
-            <label class="form-label">Annual Mileage <span class="optional">optional</span></label>
-            <select class="form-control" id="f-mileage" onchange="handleInput('f-mileage')">
-              <option value="">Select</option>
-              <option value="7500">7,500 miles</option>
-              <option value="10000">10,000 miles</option>
-              <option value="12000">12,000 miles</option>
-              <option value="15000">15,000 miles</option>
-            </select>
-          </div>
-
-          <div class="form-group" id="fg-signing">
-            <label class="form-label">Due at Signing <span class="optional">optional</span></label>
-            <div class="form-control-wrap">
-              <span class="form-prefix">$</span>
-              <input class="form-control has-prefix" type="number"
-                id="f-signing" placeholder="1500"
-                oninput="handleInput('f-signing')">
-            </div>
-          </div>
-
-          <div class="form-group" id="fg-month">
-            <label class="form-label">Month Signed <span class="optional">optional</span></label>
-            <select class="form-control" id="f-month" onchange="handleInput('f-month')">
-              <option value="">Select</option>
-              <option>Jan 2025</option><option>Feb 2025</option><option>Mar 2025</option>
-              <option>Apr 2025</option><option>May 2025</option><option>Jun 2025</option>
-              <option>Jul 2025</option><option>Aug 2025</option><option>Sep 2025</option>
-              <option>Oct 2025</option><option>Nov 2025</option><option>Dec 2025</option>
-              <option>Jan 2026</option><option>Feb 2026</option><option>Mar 2026</option>
-            </select>
-          </div>
-
-          <div class="form-group" id="fg-dealer">
-            <label class="form-label">Dealer Name <span class="optional">optional</span></label>
-            <input class="form-control" type="text" id="f-dealer"
-              placeholder="e.g. BMW of Ramsey"
-              oninput="handleInput('f-dealer')">
-          </div>
-        </div>
-      </div>
-
-      <!-- Confidence meter -->
-      <div class="confidence-widget">
-        <div class="conf-icon" id="confIcon">📊</div>
-        <div class="conf-content">
-          <div class="conf-label">
-            <span>Score Accuracy</span>
-            <span id="confPctLabel" style="color:var(--copper)">Basic</span>
-          </div>
-          <div class="conf-track">
-            <div class="conf-fill" id="confFill"></div>
-          </div>
-          <div class="conf-message" id="confMessage">Add your vehicle and payment to get started.</div>
-        </div>
-      </div>
-
-    </div><!-- /manual-form -->
-
-    <br>
-    <button class="btn-primary" id="step2manualbtn" onclick="goToStep3FromManual()" disabled>
-      <span>Continue to Review</span>
-      <span style="opacity:0.5">→</span>
+    <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="handleFile(event)">
+    <button class="btn-primary" id="step1btn" onclick="goToStep2()" disabled style="margin-top:20px">
+      <span>Continue to Redaction Review</span><span style="opacity:0.5">→</span>
     </button>
-    <div class="btn-sub">Only required fields needed · Optional fields improve accuracy</div>
+    <div class="btn-sub">You'll review &amp; redact before anything is submitted</div>
   </div>
 
-  <!-- ── STEP 3: VERIFY EXTRACTED DATA ── -->
+  <!-- STEP 2: REDACT -->
+  <div class="step" id="step2">
+    <div class="back-link" onclick="goToStep(1)">← Back</div>
+    <div class="step-kicker">Step 2 of 3 · Review &amp; Redact</div>
+    <h2 class="step-title">Redact your <em>personal info.</em></h2>
+    <p class="step-body"><strong>Drag on the image to draw black boxes</strong> over any personal information you want to hide. Only the redacted version will be uploaded — the black boxes permanently destroy the pixels underneath.</p>
+
+    <div style="padding:16px;background:var(--copper-bg);border:1px solid rgba(168,105,46,0.2);border-radius:12px;margin-bottom:20px;">
+      <div style="font-family:var(--f-mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--copper);margin-bottom:8px;">What to cover</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;font-size:13px;color:var(--ink-2);line-height:1.5;">
+        <div>▪ Your full name</div>
+        <div>▪ Home address</div>
+        <div>▪ Phone number</div>
+        <div>▪ Email address</div>
+        <div>▪ SSN / Driver's license</div>
+        <div>▪ Bank account / routing</div>
+        <div>▪ Signature(s)</div>
+        <div>▪ Any other personal info</div>
+      </div>
+      <div style="font-size:12px;color:var(--ink-4);margin-top:8px;font-style:italic;">Leave the deal terms visible — payment, term, mileage, residual, money factor, dealer name.</div>
+    </div>
+    <div style="margin-bottom:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="font-family:var(--f-display);font-size:20px;font-weight:400;color:var(--ink)">Your Lease</div>
+        <div id="redactStatus" style="font-family:var(--f-mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);background:var(--canvas-2);padding:4px 10px;border-radius:20px;border:1px solid var(--border)">No redactions yet</div>
+      </div>
+      <div class="canvas-wrap"><canvas id="redactCanvas"></canvas></div>
+      <div class="redaction-hint">Drag on the image to draw redaction boxes · Each box permanently blacks out that area</div>
+    </div>
+    <div class="info-box">
+      <strong>How it works:</strong> Each black box you draw permanently destroys the pixels underneath. When you click Continue, only the redacted version is uploaded. Your original image is never sent anywhere.
+    </div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="resetUpload()">Choose Different Image</button>
+      <button class="btn-copper" id="step2btn" onclick="goToStep3()" disabled>I've Redacted My Info — Continue →</button>
+    </div>
+    <div class="btn-sub" id="step2hint" style="color:var(--copper)">Draw at least one redaction box to continue</div>
+  </div>
+
+  <!-- STEP 3: EMAIL + SUBMIT -->
   <div class="step" id="step3">
-    <div class="back-link" onclick="goBack()">← Back</div>
-    <div class="step-kicker">Step 3 of 4 · Confirm Details</div>
-    <h2 class="step-title">Does this look <em>right?</em></h2>
-    <p class="step-body">Review the details below. Correct anything that looks off before we run your score.</p>
-
-    <div class="accuracy-banner" id="accuracyBanner">
-      <div class="acc-icon">⚡</div>
-      <div class="acc-text"><strong>87% extraction accuracy</strong> — We read 5 of 6 fields successfully. Review and correct any highlighted fields before continuing.</div>
+    <div class="back-link" onclick="goToStep(2)">← Back</div>
+    <div class="step-kicker">Step 3 of 3 · Submit</div>
+    <h2 class="step-title">Almost <em>done.</em></h2>
+    <p class="step-body">Enter your email so we can send you your full report once your lease is verified (typically within 48 hours).</p>
+    <div class="email-section">
+      <label class="email-label" for="emailInput">Email — for your report delivery</label>
+      <input class="email-input" type="email" id="emailInput" placeholder="you@email.com" oninput="checkEmail()">
+      <div class="email-note">We'll send your full report here. Never shared, never spammed.</div>
     </div>
-
-    <div class="verify-grid">
-      <div class="verify-field auto-filled full" id="vf-vehicle">
-        <div class="vf-label">Vehicle <span class="vf-auto-badge">Auto-filled</span></div>
-        <input class="vf-edit" type="text" id="vv-vehicle" value="2024 BMW X3 xDrive30i" placeholder="Year Make Model Trim">
-      </div>
-
-      <div class="verify-field auto-filled" id="vf-payment">
-        <div class="vf-label">Monthly Payment <span class="vf-auto-badge">Auto-filled</span></div>
-        <input class="vf-edit" type="text" id="vv-payment" value="$589 / mo" placeholder="$0 / mo">
-      </div>
-
-      <div class="verify-field auto-filled" id="vf-term">
-        <div class="vf-label">Term <span class="vf-auto-badge">Auto-filled</span></div>
-        <input class="vf-edit" type="text" id="vv-term" value="36 months" placeholder="36 months">
-      </div>
-
-      <div class="verify-field auto-filled" id="vf-mileage">
-        <div class="vf-label">Mileage <span class="vf-auto-badge">Auto-filled</span></div>
-        <input class="vf-edit" type="text" id="vv-mileage" value="10,000 / yr" placeholder="10,000 / yr">
-      </div>
-
-      <div class="verify-field auto-filled" id="vf-signing">
-        <div class="vf-label">Due at Signing <span class="vf-auto-badge">Auto-filled</span></div>
-        <input class="vf-edit" type="text" id="vv-signing" value="$2,800" placeholder="$0">
-      </div>
-
-      <div class="verify-field" id="vf-zip" style="border-color:rgba(168,105,46,0.4);background:var(--amber-bg,#fdf3e3)">
-        <div class="vf-label">Zip Code <span style="color:var(--copper);font-size:9px;font-family:var(--f-mono);letter-spacing:0.1em">PLEASE ADD</span></div>
-        <input class="vf-edit" type="text" id="vv-zip" value="" placeholder="07030" maxlength="5"
-          style="color:var(--copper)" oninput="checkVerifyComplete()">
-      </div>
-
-      <div class="verify-field auto-filled full" id="vf-dealer">
-        <div class="vf-label">Dealer <span class="vf-auto-badge">Auto-filled</span></div>
-        <input class="vf-edit" type="text" id="vv-dealer" value="BMW of Ramsey — Ramsey, NJ" placeholder="Dealer name">
-      </div>
-    </div>
-
-    <button class="btn-primary" id="step3btn" onclick="goToStep4()">
-      <span>Score My Deal</span>
-      <span style="opacity:0.5">→</span>
+    <button class="btn-primary" id="submitBtn" onclick="submitLease()" disabled>
+      <span>Submit My Redacted Lease</span><span style="opacity:0.5">→</span>
     </button>
-    <div class="btn-sub">Anonymous · No account needed · Free</div>
+    <div class="btn-sub">Redacted image only · Verified within 48 hours</div>
   </div>
 
-  <!-- ── STEP 4: SCORING ── -->
+  <!-- STEP 4: UPLOADING / CONFIRM -->
   <div class="step" id="step4">
-    <div class="scoring-state visible">
+    <div class="scoring-wrap" id="uploadingState">
       <div class="scoring-circle"></div>
-      <div class="scoring-label">Scoring your deal…</div>
-      <div class="scoring-sub">Comparing against 2,847 NJ submissions</div>
+      <div class="scoring-label">Uploading your redacted lease…</div>
+      <div class="scoring-sub">This won't take long</div>
+    </div>
+    <div class="confirm-card" id="confirmState" style="display:none">
+      <div class="confirm-icon">✓</div>
+      <div class="confirm-label">Upload Received</div>
+      <h2 class="confirm-title">Your lease is<br><em>under review.</em></h2>
+      <p class="confirm-body" id="confirmMsg"></p>
+      <a href="index.html" class="confirm-link">← Back to Home</a>
     </div>
   </div>
 
-</div><!-- /flow-wrapper -->
+</div>
 
 <script>
-// ── SUPABASE ─────────────────────────────────────────
-const SUPABASE_URL = 'https://xqjsvlhdpdfvzixlmdxk.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxanN2bGhkcGRmdnppeGxtZHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzg2ODcsImV4cCI6MjA4ODg1NDY4N30.MT0tEDMLaBDLtZkX9xEVEkaUfPdIA9QsJrWjGDpeWsE';
-let _supabase = null;
-function getSupabase() {
-  if (!_supabase && window.supabase) {
-    _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-  }
-  return _supabase;
+// ── SUPABASE
+const SUPABASE_URL='YOUR_SUPABASE_URL';
+const SUPABASE_KEY='YOUR_SUPABASE_ANON_KEY';
+let sb=null;
+try{if(SUPABASE_URL!=='YOUR_SUPABASE_URL'&&window.supabase){sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}}catch(e){console.error('Supabase init:',e)}
+
+// ── STATE
+let originalImageSrc=null;
+const redactions=[];
+let isDrawing=false;
+let drawStart={};
+
+// ── NAV
+function setProgress(p){document.getElementById('progressFill').style.width=p+'%'}
+function showStep(id){
+  document.querySelectorAll('.step').forEach(s=>{s.classList.remove('active');s.style.display='none'});
+  const el=document.getElementById(id);
+  el.style.display='block';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('active')));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function goToStep(n){
+  if(n===1){setProgress(10);showStep('step1')}
+  if(n===2){renderRedactionCanvas();setProgress(40);showStep('step2')}
+  if(n===3){setProgress(70);showStep('step3')}
 }
 
-let selectedMethod = null;
-let currentStep = 1;
-let fromPhoto = false;
-let filledFields = new Set();
+// ── FILE
+function handleFile(e){
+  const file=e.target.files[0];
+  if(!file)return;
 
-// ── STEP NAVIGATION ────────────────────────────────
-function setProgress(pct) {
-  document.getElementById('progressFill').style.width = pct + '%';
-}
-
-function updateDots(step) {
-  [1,2,3,4].forEach(i => {
-    const d = document.getElementById('dot'+i);
-    d.classList.remove('active','done');
-    if (i < step) d.classList.add('done');
-    else if (i === step) d.classList.add('active');
-  });
-}
-
-function showStep(id) {
-  document.querySelectorAll('.step').forEach(s => {
-    s.classList.remove('active','exiting');
-    s.style.display = 'none';
-  });
-  const el = document.getElementById(id);
-  el.style.display = 'block';
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => el.classList.add('active'));
-  });
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function selectMethod(method) {
-  selectedMethod = method;
-  ['card-photo','card-upload','card-manual'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.classList.toggle('selected', id === 'card-' + method);
-  });
-  document.getElementById('step1btn').disabled = false;
-}
-
-function goToStep1() {
-  currentStep = 1;
-  updateDots(1); setProgress(10);
-  showStep('step1');
-}
-
-function goToStep2() {
-  if (!selectedMethod) return;
-  currentStep = 2;
-  updateDots(2); setProgress(35);
-  if (selectedMethod === 'photo') {
-    fromPhoto = true;
-    showStep('step2photo');
-  } else if (selectedMethod === 'upload') {
-    fromPhoto = true;
-    showStep('step2upload');
-  } else {
-    fromPhoto = false;
-    showStep('step2manual');
-  }
-}
-
-function goBack() {
-  goToStep1();
-}
-
-function goToStep3FromManual() {
-  if (!validateManualRequired()) return;
-  populateVerifyFromManual();
-  currentStep = 3;
-  updateDots(3); setProgress(65);
-  document.getElementById('accuracyBanner').style.display = 'none';
-  showStep('step3');
-}
-
-function goToStep3FromPhoto() {
-  currentStep = 3;
-  updateDots(3); setProgress(65);
-  showStep('step3');
-}
-
-function goToStep4() {
-  currentStep = 4;
-  updateDots(4); setProgress(90);
-  showStep('step4');
-  setTimeout(() => {
-    setProgress(100);
-    saveToSession();
-    saveAndSubmitDeal().finally(() => {
-      setTimeout(() => {
-        window.location.href = 'sample-report.html';
-      }, 800);
-    });
-  }, 2800);
-}
-
-async function saveAndSubmitDeal() {
-  const db = getSupabase();
-  if (!db) return; // graceful no-op if Supabase not loaded
-
-  // Parse values from step3 verify fields
-  const raw = {
-    vehicle:  (document.getElementById('vv-vehicle')?.value  || '').trim(),
-    payment:  (document.getElementById('vv-payment')?.value  || '').trim(),
-    term:     (document.getElementById('vv-term')?.value     || '').trim(),
-    mileage:  (document.getElementById('vv-mileage')?.value  || '').trim(),
-    signing:  (document.getElementById('vv-signing')?.value  || '').trim(),
-    zip:      (document.getElementById('vv-zip')?.value      || '').trim(),
-    dealer:   (document.getElementById('vv-dealer')?.value   || '').trim(),
-  };
-
-  // Parse payment: "$589 / mo" → 589
-  const paymentNum  = parseFloat(raw.payment.replace(/[^0-9.]/g, '')) || null;
-  // Parse term: "36 months" → 36
-  const termNum     = parseInt(raw.term)  || null;
-  // Parse mileage: "10,000 / yr" → 10000
-  const mileageNum  = parseInt(raw.mileage.replace(/[^0-9]/g, '')) || null;
-  // Parse signing: "$2,800" → 2800
-  const signingNum  = parseFloat(raw.signing.replace(/[^0-9.]/g, '')) || null;
-
-  // Vehicle fields — "2024 Honda Accord Sport" → year/make/model/trim
-  const parts   = raw.vehicle.split(/\s+/).filter(Boolean);
-  let year = null, make = null, model = null, vehicleTrim = null;
-  if (parts.length > 0) {
-    const firstNum = parseInt(parts[0]);
-    if (!isNaN(firstNum) && firstNum > 1990 && firstNum < 2040) {
-      year  = firstNum;
-      make  = parts[1] || null;
-      model = parts[2] || null;
-      vehicleTrim = parts.slice(3).join(' ') || null;
-    } else {
-      make  = parts[0] || null;
-      model = parts[1] || null;
-      vehicleTrim = parts.slice(2).join(' ') || null;
-    }
+  // Check for HEIC files that browsers can't render on canvas
+  const name=file.name.toLowerCase();
+  if(name.endsWith('.heic')||name.endsWith('.heif')||file.type.includes('heic')||file.type.includes('heif')){
+    alert('HEIC files cannot be displayed in most browsers.\n\nIf you\'re on iPhone:\n• Open the photo in Photos app\n• Tap Share → Save to Files\n• Choose JPEG format\n\nOr take a new photo — when selected through this page, your iPhone will automatically convert it to JPEG.');
+    e.target.value='';return;
   }
 
-  // Zip (5-digit NJ)
-  const zip = raw.zip.replace(/\D/g, '').slice(0,5) || null;
-
-  // Calculate completeness score (0-100 based on filled fields)
-  const fieldValues = [year, make, model, paymentNum, termNum, mileageNum, signingNum, zip, raw.dealer];
-  const filledCount = fieldValues.filter(v => v !== null && v !== 0 && v !== '').length;
-  const completenessScore = Math.round((filledCount / fieldValues.length) * 100);
-
-  const deal = {
-    // user_id omitted — anonymous submission; will be linked after sign-in
-    vehicle_year:       year,
-    vehicle_make:       make,
-    vehicle_model:      model,
-    vehicle_trim:       vehicleTrim,
-    monthly_payment:    paymentNum,
-    lease_term_months:  termNum,
-    annual_mileage:     mileageNum,
-    due_at_signing:     signingNum,
-    signing_zip:        zip,
-    signing_state:      'NJ',
-    dealer_name:        raw.dealer || null,
-    input_method:       selectedMethod || 'upload',
-    deal_stage:         'unknown',
-    is_seeded:          false,
-    redaction_verified: (selectedMethod === 'photo' || selectedMethod === 'upload'),
-    completeness_score: completenessScore,
-  };
-
-  try {
-    // First try with JS client (returns data via .select)
-    const { data, error } = await db.from('deals').insert([deal]).select('id').single();
-    if (error) {
-      console.warn('[LeaseCheckr] Supabase insert error:', error.message, error.code, error.details);
-      // Fallback: raw fetch without .select (avoids SELECT RLS issues)
-      const fallback = await fetch(SUPABASE_URL + '/rest/v1/deals', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_ANON,
-          'Authorization': 'Bearer ' + SUPABASE_ANON,
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify(deal)
-      });
-      if (fallback.ok) {
-        console.log('[LeaseCheckr] Deal saved via fallback fetch (no id returned)');
-      } else {
-        const errText = await fallback.text();
-        console.warn('[LeaseCheckr] Fallback also failed:', fallback.status, errText);
-      }
-    } else if (data?.id) {
-      sessionStorage.setItem('dealId', data.id);
-      console.log('[LeaseCheckr] Deal saved:', data.id);
-    }
-  } catch (err) {
-    console.warn('[LeaseCheckr] Supabase unreachable (non-blocking):', err.message);
-  }
-}
-
-// ── CAMERA / FILE HANDLING ─────────────────────────
-function triggerCamera() {
-  document.getElementById('fileInput').click();
-}
-
-function triggerUpload() {
-  document.getElementById('uploadInput').click();
-}
-
-function handleFileSelect(e, source) {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  // Validate size (10MB max)
-  if (file.size > 10 * 1024 * 1024) {
-    alert('File is too large. Please choose a file under 10MB.');
-    e.target.value = '';
-    return;
+  if(!file.type.startsWith('image/')){
+    alert('Please upload an image file (JPG or PNG). PDFs are not accepted — please take a photo of your lease instead.');
+    e.target.value='';return;
   }
 
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    const dataUrl = ev.target.result;
-
-    if (source === 'photo') {
-      const zone    = document.getElementById('cameraZone');
-      const preview = document.getElementById('cameraPreview');
-      preview.src = dataUrl;
-      zone.classList.add('has-image');
-      showRedaction(dataUrl, 'redactionCanvas', 'redactionPanel');
-    } else {
-      // Upload flow: show file name + hide empty state
-      const empty   = document.getElementById('uploadEmpty');
-      const preview = document.getElementById('uploadPreview');
-      const zone    = document.getElementById('uploadZone');
-
-      if (file.type === 'application/pdf') {
-        // For PDFs: show a placeholder thumbnail with file name
-        empty.innerHTML = `
-          <span class="camera-icon">📄</span>
-          <div class="camera-title" style="color:var(--copper)">${file.name}</div>
-          <p class="camera-hint">PDF selected · Rendering first page for redaction review…</p>
-        `;
-        preview.style.display = 'none';
-      } else {
-        // Image: show preview
-        preview.src = dataUrl;
-        preview.style.display = 'block';
-        empty.style.display   = 'none';
-      }
-      zone.classList.add('has-image');
-      showRedaction(dataUrl, 'redactionCanvasUpload', 'redactionPanelUpload');
-    }
+  const reader=new FileReader();
+  reader.onload=(ev)=>{
+    // Verify the image actually loads in the browser before proceeding
+    const testImg=new Image();
+    testImg.onload=()=>{
+      originalImageSrc=ev.target.result;
+      document.getElementById('uploadEmpty').style.display='none';
+      document.getElementById('fileInfo').style.display='block';
+      document.getElementById('fileName').textContent=file.name;
+      document.getElementById('fileSize').textContent=(file.size/1024/1024).toFixed(1)+' MB';
+      document.getElementById('uploadZone').classList.add('has-file');
+      document.getElementById('step1btn').disabled=false;
+    };
+    testImg.onerror=()=>{
+      alert('This image format could not be loaded by your browser. Please try a JPG or PNG file, or take a new photo.');
+      e.target.value='';
+    };
+    testImg.src=ev.target.result;
   };
   reader.readAsDataURL(file);
 }
 
-function resetImage() {
-  const zone = document.getElementById('cameraZone');
-  const preview = document.getElementById('cameraPreview');
-  zone.classList.remove('has-image');
-  preview.src = '';
-  document.getElementById('redactionPanel').classList.remove('visible');
-  document.getElementById('fileInput').value = '';
-  sessionStorage.removeItem('leaseImage');
+function resetUpload(){
+  originalImageSrc=null;redactions.length=0;
+  document.getElementById('fileInput').value='';
+  document.getElementById('uploadEmpty').style.display='';
+  document.getElementById('fileInfo').style.display='none';
+  document.getElementById('uploadZone').classList.remove('has-file');
+  document.getElementById('step1btn').disabled=true;
+  goToStep(1);
 }
 
-function resetUpload() {
-  const zone = document.getElementById('uploadZone');
-  const preview = document.getElementById('uploadPreview');
-  zone.classList.remove('has-image');
-  preview.src = '';
-  document.getElementById('redactionPanelUpload').classList.remove('visible');
-  document.getElementById('uploadInput').value = '';
-  sessionStorage.removeItem('leaseImage');
+// ── REDACTION CANVAS
+function renderRedactionCanvas(){
+  const canvas=document.getElementById('redactCanvas');
+  const ctx=canvas.getContext('2d');
+  const img=new Image();
+  img.onload=function(){
+    const maxW=canvas.parentElement.offsetWidth;
+    const ratio=img.height/img.width;
+    canvas.width=maxW;canvas.height=maxW*ratio;
+    ctx.drawImage(img,0,0,canvas.width,canvas.height);
+    // No auto-redaction — user draws their own boxes
+    redactions.length=0;
+    drawAll(ctx,canvas.width,canvas.height);
+  };
+  img.src=originalImageSrc;
 }
 
-function confirmUploadAndExtract() {
-  document.getElementById('redactionPanelUpload').classList.remove('visible');
-  document.getElementById('uploadZone').style.display = 'none';
-  const ep = document.getElementById('extractingPanelUpload');
-  ep.classList.add('visible');
-  runExtractionAnimation('eu');
+function drawAll(ctx,w,h){
+  redactions.forEach(r=>{
+    ctx.fillStyle='rgba(28,25,23,0.92)';
+    ctx.fillRect(r.x*w,r.y*h,r.w*w,r.h*h);
+    // Small label
+    ctx.fillStyle='rgba(248,245,240,0.35)';
+    const fs=Math.max(9,w*0.014);
+    ctx.font=fs+'px DM Mono,monospace';
+    ctx.fillText('REDACTED',r.x*w+6,r.y*h+fs+4);
+  });
 }
 
-// ── REDACTION ──────────────────────────────────────
-const redactions = [];
-let isDrawing = false;
-let drawStart = {};
-let activeCanvasId = 'redactionCanvas'; // tracks which canvas is currently active
+function fullRedraw(){
+  const canvas=document.getElementById('redactCanvas');
+  const ctx=canvas.getContext('2d');
+  const img=new Image();
+  img.src=originalImageSrc;
+  img.onload=()=>{ctx.drawImage(img,0,0,canvas.width,canvas.height);drawAll(ctx,canvas.width,canvas.height)};
+}
 
-function showRedaction(src, canvasId, panelId) {
-  canvasId = canvasId || 'redactionCanvas';
-  panelId  = panelId  || 'redactionPanel';
-  activeCanvasId = canvasId;
+// ── DRAWING
+(function initDraw(){
+  const canvas=document.getElementById('redactCanvas');
+  function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height}}
 
-  const panel  = document.getElementById(panelId);
-  const canvas = document.getElementById(canvasId);
-  const ctx    = canvas.getContext('2d');
+  canvas.addEventListener('mousedown',e=>{drawStart=pos(e);isDrawing=true});
+  canvas.addEventListener('mousemove',e=>{
+    if(!isDrawing)return;const p=pos(e);fullRedraw();
+    const ctx=canvas.getContext('2d');ctx.fillStyle='rgba(28,25,23,0.75)';
+    ctx.fillRect(drawStart.x*canvas.width,drawStart.y*canvas.height,(p.x-drawStart.x)*canvas.width,(p.y-drawStart.y)*canvas.height);
+  });
+  canvas.addEventListener('mouseup',e=>{
+    if(!isDrawing)return;isDrawing=false;const p=pos(e);
+    if(Math.abs(p.x-drawStart.x)>0.02&&Math.abs(p.y-drawStart.y)>0.01){
+      redactions.push({x:Math.min(drawStart.x,p.x),y:Math.min(drawStart.y,p.y),w:Math.abs(p.x-drawStart.x),h:Math.abs(p.y-drawStart.y),label:'Redacted',auto:false});
+      updateRedactCount();
+    }
+    fullRedraw();
+  });
 
-  function renderImage(imgSrc) {
-    const img = new Image();
-    img.onload = function() {
-      const maxW = canvas.parentElement.offsetWidth || 600;
-      const ratio = img.height / img.width;
-      canvas.width  = maxW;
-      canvas.height = maxW * ratio;
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      redactions.length = 0;
-      redactions.push(
-        { x: 0.02, y: 0.06, w: 0.45, h: 0.06, label: 'Name / Address' },
-        { x: 0.55, y: 0.06, w: 0.43, h: 0.04, label: 'SSN' },
-        { x: 0.02, y: 0.88, w: 0.35, h: 0.06, label: 'Signature' }
-      );
-      drawRedactions(ctx, canvas.width, canvas.height);
-      panel.classList.add('visible');
-      canvas.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    };
-    img.src = imgSrc;
+  let lastTouch={};
+  canvas.addEventListener('touchstart',e=>{e.preventDefault();const t=e.touches[0];const r=canvas.getBoundingClientRect();drawStart={x:(t.clientX-r.left)/r.width,y:(t.clientY-r.top)/r.height};isDrawing=true},{passive:false});
+  canvas.addEventListener('touchmove',e=>{
+    e.preventDefault();if(!isDrawing)return;
+    const t=e.touches[0];const r=canvas.getBoundingClientRect();
+    lastTouch={x:(t.clientX-r.left)/r.width,y:(t.clientY-r.top)/r.height};
+    fullRedraw();const ctx=canvas.getContext('2d');ctx.fillStyle='rgba(28,25,23,0.75)';
+    ctx.fillRect(drawStart.x*canvas.width,drawStart.y*canvas.height,(lastTouch.x-drawStart.x)*canvas.width,(lastTouch.y-drawStart.y)*canvas.height);
+  },{passive:false});
+  canvas.addEventListener('touchend',e=>{
+    e.preventDefault();if(!isDrawing)return;isDrawing=false;
+    if(lastTouch.x&&Math.abs(lastTouch.x-drawStart.x)>0.02&&Math.abs(lastTouch.y-drawStart.y)>0.01){
+      redactions.push({x:Math.min(drawStart.x,lastTouch.x),y:Math.min(drawStart.y,lastTouch.y),w:Math.abs(lastTouch.x-drawStart.x),h:Math.abs(lastTouch.y-drawStart.y),label:'Redacted',auto:false});
+      updateRedactCount();
+    }
+    lastTouch={};fullRedraw();
+  },{passive:false});
+})();
+
+function updateRedactCount(){
+  const n=redactions.length;
+  const status=document.getElementById('redactStatus');
+  const btn=document.getElementById('step2btn');
+  const hint=document.getElementById('step2hint');
+  if(n>0){
+    status.textContent='✓ '+n+' redaction'+(n>1?'s':'');
+    status.style.color='var(--sage)';status.style.background='var(--sage-bg)';status.style.borderColor='rgba(92,122,101,0.2)';
+    btn.disabled=false;
+    hint.textContent='Your personal info is covered — continue when ready';
+    hint.style.color='var(--ink-4)';
+  }else{
+    status.textContent='No redactions yet';
+    status.style.color='var(--ink-4)';status.style.background='var(--canvas-2)';status.style.borderColor='var(--border)';
+    btn.disabled=true;
+    hint.textContent='Draw at least one redaction box to continue';
+    hint.style.color='var(--copper)';
   }
-
-  // Route PDF vs image
-  if (src.indexOf('data:application/pdf') === 0 || src.indexOf('data:application/octet') === 0) {
-    renderPdfPage(src, canvas, ctx, panel);
-  } else {
-    sessionStorage.setItem('leaseImage', src);
-    renderImage(src);
-  }
-
-  // Re-bind draw events cleanly (clone removes old listeners)
-  const old = document.getElementById(canvasId);
-  const fresh = old.cloneNode(true);
-  old.parentNode.replaceChild(fresh, old);
-  fresh.addEventListener('mousedown', startDraw);
-  fresh.addEventListener('mousemove', duringDraw);
-  fresh.addEventListener('mouseup',   endDraw);
-  fresh.addEventListener('touchstart', e => { e.preventDefault(); startDraw(e.touches[0]); }, { passive: false });
-  fresh.addEventListener('touchmove',  e => { e.preventDefault(); duringDraw(e.touches[0]); }, { passive: false });
-  fresh.addEventListener('touchend',   e => { e.preventDefault(); endDraw(); }, { passive: false });
 }
 
-async function renderPdfPage(dataUrl, canvas, ctx, panel) {
-  try {
-    if (!window.pdfjsLib) {
-      await new Promise((res, rej) => {
-        const s = document.createElement('script');
-        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-        s.onload = res; s.onerror = rej;
-        document.head.appendChild(s);
+// ── STEPS
+function goToStep2(){if(!originalImageSrc)return;goToStep(2)}
+function goToStep3(){goToStep(3)}
+function checkEmail(){
+  const e=document.getElementById('emailInput').value;
+  document.getElementById('submitBtn').disabled=!(e&&e.includes('@')&&e.includes('.'));
+}
+
+// ── SUBMIT
+async function submitLease(){
+  const email=document.getElementById('emailInput').value;
+  if(!email)return;
+  setProgress(85);showStep('step4');
+  try{
+    // Export REDACTED canvas — original pixels under black boxes are permanently gone
+    const canvas=document.getElementById('redactCanvas');
+    const blob=await new Promise(r=>canvas.toBlob(r,'image/jpeg',0.9));
+    let documentUrl=null;
+    if(sb&&blob){
+      const fileName=Date.now()+'_'+Math.random().toString(36).substring(7)+'.jpg';
+      const filePath='lease-uploads/'+fileName;
+      const{error:ue}=await sb.storage.from('lease-documents').upload(filePath,blob,{contentType:'image/jpeg',upsert:false});
+      if(ue)console.error('Upload error:',ue);else documentUrl=filePath;
+      const{error:ie}=await sb.from('submissions').insert({
+        email:email,submission_type:'verified_upload',deal_status:'signed_verified',
+        trust_tier:'high',verification_status:'pending',report_entitlement:'free_verified',
+        document_url:documentUrl
       });
-      window.pdfjsLib.GlobalWorkerOptions.workerSrc =
-        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      if(ie)console.error('Insert error:',ie);
     }
-    const raw  = atob(dataUrl.split(',')[1]);
-    const arr  = new Uint8Array(raw.length);
-    for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
-    const pdf  = await window.pdfjsLib.getDocument({ data: arr }).promise;
-    const page = await pdf.getPage(1);
-    const maxW = canvas.parentElement.offsetWidth || 600;
-    const vp   = page.getViewport({ scale: maxW / page.getViewport({ scale: 1 }).width });
-    canvas.width  = vp.width;
-    canvas.height = vp.height;
-    await page.render({ canvasContext: ctx, viewport: vp }).promise;
-    // Cache as image for redraws
-    sessionStorage.setItem('leaseImage', canvas.toDataURL('image/jpeg', 0.92));
-    redactions.length = 0;
-    redactions.push(
-      { x: 0.02, y: 0.06, w: 0.45, h: 0.06, label: 'Name / Address' },
-      { x: 0.55, y: 0.06, w: 0.43, h: 0.04, label: 'SSN' },
-      { x: 0.02, y: 0.88, w: 0.35, h: 0.06, label: 'Signature' }
-    );
-    drawRedactions(ctx, canvas.width, canvas.height);
-    panel.classList.add('visible');
-    canvas.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  } catch(err) {
-    console.error('PDF render error:', err);
-    canvas.width = 480; canvas.height = 120;
-    ctx.fillStyle = '#f8f5f0';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#1c1917';
-    ctx.font = '13px DM Sans, sans-serif';
-    ctx.fillText('PDF loaded — standard redactions applied automatically.', 16, 56);
-    sessionStorage.setItem('leaseImage', canvas.toDataURL());
-    redactions.length = 0;
-    panel.classList.add('visible');
+    setProgress(100);
+    document.getElementById('uploadingState').style.display='none';
+    document.getElementById('confirmState').style.display='block';
+    document.getElementById('confirmMsg').textContent='We\u2019ll verify your document within 48 hours and send your full report to '+email+'.';
+  }catch(err){
+    console.error('Submit error:',err);
+    document.getElementById('uploadingState').innerHTML='<div style="font-size:1.4rem;margin-bottom:12px">⚠️</div><div style="font-family:var(--f-display);font-size:20px;margin-bottom:8px">Something went wrong</div><div style="font-size:13px;color:var(--ink-3);margin-bottom:20px">Please try again.</div><button class="btn-primary" onclick="goToStep(3)" style="max-width:200px;margin:0 auto">← Go Back</button>';
   }
 }
 
-function getCanvasPos(e, canvas) {
-  const rect = canvas.getBoundingClientRect();
-  return {
-    x: (e.clientX - rect.left) / rect.width,
-    y: (e.clientY - rect.top)  / rect.height
-  };
-}
-
-function startDraw(e) {
-  const canvas = document.getElementById(activeCanvasId);
-  if (!canvas) return;
-  drawStart = getCanvasPos(e, canvas);
-  isDrawing = true;
-}
-
-function duringDraw(e) {
-  if (!isDrawing) return;
-  const canvas = document.getElementById(activeCanvasId);
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const pos = getCanvasPos(e, canvas);
-  redrawCanvas();
-  ctx.fillStyle = 'rgba(28,25,23,0.85)';
-  ctx.fillRect(
-    drawStart.x * canvas.width,
-    drawStart.y * canvas.height,
-    (pos.x - drawStart.x) * canvas.width,
-    (pos.y - drawStart.y) * canvas.height
-  );
-}
-
-function endDraw(e) {
-  if (!isDrawing) return;
-  isDrawing = false;
-  const canvas = document.getElementById(activeCanvasId);
-  if (!canvas) return;
-  const pos = e ? getCanvasPos(e, canvas) : { x: drawStart.x, y: drawStart.y };
-  if (Math.abs(pos.x - drawStart.x) > 0.01) {
-    redactions.push({
-      x: Math.min(drawStart.x, pos.x),
-      y: Math.min(drawStart.y, pos.y),
-      w: Math.abs(pos.x - drawStart.x),
-      h: Math.abs(pos.y - drawStart.y),
-      label: 'Custom'
-    });
-  }
-  redrawCanvas();
-}
-
-function redrawCanvas() {
-  const canvas = document.getElementById(activeCanvasId);
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const src = sessionStorage.getItem('leaseImage');
-  if (!src) return;
-  const img = new Image();
-  img.onload = () => {
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    drawRedactions(ctx, canvas.width, canvas.height);
-  };
-  img.src = src;
-}
-
-function drawRedactions(ctx, w, h) {
-  redactions.forEach(r => {
-    ctx.fillStyle = 'rgba(28,25,23,0.88)';
-    ctx.fillRect(r.x * w, r.y * h, r.w * w, r.h * h);
-    ctx.fillStyle = 'rgba(248,245,240,0.5)';
-    ctx.font = `${Math.max(10, w * 0.018)}px DM Mono, monospace`;
-    ctx.fillText(r.label || '', r.x * w + 6, r.y * h + 16);
-  });
-}
-
-function confirmRedactionAndExtract() {
-  document.getElementById('redactionPanel').classList.remove('visible');
-  document.getElementById('cameraZone').style.display = 'none';
-  const ep = document.getElementById('extractingPanel');
-  ep.classList.add('visible');
-  runExtractionAnimation('el');
-}
-
-function runExtractionAnimation(prefix) {
-  prefix = prefix || 'el';
-  const data = [
-    { id: prefix+'1', value: '$589 / mo' },
-    { id: prefix+'2', value: '36 months' },
-    { id: prefix+'3', value: '10,000 / yr' },
-    { id: prefix+'4', value: 'BMW of Ramsey · 07446' },
-    { id: prefix+'5', value: '$2,800' },
-  ];
-
-  data.forEach((item, i) => {
-    setTimeout(() => {
-      const el = document.getElementById(item.id);
-      if (!el) return;
-      el.classList.add('visible');
-      setTimeout(() => {
-        el.classList.add('done');
-        el.querySelector('.extract-value').textContent = item.value;
-        if (i === data.length - 1) {
-          setTimeout(() => goToStep3FromPhoto(), 600);
-        }
-      }, 600);
-    }, i * 500 + 200);
-  });
-}
-
-// ── MANUAL FORM ────────────────────────────────────
-function handleInput(id) {
-  const el = document.getElementById(id);
-  if (el && el.value && el.value !== '') {
-    el.classList.add('filled');
-    filledFields.add(id);
-  } else {
-    el.classList.remove('filled');
-    filledFields.delete(id);
-  }
-  updateConfidence();
-  checkManualRequired();
-}
-
-const requiredFields = ['f-vehicle', 'f-payment'];
-const optionalFields = ['f-term', 'f-zip', 'f-mileage', 'f-signing', 'f-month', 'f-dealer'];
-
-function checkManualRequired() {
-  const allFilled = requiredFields.every(id => {
-    const el = document.getElementById(id);
-    return el && el.value && el.value !== '';
-  });
-  document.getElementById('step2manualbtn').disabled = !allFilled;
-}
-
-function validateManualRequired() {
-  let valid = true;
-  requiredFields.forEach(id => {
-    const fg = document.getElementById('fg-' + id.replace('f-',''));
-    const el = document.getElementById(id);
-    if (!el || !el.value || el.value === '') {
-      fg && fg.classList.add('has-error');
-      valid = false;
-    } else {
-      fg && fg.classList.remove('has-error');
-    }
-  });
-  return valid;
-}
-
-function validatePayment() {
-  const el = document.getElementById('f-payment');
-  const fg = document.getElementById('fg-payment');
-  const v = parseFloat(el.value);
-  if (v < 100 || v > 3000) {
-    fg.classList.add('has-error');
-  } else {
-    fg.classList.remove('has-error');
-  }
-}
-
-function validateZip() {
-  const el = document.getElementById('f-zip');
-  const fg = document.getElementById('fg-zip');
-  if (el.value && (el.value.length !== 5 || !/^\d+$/.test(el.value))) {
-    fg.classList.add('has-error');
-  } else {
-    fg.classList.remove('has-error');
-  }
-}
-
-function updateConfidence() {
-  const total = requiredFields.length + optionalFields.length;
-  const filled = [...requiredFields, ...optionalFields].filter(id => {
-    const el = document.getElementById(id);
-    return el && el.value && el.value !== '';
-  }).length;
-
-  const pct = Math.round((filled / total) * 100);
-  const display = Math.max(15, pct);
-  document.getElementById('confFill').style.width = display + '%';
-
-  const labels = ['Basic','Fair','Good','Strong','Full'];
-  const msgs = [
-    'Add your vehicle and payment to get started.',
-    'Good start. Add term and zip code to improve accuracy.',
-    'Solid data. Adding your signing date will sharpen the timing score.',
-    'Strong submission. Your score will be highly accurate.',
-    'Excellent. Full data set — your score will be our most accurate.'
-  ];
-  const idx = Math.min(4, Math.floor(pct / 20));
-  document.getElementById('confPctLabel').textContent = labels[idx];
-  document.getElementById('confMessage').textContent = msgs[idx];
-  document.getElementById('confIcon').textContent = ['📊','📊','📈','✅','⭐'][idx];
-}
-
-// ── VERIFY STEP ────────────────────────────────────
-function populateVerifyFromManual() {
-  const v = document.getElementById('f-vehicle').value;
-  const p = document.getElementById('f-payment').value;
-  const t = document.getElementById('f-term').value;
-  const m = document.getElementById('f-mileage').value;
-  const s = document.getElementById('f-signing').value;
-  const z = document.getElementById('f-zip').value;
-  const d = document.getElementById('f-dealer').value;
-
-  if (v) { document.getElementById('vv-vehicle').value = v; document.getElementById('vf-vehicle').classList.add('auto-filled'); }
-  if (p) { document.getElementById('vv-payment').value = '$' + p + ' / mo'; document.getElementById('vf-payment').classList.add('auto-filled'); }
-  if (t) { document.getElementById('vv-term').value = t + ' months'; document.getElementById('vf-term').classList.add('auto-filled'); }
-  if (m) { document.getElementById('vv-mileage').value = parseInt(m).toLocaleString() + ' / yr'; document.getElementById('vf-mileage').classList.add('auto-filled'); }
-  if (s) { document.getElementById('vv-signing').value = '$' + parseFloat(s).toLocaleString(); document.getElementById('vf-signing').classList.add('auto-filled'); }
-  if (z) { document.getElementById('vv-zip').value = z; document.getElementById('vf-zip').style.cssText = ''; document.getElementById('vf-zip').classList.add('auto-filled'); }
-  if (d) { document.getElementById('vv-dealer').value = d; document.getElementById('vf-dealer').classList.add('auto-filled'); }
-}
-
-function checkVerifyComplete() {
-  const zip = document.getElementById('vv-zip').value;
-  if (zip && zip.length === 5) {
-    document.getElementById('vf-zip').style.cssText = '';
-    document.getElementById('vf-zip').classList.add('auto-filled');
-  }
-}
-
-// ── SESSION STORAGE ────────────────────────────────
-function saveToSession() {
-  const data = {
-    vehicle:  document.getElementById('vv-vehicle')?.value || '',
-    payment:  document.getElementById('vv-payment')?.value || '',
-    term:     document.getElementById('vv-term')?.value || '',
-    mileage:  document.getElementById('vv-mileage')?.value || '',
-    signing:  document.getElementById('vv-signing')?.value || '',
-    zip:      document.getElementById('vv-zip')?.value || '',
-    dealer:   document.getElementById('vv-dealer')?.value || '',
-    method:   fromPhoto ? 'photo' : 'manual',
-    timestamp: new Date().toISOString()
-  };
-  sessionStorage.setItem('leaseData', JSON.stringify(data));
-}
-
-// Init
+// ── INIT
 setProgress(10);
-updateDots(1);
 </script>
-
-<footer>
-  <span class="footer-logo">Lease<span>Checkr</span></span>
-  <div class="footer-links">
-    <a href="index.html">Home</a>
-    <a href="pricing.html">Pricing</a>
-    <a href="founder.html">Founding Member</a>
-    <a href="privacy.html">Privacy</a>
-    <a href="terms.html">Terms</a>
-  </div>
-</footer>
-
 </body>
 </html>
