@@ -479,6 +479,16 @@
       .option-card { padding: 32px 28px; }
       .page-header { margin-bottom: 40px; }
     }
+    footer { border-top: 1px solid var(--border); padding: 28px 64px; display: flex; align-items: center; justify-content: space-between; background: var(--canvas); }
+    .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--ink-3); }
+    .footer-logo span { color: var(--copper); }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { font-size: 0.71rem; color: var(--ink-4); text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--ink); }
+    @media (max-width: 768px) {
+      footer { padding: 24px; flex-direction: column; gap: 16px; text-align: center; }
+      .footer-links { flex-wrap: wrap; justify-content: center; }
+    }
   </style>
 </head>
 <body>
@@ -577,6 +587,17 @@
     </div>
 
   </main>
+
+  <footer>
+    <span class="footer-logo">Lease<span>Checkr</span></span>
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="founder.html">Founding Member</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="terms.html">Terms</a>
+    </div>
+  </footer>
 
 </body>
 </html>
