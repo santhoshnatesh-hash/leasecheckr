@@ -469,6 +469,189 @@
 
     .founder-nudge a:hover { border-color: var(--copper); }
 
+    /* ── EMAIL GATE MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(28,25,23,0.6);
+      backdrop-filter: blur(4px);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--canvas);
+      border-radius: 6px;
+      padding: 48px 44px;
+      max-width: 440px;
+      width: 100%;
+      position: relative;
+      animation: modalUp 0.3s cubic-bezier(0.16,1,0.3,1) forwards;
+    }
+
+    @keyframes modalUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px; right: 20px;
+      background: none; border: none;
+      font-size: 1.2rem; color: var(--ink-muted);
+      cursor: pointer; line-height: 1;
+      padding: 4px 8px;
+      transition: color 0.2s;
+    }
+    .modal-close:hover { color: var(--ink); }
+
+    .modal-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--copper);
+      margin-bottom: 14px;
+    }
+
+    .modal h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.9rem;
+      font-weight: 400;
+      line-height: 1.2;
+      color: var(--ink);
+      margin-bottom: 10px;
+    }
+
+    .modal h2 em { font-style: italic; color: var(--copper); }
+
+    .modal-desc {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      line-height: 1.65;
+      margin-bottom: 28px;
+    }
+
+    .email-field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .email-field label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+    }
+
+    .email-field input {
+      width: 100%;
+      padding: 13px 16px;
+      border: 1px solid var(--border-strong);
+      border-radius: 3px;
+      background: white;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .email-field input:focus { border-color: var(--copper); }
+    .email-field input.error { border-color: #c0392b; }
+
+    .email-error {
+      font-size: 0.75rem;
+      color: #c0392b;
+      display: none;
+      margin-top: -4px;
+    }
+    .email-error.visible { display: block; }
+
+    .modal-btn {
+      width: 100%;
+      padding: 15px;
+      background: var(--copper);
+      color: var(--canvas);
+      border: none;
+      border-radius: 3px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-bottom: 10px;
+    }
+    .modal-btn:hover { background: var(--copper-lt); }
+    .modal-btn:disabled { background: var(--ink-muted); cursor: not-allowed; }
+
+    .modal-privacy {
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--ink-muted);
+      line-height: 1.5;
+    }
+    .modal-privacy a { color: var(--ink-muted); text-decoration: underline; }
+
+    /* SUCCESS STATE */
+    .modal-success {
+      display: none;
+      text-align: center;
+      padding: 12px 0;
+    }
+    .modal-success.visible { display: block; }
+    .modal-success-icon {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: #e8f0ea;
+      color: var(--sage);
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .modal-success h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 10px;
+    }
+    .modal-success p {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      line-height: 1.65;
+      margin-bottom: 24px;
+    }
+    .modal-success-btn {
+      display: inline-block;
+      padding: 14px 32px;
+      background: var(--ink);
+      color: var(--canvas);
+      border-radius: 3px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .modal-success-btn:hover { background: var(--ink-light); }
+
+    .modal-form-wrap { transition: opacity 0.2s; }
+    .modal-form-wrap.hidden { opacity: 0; pointer-events: none; }
+
+    @media (max-width: 480px) {
+      .modal { padding: 36px 28px; }
+    }
+
     /* ANIMATIONS */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(16px); }
@@ -547,10 +730,10 @@
           <p class="price-note">One-time. No subscription. Yours to keep.</p>
         </div>
 
-        <a href="#" class="card-btn btn-pay">
-          Pay $19.99 &nbsp;<span class="coming-soon">Coming Soon</span>
+        <a href="#" class="card-btn btn-pay" onclick="event.preventDefault(); openModal();">
+          Pay $19.99 — Get Instant Access
         </a>
-        <p class="btn-sub-note">Stripe payment — launching soon</p>
+        <p class="btn-sub-note">Secure checkout · One-time payment · No subscription</p>
       </div>
 
       <!-- OPTION 2: CONTRIBUTE -->
@@ -607,6 +790,107 @@
       <a href="terms.html">Terms</a>
     </div>
   </footer>
+
+  <!-- ── EMAIL GATE MODAL ── -->
+  <div class="modal-overlay" id="emailOverlay">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
+
+      <!-- FORM STATE -->
+      <div class="modal-form-wrap" id="modalForm">
+        <div class="modal-eyebrow">One last step</div>
+        <h2>Where should we<br>send your <em>report?</em></h2>
+        <p class="modal-desc">Enter your email and we'll deliver your full report there — and send a copy you can reference any time.</p>
+
+        <div class="email-field">
+          <label for="gateEmail">Email address</label>
+          <input type="email" id="gateEmail" placeholder="you@email.com" autocomplete="email">
+          <div class="email-error" id="emailError">Please enter a valid email address.</div>
+        </div>
+
+        <button class="modal-btn" id="continueBtn" onclick="handleEmailSubmit()">
+          Continue to Payment →
+        </button>
+
+        <p class="modal-privacy">
+          No spam. Your report, one receipt, and occasional product updates.<br>
+          <a href="privacy.html">Privacy policy</a>
+        </p>
+      </div>
+
+      <!-- SUCCESS STATE -->
+      <div class="modal-success" id="modalSuccess">
+        <div class="modal-success-icon">✓</div>
+        <h3>You're all set.</h3>
+        <p>We've saved your email. You'll be redirected to payment — your report will be waiting when you return.</p>
+        <a href="#" class="modal-success-btn" id="stripeBtn">Continue to Payment →</a>
+        <p style="margin-top:14px;font-size:0.72rem;color:var(--ink-muted);">Stripe checkout launching soon — check back shortly.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function openModal() {
+      document.getElementById('emailOverlay').classList.add('open');
+      setTimeout(() => document.getElementById('gateEmail').focus(), 300);
+    }
+
+    function closeModal() {
+      document.getElementById('emailOverlay').classList.remove('open');
+      // Reset form state
+      document.getElementById('gateEmail').value = '';
+      document.getElementById('gateEmail').classList.remove('error');
+      document.getElementById('emailError').classList.remove('visible');
+      document.getElementById('modalForm').classList.remove('hidden');
+      document.getElementById('modalSuccess').classList.remove('visible');
+    }
+
+    function isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    function handleEmailSubmit() {
+      const emailInput = document.getElementById('gateEmail');
+      const errorEl = document.getElementById('emailError');
+      const email = emailInput.value.trim();
+
+      if (!isValidEmail(email)) {
+        emailInput.classList.add('error');
+        errorEl.classList.add('visible');
+        emailInput.focus();
+        return;
+      }
+
+      // Clear error
+      emailInput.classList.remove('error');
+      errorEl.classList.remove('visible');
+
+      // Store email locally (will write to Supabase when wired)
+      localStorage.setItem('lc_email', email);
+
+      // Show success state
+      document.getElementById('modalForm').classList.add('hidden');
+      setTimeout(() => {
+        document.getElementById('modalSuccess').classList.add('visible');
+      }, 200);
+    }
+
+    // Close on overlay click
+    document.getElementById('emailOverlay').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // Allow Enter key to submit
+    document.getElementById('gateEmail').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') handleEmailSubmit();
+    });
+  </script>
 
 </body>
 </html>
