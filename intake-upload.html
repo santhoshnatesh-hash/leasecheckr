@@ -380,9 +380,43 @@ nav {
   margin-bottom: 14px;
 }
 
-#redactionCanvas {
-  width: 100%; display: block; border-radius: 16px;
+#redactionCanvas,
+#redactionCanvasUpload {
+  width: 100%; display: block; border-radius: 8px;
   cursor: crosshair;
+  touch-action: none;
+}
+
+.redaction-canvas-wrap {
+  border: 2px solid rgba(168,105,46,0.25);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #1c1917;
+  margin-bottom: 14px;
+  position: relative;
+}
+
+.redaction-canvas-wrap::after {
+  content: 'Drag to add redaction boxes';
+  position: absolute; bottom: 10px; right: 12px;
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(253,250,246,0.45);
+  pointer-events: none;
+}
+
+.redaction-zone-tag {
+  position: absolute;
+  background: rgba(168,105,46,0.9);
+  color: #fdfaf6;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 2px;
+  pointer-events: none;
+  white-space: nowrap;
 }
 
 .redaction-instruction {
@@ -1321,215 +1355,260 @@ function confirmUploadAndExtract() {
   runExtractionAnimation('eu');
 }
 
-// ── REDACTION ──────────────────────────────────────
-const redactions = [];
-let isDrawing = false;
-let drawStart = {};
-let activeCanvasId = 'redactionCanvas'; // tracks which canvas is currently active
+// ── REDACTION ENGINE ───────────────────────────────
+  // State
+  const redactions = [];
+  let isDrawing = false;
+  let drawStart = {};
+  let activeCanvasId = 'redactionCanvas';
+  let activeCtx = null;
+  let canvasBgImage = null; // cached background for redraws
 
-function showRedaction(src, canvasId, panelId) {
-  canvasId = canvasId || 'redactionCanvas';
-  panelId  = panelId  || 'redactionPanel';
-  activeCanvasId = canvasId;
-
-  const panel  = document.getElementById(panelId);
-  const canvas = document.getElementById(canvasId);
-  const ctx    = canvas.getContext('2d');
-
-  function renderImage(imgSrc) {
-    const img = new Image();
-    img.onload = function() {
-      const maxW = canvas.parentElement.offsetWidth || 600;
-      const ratio = img.height / img.width;
-      canvas.width  = maxW;
-      canvas.height = maxW * ratio;
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      redactions.length = 0;
-      redactions.push(
-        { x: 0.02, y: 0.06, w: 0.45, h: 0.06, label: 'Name / Address' },
-        { x: 0.55, y: 0.06, w: 0.43, h: 0.04, label: 'SSN' },
-        { x: 0.02, y: 0.88, w: 0.35, h: 0.06, label: 'Signature' }
-      );
-      drawRedactions(ctx, canvas.width, canvas.height);
-      panel.classList.add('visible');
-      canvas.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    };
-    img.src = imgSrc;
-  }
-
-  // Route PDF vs image
-  if (src.indexOf('data:application/pdf') === 0 || src.indexOf('data:application/octet') === 0) {
-    renderPdfPage(src, canvas, ctx, panel);
-  } else {
-    sessionStorage.setItem('leaseImage', src);
-    renderImage(src);
-  }
-
-  // Re-bind draw events cleanly (clone removes old listeners)
-  const old = document.getElementById(canvasId);
-  const fresh = old.cloneNode(true);
-  old.parentNode.replaceChild(fresh, old);
-  fresh.addEventListener('mousedown', startDraw);
-  fresh.addEventListener('mousemove', duringDraw);
-  fresh.addEventListener('mouseup',   endDraw);
-  fresh.addEventListener('touchstart', e => { e.preventDefault(); startDraw(e.touches[0]); }, { passive: false });
-  fresh.addEventListener('touchmove',  e => { e.preventDefault(); duringDraw(e.touches[0]); }, { passive: false });
-  fresh.addEventListener('touchend',   e => { e.preventDefault(); endDraw(); }, { passive: false });
-}
-
-async function renderPdfPage(dataUrl, canvas, ctx, panel) {
-  try {
-    if (!window.pdfjsLib) {
-      await new Promise((res, rej) => {
-        const s = document.createElement('script');
-        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-        s.onload = res; s.onerror = rej;
-        document.head.appendChild(s);
-      });
-      window.pdfjsLib.GlobalWorkerOptions.workerSrc =
-        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    }
-    const raw  = atob(dataUrl.split(',')[1]);
-    const arr  = new Uint8Array(raw.length);
-    for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
-    const pdf  = await window.pdfjsLib.getDocument({ data: arr }).promise;
-    const page = await pdf.getPage(1);
-    const maxW = canvas.parentElement.offsetWidth || 600;
-    const vp   = page.getViewport({ scale: maxW / page.getViewport({ scale: 1 }).width });
-    canvas.width  = vp.width;
-    canvas.height = vp.height;
-    await page.render({ canvasContext: ctx, viewport: vp }).promise;
-    // Cache as image for redraws
-    sessionStorage.setItem('leaseImage', canvas.toDataURL('image/jpeg', 0.92));
-    redactions.length = 0;
-    redactions.push(
-      { x: 0.02, y: 0.06, w: 0.45, h: 0.06, label: 'Name / Address' },
-      { x: 0.55, y: 0.06, w: 0.43, h: 0.04, label: 'SSN' },
-      { x: 0.02, y: 0.88, w: 0.35, h: 0.06, label: 'Signature' }
-    );
-    drawRedactions(ctx, canvas.width, canvas.height);
-    panel.classList.add('visible');
-    canvas.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  } catch(err) {
-    console.error('PDF render error:', err);
-    canvas.width = 480; canvas.height = 120;
-    ctx.fillStyle = '#f8f5f0';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#1c1917';
-    ctx.font = '13px DM Sans, sans-serif';
-    ctx.fillText('PDF loaded — standard redactions applied automatically.', 16, 56);
-    sessionStorage.setItem('leaseImage', canvas.toDataURL());
-    redactions.length = 0;
-    panel.classList.add('visible');
-  }
-}
-
-function getCanvasPos(e, canvas) {
-  const rect = canvas.getBoundingClientRect();
-  return {
-    x: (e.clientX - rect.left) / rect.width,
-    y: (e.clientY - rect.top)  / rect.height
-  };
-}
-
-function startDraw(e) {
-  const canvas = document.getElementById(activeCanvasId);
-  if (!canvas) return;
-  drawStart = getCanvasPos(e, canvas);
-  isDrawing = true;
-}
-
-function duringDraw(e) {
-  if (!isDrawing) return;
-  const canvas = document.getElementById(activeCanvasId);
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const pos = getCanvasPos(e, canvas);
-  redrawCanvas();
-  ctx.fillStyle = 'rgba(28,25,23,0.85)';
-  ctx.fillRect(
-    drawStart.x * canvas.width,
-    drawStart.y * canvas.height,
-    (pos.x - drawStart.x) * canvas.width,
-    (pos.y - drawStart.y) * canvas.height
-  );
-}
-
-function endDraw(e) {
-  if (!isDrawing) return;
-  isDrawing = false;
-  const canvas = document.getElementById(activeCanvasId);
-  if (!canvas) return;
-  const pos = e ? getCanvasPos(e, canvas) : { x: drawStart.x, y: drawStart.y };
-  if (Math.abs(pos.x - drawStart.x) > 0.01) {
-    redactions.push({
-      x: Math.min(drawStart.x, pos.x),
-      y: Math.min(drawStart.y, pos.y),
-      w: Math.abs(pos.x - drawStart.x),
-      h: Math.abs(pos.y - drawStart.y),
-      label: 'Custom'
-    });
-  }
-  redrawCanvas();
-}
-
-function redrawCanvas() {
-  const canvas = document.getElementById(activeCanvasId);
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const src = sessionStorage.getItem('leaseImage');
-  if (!src) return;
-  const img = new Image();
-  img.onload = () => {
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    drawRedactions(ctx, canvas.width, canvas.height);
-  };
-  img.src = src;
-}
-
-function drawRedactions(ctx, w, h) {
-  redactions.forEach(r => {
-    ctx.fillStyle = 'rgba(28,25,23,0.88)';
-    ctx.fillRect(r.x * w, r.y * h, r.w * w, r.h * h);
-    ctx.fillStyle = 'rgba(248,245,240,0.5)';
-    ctx.font = `${Math.max(10, w * 0.018)}px DM Mono, monospace`;
-    ctx.fillText(r.label || '', r.x * w + 6, r.y * h + 16);
-  });
-}
-
-function confirmRedactionAndExtract() {
-  document.getElementById('redactionPanel').classList.remove('visible');
-  document.getElementById('cameraZone').style.display = 'none';
-  const ep = document.getElementById('extractingPanel');
-  ep.classList.add('visible');
-  runExtractionAnimation('el');
-}
-
-function runExtractionAnimation(prefix) {
-  prefix = prefix || 'el';
-  const data = [
-    { id: prefix+'1', value: '$589 / mo' },
-    { id: prefix+'2', value: '36 months' },
-    { id: prefix+'3', value: '10,000 / yr' },
-    { id: prefix+'4', value: 'BMW of Ramsey · 07446' },
-    { id: prefix+'5', value: '$2,800' },
+  // Default redaction zones for NJ MVSC-1 lease document
+  // These are proportional coordinates (0-1) targeting standard field positions
+  const DEFAULT_ZONES = [
+    { x: 0.01, y: 0.03, w: 0.55, h: 0.055, label: 'Name / Address' },
+    { x: 0.60, y: 0.03, w: 0.38, h: 0.055, label: 'SSN / DOB' },
+    { x: 0.01, y: 0.86, w: 0.40, h: 0.065, label: 'Signature' },
+    { x: 0.55, y: 0.86, w: 0.43, h: 0.065, label: 'Co-signer' },
   ];
 
-  data.forEach((item, i) => {
-    setTimeout(() => {
-      const el = document.getElementById(item.id);
-      if (!el) return;
-      el.classList.add('visible');
-      setTimeout(() => {
-        el.classList.add('done');
-        el.querySelector('.extract-value').textContent = item.value;
-        if (i === data.length - 1) {
-          setTimeout(() => goToStep3FromPhoto(), 600);
-        }
-      }, 600);
-    }, i * 500 + 200);
-  });
-}
+  function showRedaction(src, canvasId, panelId) {
+    canvasId = canvasId || 'redactionCanvas';
+    panelId  = panelId  || 'redactionPanel';
+    activeCanvasId = canvasId;
+
+    const panel  = document.getElementById(panelId);
+    const canvas = document.getElementById(canvasId);
+    if (!canvas || !panel) return;
+
+    // Detach & re-attach draw listeners on this canvas cleanly
+    bindDrawListeners(canvasId);
+
+    // Route PDF vs image
+    if (src.startsWith('data:application/pdf') || src.startsWith('data:application/octet')) {
+      renderPdfPage(src, canvasId, panel);
+    } else {
+      renderImageToCanvas(src, canvasId, panel);
+    }
+  }
+
+  function renderImageToCanvas(src, canvasId, panel) {
+    const canvas = document.getElementById(canvasId);
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.onload = function() {
+      // Set canvas to actual pixel dimensions (not CSS width)
+      const displayW = canvas.parentElement.clientWidth || 600;
+      const scale = window.devicePixelRatio || 1;
+      canvas.width  = displayW * scale;
+      canvas.height = displayW * scale * (img.height / img.width);
+      canvas.style.width  = displayW + 'px';
+      canvas.style.height = (displayW * (img.height / img.width)) + 'px';
+
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvasBgImage = img;
+
+      redactions.length = 0;
+      DEFAULT_ZONES.forEach(z => redactions.push({...z}));
+      drawAllRedactions(ctx, canvas.width, canvas.height);
+
+      panel.classList.add('visible');
+      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    };
+    img.src = src;
+    sessionStorage.setItem('leaseImage', src);
+  }
+
+  async function renderPdfPage(dataUrl, canvasId, panel) {
+    const canvas = document.getElementById(canvasId);
+    const ctx = canvas.getContext('2d');
+
+    // Show loading state
+    panel.classList.add('visible');
+    canvas.width = canvas.parentElement.clientWidth || 600;
+    canvas.height = 120;
+    ctx.fillStyle = '#1c1917';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'rgba(248,245,240,0.5)';
+    ctx.font = '12px DM Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('RENDERING PDF…', canvas.width / 2, 66);
+    ctx.textAlign = 'left';
+
+    try {
+      if (!window.pdfjsLib) {
+        await new Promise((res, rej) => {
+          const s = document.createElement('script');
+          s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+          s.onload = res; s.onerror = rej;
+          document.head.appendChild(s);
+        });
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+          'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      }
+
+      // Decode base64 safely
+      const b64 = dataUrl.split(',')[1];
+      const binStr = atob(b64);
+      const arr = new Uint8Array(binStr.length);
+      for (let i = 0; i < binStr.length; i++) arr[i] = binStr.charCodeAt(i);
+
+      const pdf  = await window.pdfjsLib.getDocument({ data: arr }).promise;
+      const page = await pdf.getPage(1);
+
+      const displayW = canvas.parentElement.clientWidth || 600;
+      const scale = (window.devicePixelRatio || 1);
+      const baseVp = page.getViewport({ scale: 1 });
+      const renderScale = (displayW * scale) / baseVp.width;
+      const vp = page.getViewport({ scale: renderScale });
+
+      canvas.width  = vp.width;
+      canvas.height = vp.height;
+      canvas.style.width  = displayW + 'px';
+      canvas.style.height = (displayW * (baseVp.height / baseVp.width)) + 'px';
+
+      await page.render({ canvasContext: ctx, viewport: vp }).promise;
+
+      // Cache rendered page as image for clean redraws
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      sessionStorage.setItem('leaseImage', imgData);
+      const bgImg = new Image();
+      bgImg.onload = () => { canvasBgImage = bgImg; };
+      bgImg.src = imgData;
+
+      redactions.length = 0;
+      DEFAULT_ZONES.forEach(z => redactions.push({...z}));
+      drawAllRedactions(ctx, canvas.width, canvas.height);
+      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    } catch(err) {
+      console.error('PDF render error:', err);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#2a2520';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'rgba(248,245,240,0.7)';
+      ctx.font = '13px DM Sans, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('PDF preview unavailable — standard redactions will be applied.', canvas.width/2, canvas.height/2);
+      ctx.textAlign = 'left';
+      sessionStorage.setItem('leaseImage', canvas.toDataURL());
+      redactions.length = 0;
+    }
+  }
+
+  function bindDrawListeners(canvasId) {
+    // Use a data attribute to avoid stacking listeners
+    const canvas = document.getElementById(canvasId);
+    if (!canvas || canvas.dataset.drawBound === 'true') return;
+    canvas.dataset.drawBound = 'true';
+    canvas.addEventListener('mousedown',  startDraw);
+    canvas.addEventListener('mousemove',  duringDraw);
+    canvas.addEventListener('mouseup',    endDraw);
+    canvas.addEventListener('mouseleave', endDraw);
+    canvas.addEventListener('touchstart', e => { e.preventDefault(); startDraw(e.touches[0]); },  { passive: false });
+    canvas.addEventListener('touchmove',  e => { e.preventDefault(); duringDraw(e.touches[0]); }, { passive: false });
+    canvas.addEventListener('touchend',   e => { e.preventDefault(); endDraw(); },                { passive: false });
+  }
+
+  function getCanvasPos(e, canvas) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width  / rect.width;
+    const scaleY = canvas.height / rect.height;
+    return {
+      x: (e.clientX - rect.left) * scaleX / canvas.width,
+      y: (e.clientY - rect.top)  * scaleY / canvas.height
+    };
+  }
+
+  function startDraw(e) {
+    const canvas = document.getElementById(activeCanvasId);
+    if (!canvas) return;
+    activeCtx = canvas.getContext('2d');
+    drawStart = getCanvasPos(e, canvas);
+    isDrawing = true;
+  }
+
+  function duringDraw(e) {
+    if (!isDrawing || !activeCtx) return;
+    const canvas = document.getElementById(activeCanvasId);
+    if (!canvas) return;
+    const pos = getCanvasPos(e, canvas);
+    // Redraw background + committed redactions
+    redrawBaseCanvas();
+    // Draw live preview box
+    activeCtx.fillStyle = 'rgba(28,25,23,0.7)';
+    activeCtx.fillRect(
+      drawStart.x * canvas.width,
+      drawStart.y * canvas.height,
+      (pos.x - drawStart.x) * canvas.width,
+      (pos.y - drawStart.y) * canvas.height
+    );
+  }
+
+  function endDraw(e) {
+    if (!isDrawing) return;
+    isDrawing = false;
+    const canvas = document.getElementById(activeCanvasId);
+    if (!canvas) return;
+    if (e && (e.type === 'mouseup' || e.type === 'touchend')) {
+      const pos = e.touches ? getCanvasPos(e.changedTouches[0], canvas) : getCanvasPos(e, canvas);
+      const w = Math.abs(pos.x - drawStart.x);
+      const h = Math.abs(pos.y - drawStart.y);
+      if (w > 0.015 && h > 0.005) {
+        redactions.push({
+          x: Math.min(drawStart.x, pos.x),
+          y: Math.min(drawStart.y, pos.y),
+          w, h,
+          label: 'Custom'
+        });
+      }
+    }
+    redrawBaseCanvas();
+    const canvas2 = document.getElementById(activeCanvasId);
+    if (canvas2 && activeCtx) drawAllRedactions(activeCtx, canvas2.width, canvas2.height);
+  }
+
+  function redrawBaseCanvas() {
+    const canvas = document.getElementById(activeCanvasId);
+    if (!canvas || !activeCtx) return;
+    if (canvasBgImage) {
+      activeCtx.drawImage(canvasBgImage, 0, 0, canvas.width, canvas.height);
+    } else {
+      const src = sessionStorage.getItem('leaseImage');
+      if (src) {
+        const img = new Image();
+        img.onload = () => {
+          activeCtx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          drawAllRedactions(activeCtx, canvas.width, canvas.height);
+        };
+        img.src = src;
+        return; // async - will draw when loaded
+      }
+    }
+    drawAllRedactions(activeCtx, canvas.width, canvas.height);
+  }
+
+  function drawAllRedactions(ctx, w, h) {
+    redactions.forEach(r => {
+      const rx = r.x * w, ry = r.y * h, rw = r.w * w, rh = r.h * h;
+
+      // Solid dark fill
+      ctx.fillStyle = 'rgba(20,17,15,0.92)';
+      ctx.fillRect(rx, ry, rw, rh);
+
+      // Subtle inner border
+      ctx.strokeStyle = 'rgba(168,105,46,0.6)';
+      ctx.lineWidth = Math.max(1, w * 0.002);
+      ctx.strokeRect(rx + 1, ry + 1, rw - 2, rh - 2);
+
+      // Label text
+      const fontSize = Math.max(9, Math.min(13, w * 0.018));
+      ctx.font = `500 ${fontSize}px DM Mono, monospace`;
+      ctx.fillStyle = 'rgba(196,134,74,0.85)';
+      ctx.fillText(r.label || 'REDACTED', rx + 6, ry + fontSize + 4);
+    });
+  }
 
 // ── MANUAL FORM ────────────────────────────────────
 function handleInput(id) {
