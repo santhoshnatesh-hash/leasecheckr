@@ -183,6 +183,15 @@
 
     .form-wrapper { width: 100%; max-width: 480px; margin: 0 auto; position: relative; }
 
+    /* Form gets a subtle card lift */
+    .form-panel-inner {
+      background: #fff;
+      border: 1px solid var(--border-2);
+      border-radius: 6px;
+      padding: 28px 28px 22px;
+      box-shadow: 0 2px 12px rgba(28,25,23,0.06), 0 8px 32px rgba(28,25,23,0.04);
+    }
+
     /* EDIT BAR */
     .edit-bar {
       display: none; align-items: center; justify-content: space-between;
@@ -244,14 +253,14 @@
     .mf-helper strong { color: var(--ink-3); font-style: normal; font-weight: 500; }
 
     /* CTA */
-    .cta-btn { width: 100%; margin-top: 16px; padding: 15px 22px; background: var(--ink); color: var(--canvas); border: none; border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 500; letter-spacing: 0.04em; cursor: pointer; transition: all 0.2s var(--ease); display: flex; align-items: center; justify-content: center; gap: 10px; position: relative; overflow: hidden; }
-    .cta-btn::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(168,105,46,0.18) 0%, transparent 60%); opacity: 0; transition: opacity 0.3s; }
-    .cta-btn:hover { background: var(--ink-2); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(28,25,23,0.15); }
+    .cta-btn { width: 100%; margin-top: 20px; padding: 17px 22px; background: var(--ink); color: var(--canvas); border: none; border-radius: 4px; font-family: 'DM Sans', sans-serif; font-size: 0.92rem; font-weight: 500; letter-spacing: 0.05em; cursor: pointer; transition: all 0.22s var(--ease); display: flex; align-items: center; justify-content: center; gap: 10px; position: relative; overflow: hidden; box-shadow: 0 2px 8px rgba(28,25,23,0.12); }
+    .cta-btn::before { content: ''; position: absolute; inset: 0; background: linear-gradient(120deg, rgba(168,105,46,0.22) 0%, transparent 55%); opacity: 0; transition: opacity 0.3s; }
+    .cta-btn:hover { background: var(--ink-2); transform: translateY(-2px); box-shadow: 0 10px 28px rgba(28,25,23,0.18); }
     .cta-btn:hover::before { opacity: 1; }
-    .cta-btn:active { transform: none; }
-    .cta-arrow { transition: transform 0.2s; }
-    .cta-btn:hover .cta-arrow { transform: translateX(3px); }
-    .trust-line { text-align: center; font-family: 'DM Mono', monospace; font-size: 0.54rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-4); margin-top: 9px; }
+    .cta-btn:active { transform: none; box-shadow: none; }
+    .cta-arrow { transition: transform 0.2s; font-size: 1rem; }
+    .cta-btn:hover .cta-arrow { transform: translateX(4px); }
+    .trust-line { text-align: center; font-family: 'DM Mono', monospace; font-size: 0.54rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-4); margin-top: 10px; }
 
     /* ── TEASER PANEL ── */
     .teaser-panel { display: none; opacity: 0; transform: translateX(18px); transition: all 0.45s var(--ease); }
@@ -800,16 +809,16 @@
 
     <div class="proof-row">
       <div class="proof-item">
-        <span class="proof-value" id="dealsCount">847</span>
-        <span class="proof-label">Deals checked</span>
+        <span class="proof-value">NJ</span>
+        <span class="proof-label">Leases only</span>
       </div>
       <div class="proof-item">
         <span class="proof-value">21</span>
-        <span class="proof-label">NJ counties</span>
+        <span class="proof-label">Counties tracked</span>
       </div>
       <div class="proof-item">
         <span class="proof-value" id="foundersCount">153</span>
-        <span class="proof-label">Founding members</span>
+        <span class="proof-label">Founding Members</span>
       </div>
     </div>
 
@@ -817,10 +826,9 @@
       <div class="founder-dot"></div>
       <div>
         <div class="founder-text">
-          Submitting your first verified lease document? You qualify as a Founding Member — one of the first 1,000 NJ drivers helping build the benchmark.
+          Submit a verified NJ lease document and become a Founding Member — one of the first 1,000 contributors helping build the benchmark.
           <br><a href="founder.html">See Founding Member benefits →</a>
         </div>
-        <div class="founder-count" id="spotsLeft">847 spots remaining</div>
       </div>
     </div>
   </div>
@@ -840,6 +848,7 @@
 
       <!-- FORM PANEL -->
       <div class="form-panel" id="formPanel">
+        <div class="form-panel-inner">
         <div class="form-eyebrow">Check your lease quote</div>
 
         <!-- MAKE / MODEL / TRIM -->
@@ -951,17 +960,6 @@
                 <input type="text" id="fDealer" placeholder="e.g. Honda of Paramus">
               </div>
             </div>
-            <div class="field-row field-full">
-              <div class="field">
-                <label class="field-label">What are you checking?</label>
-                <select id="fCheckType">
-                  <option value="">Select one</option>
-                  <option>Dealer quote (not yet signed)</option>
-                  <option>Signed lease</option>
-                  <option>Not sure yet</option>
-                </select>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -970,6 +968,7 @@
           <span class="cta-arrow">→</span>
         </button>
         <div class="trust-line">No account required · NJ leases only · Under 60 seconds</div>
+        </div><!-- /form-panel-inner -->
       </div>
 
       <!-- TEASER PANEL -->
@@ -1004,7 +1003,7 @@
 
         <div class="confidence-line">
           <div class="conf-dot"></div>
-          <span id="tConfidence">Based on verified NJ lease submissions</span>
+          <span id="tConfidence">Based on comparable NJ lease submissions in the last 60 days</span>
         </div>
 
         <div class="locked-hint">
@@ -1017,12 +1016,9 @@
         <div class="teaser-ctas">
           <a href="access.html" class="cta-primary">
             <span class="cta-primary-label">Get Full Report</span>
-            <span class="cta-primary-price">$19.99 or upload your lease free →</span>
+            <span class="cta-primary-price">$19.99 one-time · or free with lease upload</span>
           </a>
-          <a href="sample-report.html" target="_blank" class="cta-secondary">View Sample Report →</a>
-          <div class="cta-tertiary">
-            Or <a href="founder.html">contribute your lease and join 153 Founding Members</a> — full report free, Premium access permanent.
-          </div>
+          <a href="sample-report.html" target="_blank" class="cta-secondary">See what the full report includes →</a>
         </div>
       </div>
 
@@ -1039,14 +1035,14 @@
 
     <div class="mislead-grid">
       <div class="mislead-left reveal">
-        <div class="big-stat">$67</div>
-        <div class="big-stat-label">Avg. monthly overpayment observed in NJ submissions</div>
+        <div class="big-stat">$50–80</div>
+        <div class="big-stat-label">Typical monthly gap between a fair deal and an average submission</div>
         <p>
-          Most shoppers negotiate by asking <strong>"can you get it under $400 a month?"</strong> Dealers are trained to work with that number — by adjusting the term, the mileage, or the drive-off in ways that look like a win but aren't.
+          Most shoppers negotiate by asking <strong>"can you get it under $400 a month?"</strong> Dealers are trained to work with that number — adjusting term, mileage, or drive-off in ways that look like a win but aren't.
         </p>
         <br>
         <p>
-          Over a 36-month lease, a $67/month overpayment is <strong>$2,412 left on the table</strong> — often from a money factor markup that took a dealer 30 seconds to apply.
+          Over 36 months, even a $60/month overpayment is <strong>$2,160 left on the table</strong> — often from a money factor markup that took a dealer 30 seconds to apply.
         </p>
       </div>
 
@@ -1055,28 +1051,28 @@
           <div class="mp-num">01</div>
           <div>
             <div class="mp-title">Monthly payment is a result, not a starting point</div>
-            <div class="mp-desc">Your payment is calculated from cap cost, residual, money factor, and fees. Negotiating the payment alone leaves all the real levers in the dealer's hands.</div>
+            <div class="mp-desc">Your payment is calculated from cap cost, residual, money factor, and fees. Negotiating the payment alone leaves every real lever in the dealer's hands.</div>
           </div>
         </div>
         <div class="mislead-point">
           <div class="mp-num">02</div>
           <div>
             <div class="mp-title">Money factor markups are invisible in the payment</div>
-            <div class="mp-desc">A dealer can mark up the money factor by 0.0005 and your payment barely moves — but you pay an extra $500+ over the term. Most shoppers never ask.</div>
+            <div class="mp-desc">A dealer can mark up the money factor and your payment barely moves — but you pay hundreds more over the term. Most shoppers never ask what it is.</div>
           </div>
         </div>
         <div class="mislead-point">
           <div class="mp-num">03</div>
           <div>
-            <div class="mp-title">Due at signing can hide the real cost</div>
-            <div class="mp-desc">Putting more money down lowers the payment but doesn't improve the deal. A lower monthly number with a high drive-off is not a better lease.</div>
+            <div class="mp-title">Due at signing can obscure the real cost</div>
+            <div class="mp-desc">More money down lowers the payment but doesn't improve the deal. A low monthly number with a high drive-off is not a better lease — it's a more expensive one.</div>
           </div>
         </div>
         <div class="mislead-point">
           <div class="mp-num">04</div>
           <div>
             <div class="mp-title">National averages don't reflect your county</div>
-            <div class="mp-desc">A Monmouth County Honda CR-V deal looks different from a Bergen County one. Local verified data is the only relevant comparison.</div>
+            <div class="mp-desc">A Monmouth County deal looks different from a Bergen County one. Only local, verified comparisons tell you whether your specific deal is fair.</div>
           </div>
         </div>
       </div>
@@ -1228,25 +1224,25 @@
         </p>
       </div>
 
-      <div class="ask-questions">
+        <div class="ask-questions">
         <div class="ask-q reveal">
           <div class="ask-q-text">"What money factor are you using on this lease?"</div>
-          <div class="ask-q-why">The money factor is your financing rate. Dealers receive a buy rate from the manufacturer and are often permitted to mark it up. You have the right to know the number you're paying.</div>
+          <div class="ask-q-why">Dealers receive a buy rate from the manufacturer and are often permitted to mark it up. This is your financing rate — you have every right to know the number you're paying.</div>
           <div class="ask-q-tag">Affects financing cost</div>
         </div>
         <div class="ask-q reveal reveal-delay-1">
-          <div class="ask-q-text">"What residual are you using, and is that based on MSRP?"</div>
-          <div class="ask-q-why">The residual should come from the manufacturer's leasing arm, not be set by the dealership. Confirming this tells you whether the payment calculation is legitimate.</div>
+          <div class="ask-q-text">"What residual are you using, and is it based on MSRP?"</div>
+          <div class="ask-q-why">The residual comes from the manufacturer's leasing arm, not the dealer. Knowing the percentage lets you verify the payment math independently.</div>
           <div class="ask-q-tag">Affects monthly payment</div>
         </div>
         <div class="ask-q reveal reveal-delay-2">
           <div class="ask-q-text">"What is the selling price before fees and cap cost reductions?"</div>
-          <div class="ask-q-why">The cap cost is what your lease is actually built on. A lower cap cost — achieved through negotiation or incentives — reduces every payment for the term of the lease.</div>
+          <div class="ask-q-why">The cap cost is what your lease is actually built on. Negotiating it down — through price or manufacturer incentives — reduces every payment for the term.</div>
           <div class="ask-q-tag">Affects entire lease cost</div>
         </div>
         <div class="ask-q reveal reveal-delay-3">
-          <div class="ask-q-text">"Can you itemize exactly what is in the due-at-signing amount?"</div>
-          <div class="ask-q-why">Drive-offs can include first payment, acquisition fee, DMV, taxes, and add-ons. Understanding the breakdown tells you if anything has been quietly added to the transaction.</div>
+          <div class="ask-q-text">"Can you break down exactly what's in the due-at-signing amount?"</div>
+          <div class="ask-q-why">Drive-offs can include first payment, acquisition fee, taxes, DMV fees, and dealer add-ons. The breakdown tells you what's required and what isn't.</div>
           <div class="ask-q-tag">Affects total cost</div>
         </div>
       </div>
@@ -1309,33 +1305,33 @@
         <div class="s-eyebrow" style="color:var(--copper);">Why local data matters</div>
         <h2 class="s-headline-light" style="margin-bottom:24px;">National averages<br>don't reflect<br><em>your county.</em></h2>
         <p>
-          A Toyota RAV4 lease in Bergen County does not look like a Toyota RAV4 lease in national data. Local dealer incentives, regional demand, and county tax structures all affect what a fair deal actually looks like in your area.
+          A Toyota RAV4 lease in Bergen County does not look like a Toyota RAV4 in national data. Local dealer incentives, regional demand, and county tax structures all shape what fair actually means in your area.
         </p>
         <p>
-          <strong>LeaseCheckr is built entirely from verified NJ lease submissions</strong> — real contracts and dealer worksheets from NJ drivers, matched to county and vehicle. Not national estimates. Not manufacturer suggested figures. Real deals, from your market.
+          <strong>LeaseCheckr is built from verified NJ lease submissions</strong> — real contracts and dealer worksheets from NJ drivers, matched to county and vehicle. Not national estimates. Real deals, from your market.
         </p>
         <p>
-          Every submission improves the benchmark for the next driver. That's why verified document uploads are valued — they're the only way to build a dataset that's actually useful locally.
+          Every verified submission improves the benchmark. That's why document uploads matter more than manual entry — they're the only way to build data that's genuinely useful locally.
         </p>
 
         <div class="benchmark-stat-row reveal">
           <div class="bsr-item">
             <div class="bsr-value">21</div>
-            <div class="bsr-label">NJ counties covered</div>
+            <div class="bsr-label">NJ counties tracked</div>
           </div>
           <div class="bsr-item">
             <div class="bsr-value">60</div>
             <div class="bsr-label">Day rolling window</div>
           </div>
           <div class="bsr-item">
-            <div class="bsr-value">100%</div>
-            <div class="bsr-label">NJ-verified submissions</div>
+            <div class="bsr-value">NJ</div>
+            <div class="bsr-label">Leases only, always</div>
           </div>
         </div>
       </div>
 
       <div class="benchmark-right reveal reveal-delay-1">
-        <div class="county-chart-title">Sample: Avg. lease payment by county · Honda CR-V EX-L · 36mo</div>
+        <div class="county-chart-title">Illustrative sample · Avg. payment by county · Honda CR-V EX-L · 36mo</div>
         <div class="county-chart" id="countyChart">
           <div class="county-row"><span class="county-name">Bergen</span><div class="county-bar-wrap"><div class="county-bar" data-w="88"></div></div><span class="county-val">$438</span></div>
           <div class="county-row"><span class="county-name">Morris</span><div class="county-bar-wrap"><div class="county-bar" data-w="80"></div></div><span class="county-val">$428</span></div>
@@ -1430,7 +1426,11 @@
     document.getElementById('tPay').textContent = '$' + pay.toLocaleString();
     document.getElementById('tAvg').textContent = '$' + avg.toLocaleString();
     document.getElementById('tCountyLbl').textContent = label + ' Average';
-    document.getElementById('tConfidence').textContent = 'Based on verified NJ ' + (model || 'lease') + ' submissions in the last 60 days';
+
+    // Stable, non-random confidence line
+    const modelName = model || 'lease';
+    document.getElementById('tConfidence').textContent =
+      `Based on comparable NJ ${modelName} submissions in ${label} over the last 60 days`;
 
     const deltaEl = document.getElementById('tDelta');
     if (diff < 0) { deltaEl.textContent = '↓ $' + Math.abs(diff) + '/mo below avg'; deltaEl.className = 'pay-box-delta delta-good'; }
@@ -1468,7 +1468,6 @@
   // ── COUNTERS
   const CLAIMED = 153, TOTAL = 1000;
   document.getElementById('foundersCount').textContent = CLAIMED;
-  document.getElementById('spotsLeft').textContent = (TOTAL - CLAIMED).toLocaleString() + ' spots remaining';
 
   // ── COUNTY BAR CHART ANIMATION
   function animateBars() {
