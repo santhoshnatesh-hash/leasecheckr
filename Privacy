@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — LeaseCheckr</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --canvas:#f8f5f0;--canvas-2:#f2ede6;--ink:#1c1917;--ink-2:#3d3830;
+      --ink-3:#6b6259;--ink-4:#a89f94;--copper:#a8692e;--copper-lt:#c4864a;
+      --copper-pale:#f0e4d4;--cream:#fdfaf6;
+      --border:rgba(28,25,23,0.10);--border-2:rgba(28,25,23,0.18);
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--canvas); color: var(--ink); -webkit-font-smoothing: antialiased; }
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 48px; background: rgba(248,245,240,0.92); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+    .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 500; letter-spacing: 0.02em; color: var(--ink); text-decoration: none; }
+    .nav-logo span { color: var(--copper); }
+    .nav-back { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); text-decoration: none; transition: color 0.2s; }
+    .nav-back:hover { color: var(--ink); }
+    .page-wrap { max-width: 720px; margin: 0 auto; padding: 120px 48px 80px; }
+    .page-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--copper); margin-bottom: 16px; }
+    .page-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.4rem, 4vw, 3.6rem); font-weight: 300; line-height: 1.1; color: var(--ink); margin-bottom: 12px; }
+    .page-updated { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-4); margin-bottom: 48px; }
+    .policy-divider { height: 1px; background: var(--border); margin-bottom: 48px; }
+    /* Termly embed container */
+    .termly-embed { min-height: 400px; }
+    /* Fallback prose styles for when Termly renders */
+    .policy-body { font-size: 0.92rem; font-weight: 300; line-height: 1.85; color: var(--ink-2); }
+    .policy-body h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 500; color: var(--ink); margin: 36px 0 12px; }
+    .policy-body h3 { font-size: 0.9rem; font-weight: 500; color: var(--ink); margin: 24px 0 8px; }
+    .policy-body p { margin-bottom: 16px; }
+    .policy-body ul { padding-left: 20px; margin-bottom: 16px; }
+    .policy-body ul li { margin-bottom: 6px; }
+    .policy-body a { color: var(--copper); text-decoration: none; border-bottom: 1px solid rgba(168,105,46,0.3); }
+    footer { border-top: 1px solid var(--border); padding: 28px 48px; display: flex; align-items: center; justify-content: space-between; max-width: 720px; margin: 0 auto; }
+    .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--ink-3); }
+    .footer-logo span { color: var(--copper); }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { font-size: 0.72rem; color: var(--ink-4); text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--ink); }
+    @media (max-width: 768px) {
+      nav { padding: 0 24px; }
+      .page-wrap { padding: 100px 24px 60px; }
+      footer { padding: 24px; flex-direction: column; gap: 16px; text-align: center; }
+      .footer-links { flex-wrap: wrap; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Lease<span>Checkr</span></a>
+  <a href="index.html" class="nav-back">← Back to LeaseCheckr</a>
+</nav>
+
+<div class="page-wrap">
+  <div class="page-eyebrow">Legal</div>
+  <h1 class="page-title">Privacy Policy</h1>
+  <div class="page-updated">Last updated: March 2026</div>
+  <div class="policy-divider"></div>
+
+  <!-- Termly embed will go here — replace with your Termly embed code -->
+  <div class="termly-embed" name="termly-embed" data-id="YOUR_TERMLY_POLICY_ID"></div>
+
+  <!-- Fallback / placeholder until Termly is embedded -->
+  <div class="policy-body" id="placeholderContent">
+    <p>This privacy policy explains how LeaseCheckr collects, uses, and protects information submitted through this platform.</p>
+
+    <h2>Information We Collect</h2>
+    <p>When you submit a lease quote, we collect the deal parameters you enter — including vehicle details, payment, term, mileage, and ZIP code. We do not require account creation to receive a free result.</p>
+    <p>If you choose to upload a lease document, we extract deal data from the document for benchmark purposes. Personal identifiers — including your name, address, phone number, and vehicle identification number — are fully redacted before any data is stored.</p>
+
+    <h2>How We Use Your Information</h2>
+    <p>Deal data submitted through the platform is used to generate your score and, where you have consented, to contribute to the anonymised NJ lease benchmark dataset. We do not sell your personal information to third parties.</p>
+
+    <h2>Document Handling</h2>
+    <p>Uploaded lease documents are processed for data extraction only. Personal identifiers are stripped from the document before any data enters our benchmark. Raw documents are not retained after processing is complete.</p>
+
+    <h2>Cookies</h2>
+    <p>We use cookies to support site functionality and to understand how visitors interact with the platform. You can manage cookie preferences through your browser settings.</p>
+
+    <h2>Contact</h2>
+    <p>If you have questions about this policy, please contact us at <a href="mailto:privacy@leasecheckr.com">privacy@leasecheckr.com</a>.</p>
+  </div>
+</div>
+
+<footer>
+  <span class="footer-logo">Lease<span>Checkr</span></span>
+  <div class="footer-links">
+    <a href="index.html">Check a Lease</a>
+    <a href="pricing.html">Pricing</a>
+    <a href="terms.html">Terms</a>
+  </div>
+</footer>
+
+<script>
+  // When Termly embed is active, hide the placeholder content
+  window.addEventListener('load', function() {
+    const termlyEmbed = document.querySelector('[data-id]');
+    if (termlyEmbed && termlyEmbed.children.length > 0) {
+      document.getElementById('placeholderContent').style.display = 'none';
+    }
+  });
+</script>
+
+</body>
+</html>
