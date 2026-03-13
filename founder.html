@@ -5,14 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Founding Member — LeaseCheckr</title>
   <meta name="description" content="The first 1,000 NJ drivers who contribute a verified lease document become Founding Members — early contributors helping build LeaseCheckr's benchmark from day one.">
-  <meta property="og:title" content="Founding Member — LeaseCheckr">
-  <meta property="og:description" content="The first 1,000 NJ drivers who contribute a verified lease document become Founding Members. Contribute your lease, unlock Premium access free.">
-  <meta property="og:url" content="https://leasecheckr.vercel.app/founder.html">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="LeaseCheckr">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Founding Member — LeaseCheckr">
-  <meta name="twitter:description" content="The first 1,000 NJ drivers who contribute a verified lease document become Founding Members. Contribute your lease, unlock Premium access free.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
@@ -307,7 +299,13 @@
       footer{padding:24px;flex-direction:column;gap:16px;text-align:center;}
       .footer-links{flex-wrap:wrap;justify-content:center;}
     }
+    /* SOLD OUT STATE */
+    .sold-out .cta-main{background:var(--ink-4);pointer-events:none;cursor:default}
+    .sold-out .spots-dot{background:var(--ink-4);animation:none}
+    .sold-out .spots-counter{background:var(--canvas-2);border-color:var(--border)}
+    .sold-out .spots-text{color:var(--ink-3)}
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -411,7 +409,7 @@
     <span class="privacy-icon">🔒</span>
     <div>
       <div class="privacy-title">How We Handle Your Document</div>
-      <div class="privacy-text">Your lease document is used only to extract deal data for the benchmark. Personal identifiers are redacted before processing and not stored in identifiable form. For the full account of how documents are handled, see our <a href="privacy.html" style="color:var(--copper);text-decoration:none;border-bottom:1px solid rgba(168,105,46,0.3);">privacy policy</a>.</div>
+      <div class="privacy-text">Personal identifiers are redacted before your document enters our system. What is retained is deal data only — payment, term, mileage, money factor, county. No name, address, contact information, or VIN is stored in identifiable form in the benchmark. For the complete account of how documents are handled, see our <a href="privacy.html" style="color:var(--copper);text-decoration:none;border-bottom:1px solid rgba(168,105,46,0.3);">privacy policy</a>.</div>
     </div>
   </div>
 
@@ -446,10 +444,49 @@
 </footer>
 
 <script>
-  const CLAIMED = 153, TOTAL = 1000;
-  document.getElementById('spotsText').textContent = `${(TOTAL-CLAIMED).toLocaleString()} spots remaining`;
+  // ── SUPABASE
+  const SUPABASE_URL='YOUR_SUPABASE_URL';
+  const SUPABASE_KEY='YOUR_SUPABASE_ANON_KEY';
+  let sb=null;
+  try{if(SUPABASE_URL!=='YOUR_SUPABASE_URL'&&window.supabase){sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}}catch(e){console.error(e)}
 
-  const card = document.getElementById('memberCard');
+  const TOTAL=1000;
+
+  // ── LIVE FOUNDER COUNT
+  async function loadFounderCount(){
+    let claimed=153; // fallback
+    if(sb){
+      try{
+        const{data,error}=await sb.from('founder_slots').select('claimed_count').eq('id',1).single();
+        if(!error&&data)claimed=data.claimed_count;
+      }catch(e){console.error(e)}
+    }
+    const remaining=TOTAL-claimed;
+    const spotsEl=document.getElementById('spotsText');
+
+    if(remaining<=0){
+      // SOLD OUT STATE
+      spotsEl.textContent='All 1,000 spots have been claimed';
+      document.body.classList.add('sold-out');
+      // Update CTA
+      const cta=document.querySelector('.cta-main');
+      if(cta){
+        cta.innerHTML='<span>All Founding Member Spots Claimed</span>';
+        cta.href='access.html';
+      }
+      const ctaSub=document.querySelector('.cta-support');
+      if(ctaSub)ctaSub.textContent='You can still get your full report by uploading your lease or paying $19.99';
+      // Update hero subhead
+      const sub=document.querySelector('.hero-subhead');
+      if(sub)sub.textContent='All 1,000 Founding Member spots have been claimed. Thank you to every driver who helped build the benchmark. You can still upload your lease for a free report or purchase full access.';
+    }else{
+      spotsEl.textContent=remaining.toLocaleString()+' of 1,000 spots remaining';
+    }
+  }
+  loadFounderCount();
+
+  // ── CARD 3D EFFECT
+  const card=document.getElementById('memberCard');
   document.addEventListener('mousemove',(e)=>{
     if(window.innerWidth<768)return;
     const rect=card.getBoundingClientRect();
