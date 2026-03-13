@@ -382,41 +382,9 @@ nav {
 
 #redactionCanvas,
 #redactionCanvasUpload {
-  width: 100%; display: block; border-radius: 8px;
+  width: 100%; display: block;
   cursor: crosshair;
   touch-action: none;
-}
-
-.redaction-canvas-wrap {
-  border: 2px solid rgba(168,105,46,0.25);
-  border-radius: 10px;
-  overflow: hidden;
-  background: #1c1917;
-  margin-bottom: 14px;
-  position: relative;
-}
-
-.redaction-canvas-wrap::after {
-  content: 'Drag to add redaction boxes';
-  position: absolute; bottom: 10px; right: 12px;
-  font-family: 'DM Mono', monospace; font-size: 9px;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  color: rgba(253,250,246,0.45);
-  pointer-events: none;
-}
-
-.redaction-zone-tag {
-  position: absolute;
-  background: rgba(168,105,46,0.9);
-  color: #fdfaf6;
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 2px 6px;
-  border-radius: 2px;
-  pointer-events: none;
-  white-space: nowrap;
 }
 
 .redaction-instruction {
@@ -1167,14 +1135,57 @@ footer { border-top: 1px solid var(--border); padding: 28px 64px; display: flex;
   <div class="step" id="step4">
     <div class="scoring-state visible">
       <div class="scoring-circle"></div>
-      <div class="scoring-label">Scoring your deal…</div>
-      <div class="scoring-sub">Comparing against 2,847 NJ submissions</div>
+      <div class="scoring-label" id="scoringLabel">Saving your deal…</div>
+      <div class="scoring-sub" id="scoringSub">Securely storing your submission</div>
     </div>
   </div>
 
 </div><!-- /flow-wrapper -->
 
 <script>
+// ── SUPABASE ────────────────────────────────────────
+const SUPABASE_URL  = 'https://xqjsvlhdpdfvzixlmdxk.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxanN2bGhkcGRmdnppeGxtZHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzg2ODcsImV4cCI6MjA4ODg1NDY4N30.MT0tEDMLaBDLtZkX9xEVEkaUfPdIA9QsJrWjGDpeWsE';
+
+async function supabaseInsert(table, payload) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_ANON,
+      'Authorization': `Bearer ${SUPABASE_ANON}`,
+      'Prefer': 'return=representation'
+    },
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Supabase ${table} insert failed: ${err}`);
+  }
+  return res.json();
+}
+
+// Parse a dollar string like "$589 / mo" → 589
+function parseDollars(s) {
+  if (!s) return null;
+  const n = parseFloat(s.replace(/[^0-9.]/g, ''));
+  return isNaN(n) ? null : n;
+}
+
+// Parse mileage like "10,000 / yr" → 10000
+function parseMileage(s) {
+  if (!s) return null;
+  const n = parseInt(s.replace(/[^0-9]/g, ''));
+  return isNaN(n) ? null : n;
+}
+
+// Parse term like "36 months" → 36
+function parseTerm(s) {
+  if (!s) return null;
+  const n = parseInt(s);
+  return isNaN(n) ? null : n;
+}
+
 let selectedMethod = null;
 let currentStep = 1;
 let fromPhoto = false;
@@ -1257,17 +1268,79 @@ function goToStep3FromPhoto() {
   showStep('step3');
 }
 
-function goToStep4() {
+async function goToStep4() {
   currentStep = 4;
   updateDots(4); setProgress(90);
   showStep('step4');
+
+  // Cycle scoring labels for UX
+  const labels = [
+    ['Saving your deal…',       'Securely storing your submission'],
+    ['Analyzing your payment…', 'Comparing against NJ market data'],
+    ['Running comparisons…',    'Checking dealer & zip benchmarks'],
+    ['Almost there…',           'Building your full report'],
+  ];
+  let li = 0;
+  const labelEl = document.getElementById('scoringLabel');
+  const subEl   = document.getElementById('scoringSub');
+  const labelInterval = setInterval(() => {
+    li = (li + 1) % labels.length;
+    if (labelEl) labelEl.textContent = labels[li][0];
+    if (subEl)   subEl.textContent   = labels[li][1];
+  }, 900);
+  setTimeout(() => clearInterval(labelInterval), 3600);
+
+  // Collect verified field values
+  const vehicle  = document.getElementById('vv-vehicle')?.value?.trim() || null;
+  const payStr   = document.getElementById('vv-payment')?.value?.trim() || null;
+  const termStr  = document.getElementById('vv-term')?.value?.trim()    || null;
+  const mileStr  = document.getElementById('vv-mileage')?.value?.trim() || null;
+  const signStr  = document.getElementById('vv-signing')?.value?.trim() || null;
+  const zip      = document.getElementById('vv-zip')?.value?.trim()     || null;
+  const dealer   = document.getElementById('vv-dealer')?.value?.trim()  || null;
+
+  const dealPayload = {
+    vehicle_name:     vehicle,
+    monthly_payment:  parseDollars(payStr),
+    lease_term:       parseTerm(termStr),
+    annual_mileage:   parseMileage(mileStr),
+    due_at_signing:   parseDollars(signStr),
+    zip_code:         zip,
+    dealer_name:      dealer,
+    submission_method: fromPhoto ? 'document_upload' : 'manual',
+    status:           'pending_score',
+    is_seeded:        false
+  };
+
+  saveToSession();
+
+  try {
+    // Insert deal row
+    const dealRows = await supabaseInsert('deals', dealPayload);
+    const dealId = dealRows?.[0]?.id || null;
+
+    // Insert upload record if document was used
+    if (fromPhoto && dealId) {
+      await supabaseInsert('uploads', {
+        deal_id:    dealId,
+        file_type:  selectedMethod === 'upload' ? 'document' : 'photo',
+        status:     'pending_extraction',
+        source:     selectedMethod
+      });
+    }
+
+    sessionStorage.setItem('dealId', dealId);
+    console.log('✅ Deal saved:', dealId);
+  } catch(err) {
+    // Non-blocking — don't stop the user experience
+    console.error('Supabase write failed (non-blocking):', err);
+  }
+
+  // Finish progress animation then redirect
+  setProgress(100);
   setTimeout(() => {
-    setProgress(100);
-    saveToSession();
-    setTimeout(() => {
-      window.location.href = 'sample-report.html';
-    }, 1200);
-  }, 2800);
+    window.location.href = 'sample-report.html';
+  }, 1800);
 }
 
 // ── CAMERA / FILE HANDLING ─────────────────────────
@@ -1356,16 +1429,13 @@ function confirmUploadAndExtract() {
 }
 
 // ── REDACTION ENGINE ───────────────────────────────
-  // State
   const redactions = [];
   let isDrawing = false;
   let drawStart = {};
   let activeCanvasId = 'redactionCanvas';
   let activeCtx = null;
-  let canvasBgImage = null; // cached background for redraws
+  let canvasBgImage = null;
 
-  // Default redaction zones for NJ MVSC-1 lease document
-  // These are proportional coordinates (0-1) targeting standard field positions
   const DEFAULT_ZONES = [
     { x: 0.01, y: 0.03, w: 0.55, h: 0.055, label: 'Name / Address' },
     { x: 0.60, y: 0.03, w: 0.38, h: 0.055, label: 'SSN / DOB' },
@@ -1377,15 +1447,11 @@ function confirmUploadAndExtract() {
     canvasId = canvasId || 'redactionCanvas';
     panelId  = panelId  || 'redactionPanel';
     activeCanvasId = canvasId;
-
+    canvasBgImage  = null;
     const panel  = document.getElementById(panelId);
     const canvas = document.getElementById(canvasId);
     if (!canvas || !panel) return;
-
-    // Detach & re-attach draw listeners on this canvas cleanly
     bindDrawListeners(canvasId);
-
-    // Route PDF vs image
     if (src.startsWith('data:application/pdf') || src.startsWith('data:application/octet')) {
       renderPdfPage(src, canvasId, panel);
     } else {
@@ -1398,21 +1464,18 @@ function confirmUploadAndExtract() {
     const ctx = canvas.getContext('2d');
     const img = new Image();
     img.onload = function() {
-      // Set canvas to actual pixel dimensions (not CSS width)
+      const dpr = window.devicePixelRatio || 1;
       const displayW = canvas.parentElement.clientWidth || 600;
-      const scale = window.devicePixelRatio || 1;
-      canvas.width  = displayW * scale;
-      canvas.height = displayW * scale * (img.height / img.width);
+      canvas.width  = displayW * dpr;
+      canvas.height = displayW * dpr * (img.height / img.width);
       canvas.style.width  = displayW + 'px';
       canvas.style.height = (displayW * (img.height / img.width)) + 'px';
-
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       canvasBgImage = img;
-
+      activeCtx = ctx;
       redactions.length = 0;
       DEFAULT_ZONES.forEach(z => redactions.push({...z}));
       drawAllRedactions(ctx, canvas.width, canvas.height);
-
       panel.classList.add('visible');
       panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     };
@@ -1423,19 +1486,17 @@ function confirmUploadAndExtract() {
   async function renderPdfPage(dataUrl, canvasId, panel) {
     const canvas = document.getElementById(canvasId);
     const ctx = canvas.getContext('2d');
-
-    // Show loading state
     panel.classList.add('visible');
-    canvas.width = canvas.parentElement.clientWidth || 600;
-    canvas.height = 120;
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = (canvas.parentElement.clientWidth || 600) * dpr;
+    canvas.height = 140;
     ctx.fillStyle = '#1c1917';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = 'rgba(248,245,240,0.5)';
-    ctx.font = '12px DM Mono, monospace';
+    ctx.fillStyle = 'rgba(196,134,74,0.7)';
+    ctx.font = `${11 * dpr}px DM Mono, monospace`;
     ctx.textAlign = 'center';
-    ctx.fillText('RENDERING PDF…', canvas.width / 2, 66);
+    ctx.fillText('RENDERING PDF…', canvas.width / 2, canvas.height / 2 + 4);
     ctx.textAlign = 'left';
-
     try {
       if (!window.pdfjsLib) {
         await new Promise((res, rej) => {
@@ -1447,41 +1508,31 @@ function confirmUploadAndExtract() {
         window.pdfjsLib.GlobalWorkerOptions.workerSrc =
           'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
       }
-
-      // Decode base64 safely
       const b64 = dataUrl.split(',')[1];
-      const binStr = atob(b64);
-      const arr = new Uint8Array(binStr.length);
-      for (let i = 0; i < binStr.length; i++) arr[i] = binStr.charCodeAt(i);
-
+      const bin = atob(b64);
+      const arr = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
       const pdf  = await window.pdfjsLib.getDocument({ data: arr }).promise;
       const page = await pdf.getPage(1);
-
       const displayW = canvas.parentElement.clientWidth || 600;
-      const scale = (window.devicePixelRatio || 1);
       const baseVp = page.getViewport({ scale: 1 });
-      const renderScale = (displayW * scale) / baseVp.width;
-      const vp = page.getViewport({ scale: renderScale });
-
+      const scale  = (displayW * dpr) / baseVp.width;
+      const vp     = page.getViewport({ scale });
       canvas.width  = vp.width;
       canvas.height = vp.height;
       canvas.style.width  = displayW + 'px';
-      canvas.style.height = (displayW * (baseVp.height / baseVp.width)) + 'px';
-
+      canvas.style.height = (displayW * baseVp.height / baseVp.width) + 'px';
       await page.render({ canvasContext: ctx, viewport: vp }).promise;
-
-      // Cache rendered page as image for clean redraws
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const imgData = canvas.toDataURL('image/jpeg', 0.92);
       sessionStorage.setItem('leaseImage', imgData);
-      const bgImg = new Image();
-      bgImg.onload = () => { canvasBgImage = bgImg; };
-      bgImg.src = imgData;
-
+      const bg = new Image();
+      bg.onload = () => { canvasBgImage = bg; };
+      bg.src = imgData;
+      activeCtx = ctx;
       redactions.length = 0;
       DEFAULT_ZONES.forEach(z => redactions.push({...z}));
       drawAllRedactions(ctx, canvas.width, canvas.height);
       panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-
     } catch(err) {
       console.error('PDF render error:', err);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -1490,7 +1541,7 @@ function confirmUploadAndExtract() {
       ctx.fillStyle = 'rgba(248,245,240,0.7)';
       ctx.font = '13px DM Sans, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('PDF preview unavailable — standard redactions will be applied.', canvas.width/2, canvas.height/2);
+      ctx.fillText('PDF preview unavailable — standard redactions applied.', canvas.width/2, 70);
       ctx.textAlign = 'left';
       sessionStorage.setItem('leaseImage', canvas.toDataURL());
       redactions.length = 0;
@@ -1498,26 +1549,23 @@ function confirmUploadAndExtract() {
   }
 
   function bindDrawListeners(canvasId) {
-    // Use a data attribute to avoid stacking listeners
     const canvas = document.getElementById(canvasId);
-    if (!canvas || canvas.dataset.drawBound === 'true') return;
-    canvas.dataset.drawBound = 'true';
+    if (!canvas || canvas.dataset.drawBound) return;
+    canvas.dataset.drawBound = '1';
     canvas.addEventListener('mousedown',  startDraw);
     canvas.addEventListener('mousemove',  duringDraw);
     canvas.addEventListener('mouseup',    endDraw);
     canvas.addEventListener('mouseleave', endDraw);
-    canvas.addEventListener('touchstart', e => { e.preventDefault(); startDraw(e.touches[0]); },  { passive: false });
-    canvas.addEventListener('touchmove',  e => { e.preventDefault(); duringDraw(e.touches[0]); }, { passive: false });
-    canvas.addEventListener('touchend',   e => { e.preventDefault(); endDraw(); },                { passive: false });
+    canvas.addEventListener('touchstart', e => { e.preventDefault(); startDraw(e.touches[0]); },       { passive: false });
+    canvas.addEventListener('touchmove',  e => { e.preventDefault(); duringDraw(e.touches[0]); },      { passive: false });
+    canvas.addEventListener('touchend',   e => { e.preventDefault(); endDraw(e.changedTouches[0]); }, { passive: false });
   }
 
   function getCanvasPos(e, canvas) {
     const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width  / rect.width;
-    const scaleY = canvas.height / rect.height;
     return {
-      x: (e.clientX - rect.left) * scaleX / canvas.width,
-      y: (e.clientY - rect.top)  * scaleY / canvas.height
+      x: (e.clientX - rect.left) / rect.width,
+      y: (e.clientY - rect.top)  / rect.height
     };
   }
 
@@ -1534,10 +1582,8 @@ function confirmUploadAndExtract() {
     const canvas = document.getElementById(activeCanvasId);
     if (!canvas) return;
     const pos = getCanvasPos(e, canvas);
-    // Redraw background + committed redactions
-    redrawBaseCanvas();
-    // Draw live preview box
-    activeCtx.fillStyle = 'rgba(28,25,23,0.7)';
+    redrawBase();
+    activeCtx.fillStyle = 'rgba(28,25,23,0.65)';
     activeCtx.fillRect(
       drawStart.x * canvas.width,
       drawStart.y * canvas.height,
@@ -1551,64 +1597,60 @@ function confirmUploadAndExtract() {
     isDrawing = false;
     const canvas = document.getElementById(activeCanvasId);
     if (!canvas) return;
-    if (e && (e.type === 'mouseup' || e.type === 'touchend')) {
-      const pos = e.touches ? getCanvasPos(e.changedTouches[0], canvas) : getCanvasPos(e, canvas);
+    if (e) {
+      const pos = getCanvasPos(e, canvas);
       const w = Math.abs(pos.x - drawStart.x);
       const h = Math.abs(pos.y - drawStart.y);
       if (w > 0.015 && h > 0.005) {
         redactions.push({
           x: Math.min(drawStart.x, pos.x),
           y: Math.min(drawStart.y, pos.y),
-          w, h,
-          label: 'Custom'
+          w, h, label: 'Custom'
         });
       }
     }
-    redrawBaseCanvas();
-    const canvas2 = document.getElementById(activeCanvasId);
-    if (canvas2 && activeCtx) drawAllRedactions(activeCtx, canvas2.width, canvas2.height);
+    redrawBase();
+    if (activeCtx) drawAllRedactions(activeCtx, canvas.width, canvas.height);
   }
 
-  function redrawBaseCanvas() {
+  function redrawBase() {
     const canvas = document.getElementById(activeCanvasId);
     if (!canvas || !activeCtx) return;
     if (canvasBgImage) {
       activeCtx.drawImage(canvasBgImage, 0, 0, canvas.width, canvas.height);
+      drawAllRedactions(activeCtx, canvas.width, canvas.height);
     } else {
       const src = sessionStorage.getItem('leaseImage');
       if (src) {
         const img = new Image();
         img.onload = () => {
+          canvasBgImage = img;
           activeCtx.drawImage(img, 0, 0, canvas.width, canvas.height);
           drawAllRedactions(activeCtx, canvas.width, canvas.height);
         };
         img.src = src;
-        return; // async - will draw when loaded
       }
     }
-    drawAllRedactions(activeCtx, canvas.width, canvas.height);
   }
 
   function drawAllRedactions(ctx, w, h) {
     redactions.forEach(r => {
-      const rx = r.x * w, ry = r.y * h, rw = r.w * w, rh = r.h * h;
-
-      // Solid dark fill
-      ctx.fillStyle = 'rgba(20,17,15,0.92)';
+      const rx = r.x*w, ry = r.y*h, rw = r.w*w, rh = r.h*h;
+      ctx.fillStyle = 'rgba(16,13,11,0.93)';
       ctx.fillRect(rx, ry, rw, rh);
-
-      // Subtle inner border
-      ctx.strokeStyle = 'rgba(168,105,46,0.6)';
-      ctx.lineWidth = Math.max(1, w * 0.002);
-      ctx.strokeRect(rx + 1, ry + 1, rw - 2, rh - 2);
-
-      // Label text
-      const fontSize = Math.max(9, Math.min(13, w * 0.018));
-      ctx.font = `500 ${fontSize}px DM Mono, monospace`;
-      ctx.fillStyle = 'rgba(196,134,74,0.85)';
-      ctx.fillText(r.label || 'REDACTED', rx + 6, ry + fontSize + 4);
+      ctx.strokeStyle = 'rgba(168,105,46,0.55)';
+      ctx.lineWidth = Math.max(1, w * 0.0015);
+      ctx.strokeRect(rx+1, ry+1, rw-2, rh-2);
+      const fs = Math.max(9, Math.min(14, w * 0.018));
+      ctx.font = `500 ${fs}px DM Mono, monospace`;
+      ctx.fillStyle = 'rgba(196,134,74,0.9)';
+      ctx.fillText(r.label || 'REDACTED', rx+6, ry+fs+4);
     });
   }
+
+  // Legacy stubs (called by old confirmRedaction buttons — keep for photo path)
+  function redrawCanvas() { redrawBase(); }
+  function drawRedactions(ctx, w, h) { drawAllRedactions(ctx, w, h); }
 
 // ── MANUAL FORM ────────────────────────────────────
 function handleInput(id) {
