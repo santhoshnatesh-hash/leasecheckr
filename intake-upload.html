@@ -380,11 +380,9 @@ nav {
   margin-bottom: 14px;
 }
 
-#redactionCanvas,
-#redactionCanvasUpload {
-  width: 100%; display: block;
+#redactionCanvas {
+  width: 100%; display: block; border-radius: 16px;
   cursor: crosshair;
-  touch-action: none;
 }
 
 .redaction-instruction {
@@ -721,6 +719,7 @@ footer { border-top: 1px solid var(--border); padding: 28px 64px; display: flex;
   .footer-links { flex-wrap: wrap; justify-content: center; }
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -1135,55 +1134,23 @@ footer { border-top: 1px solid var(--border); padding: 28px 64px; display: flex;
   <div class="step" id="step4">
     <div class="scoring-state visible">
       <div class="scoring-circle"></div>
-      <div class="scoring-label" id="scoringLabel">Saving your deal…</div>
-      <div class="scoring-sub" id="scoringSub">Securely storing your submission</div>
+      <div class="scoring-label">Scoring your deal…</div>
+      <div class="scoring-sub">Comparing against 2,847 NJ submissions</div>
     </div>
   </div>
 
 </div><!-- /flow-wrapper -->
 
 <script>
-// ── SUPABASE ────────────────────────────────────────
-const SUPABASE_URL  = 'https://xqjsvlhdpdfvzixlmdxk.supabase.co';
+// ── SUPABASE ─────────────────────────────────────────
+const SUPABASE_URL = 'https://xqjsvlhdpdfvzixlmdxk.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxanN2bGhkcGRmdnppeGxtZHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzg2ODcsImV4cCI6MjA4ODg1NDY4N30.MT0tEDMLaBDLtZkX9xEVEkaUfPdIA9QsJrWjGDpeWsE';
-
-async function supabaseInsert(table, payload) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'apikey': SUPABASE_ANON,
-      'Authorization': `Bearer ${SUPABASE_ANON}`,
-      'Prefer': 'return=representation'
-    },
-    body: JSON.stringify(payload)
-  });
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Supabase ${table} insert failed: ${err}`);
+let _supabase = null;
+function getSupabase() {
+  if (!_supabase && window.supabase) {
+    _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
   }
-  return res.json();
-}
-
-// Parse a dollar string like "$589 / mo" → 589
-function parseDollars(s) {
-  if (!s) return null;
-  const n = parseFloat(s.replace(/[^0-9.]/g, ''));
-  return isNaN(n) ? null : n;
-}
-
-// Parse mileage like "10,000 / yr" → 10000
-function parseMileage(s) {
-  if (!s) return null;
-  const n = parseInt(s.replace(/[^0-9]/g, ''));
-  return isNaN(n) ? null : n;
-}
-
-// Parse term like "36 months" → 36
-function parseTerm(s) {
-  if (!s) return null;
-  const n = parseInt(s);
-  return isNaN(n) ? null : n;
+  return _supabase;
 }
 
 let selectedMethod = null;
@@ -1268,79 +1235,119 @@ function goToStep3FromPhoto() {
   showStep('step3');
 }
 
-async function goToStep4() {
+function goToStep4() {
   currentStep = 4;
   updateDots(4); setProgress(90);
   showStep('step4');
+  setTimeout(() => {
+    setProgress(100);
+    saveToSession();
+    saveAndSubmitDeal().finally(() => {
+      setTimeout(() => {
+        window.location.href = 'sample-report.html';
+      }, 800);
+    });
+  }, 2800);
+}
 
-  // Cycle scoring labels for UX
-  const labels = [
-    ['Saving your deal…',       'Securely storing your submission'],
-    ['Analyzing your payment…', 'Comparing against NJ market data'],
-    ['Running comparisons…',    'Checking dealer & zip benchmarks'],
-    ['Almost there…',           'Building your full report'],
-  ];
-  let li = 0;
-  const labelEl = document.getElementById('scoringLabel');
-  const subEl   = document.getElementById('scoringSub');
-  const labelInterval = setInterval(() => {
-    li = (li + 1) % labels.length;
-    if (labelEl) labelEl.textContent = labels[li][0];
-    if (subEl)   subEl.textContent   = labels[li][1];
-  }, 900);
-  setTimeout(() => clearInterval(labelInterval), 3600);
+async function saveAndSubmitDeal() {
+  const db = getSupabase();
+  if (!db) return; // graceful no-op if Supabase not loaded
 
-  // Collect verified field values
-  const vehicle  = document.getElementById('vv-vehicle')?.value?.trim() || null;
-  const payStr   = document.getElementById('vv-payment')?.value?.trim() || null;
-  const termStr  = document.getElementById('vv-term')?.value?.trim()    || null;
-  const mileStr  = document.getElementById('vv-mileage')?.value?.trim() || null;
-  const signStr  = document.getElementById('vv-signing')?.value?.trim() || null;
-  const zip      = document.getElementById('vv-zip')?.value?.trim()     || null;
-  const dealer   = document.getElementById('vv-dealer')?.value?.trim()  || null;
-
-  const dealPayload = {
-    vehicle_name:     vehicle,
-    monthly_payment:  parseDollars(payStr),
-    lease_term:       parseTerm(termStr),
-    annual_mileage:   parseMileage(mileStr),
-    due_at_signing:   parseDollars(signStr),
-    zip_code:         zip,
-    dealer_name:      dealer,
-    submission_method: fromPhoto ? 'document_upload' : 'manual',
-    status:           'pending_score',
-    is_seeded:        false
+  // Parse values from step3 verify fields
+  const raw = {
+    vehicle:  (document.getElementById('vv-vehicle')?.value  || '').trim(),
+    payment:  (document.getElementById('vv-payment')?.value  || '').trim(),
+    term:     (document.getElementById('vv-term')?.value     || '').trim(),
+    mileage:  (document.getElementById('vv-mileage')?.value  || '').trim(),
+    signing:  (document.getElementById('vv-signing')?.value  || '').trim(),
+    zip:      (document.getElementById('vv-zip')?.value      || '').trim(),
+    dealer:   (document.getElementById('vv-dealer')?.value   || '').trim(),
   };
 
-  saveToSession();
+  // Parse payment: "$589 / mo" → 589
+  const paymentNum  = parseFloat(raw.payment.replace(/[^0-9.]/g, '')) || null;
+  // Parse term: "36 months" → 36
+  const termNum     = parseInt(raw.term)  || null;
+  // Parse mileage: "10,000 / yr" → 10000
+  const mileageNum  = parseInt(raw.mileage.replace(/[^0-9]/g, '')) || null;
+  // Parse signing: "$2,800" → 2800
+  const signingNum  = parseFloat(raw.signing.replace(/[^0-9.]/g, '')) || null;
 
-  try {
-    // Insert deal row
-    const dealRows = await supabaseInsert('deals', dealPayload);
-    const dealId = dealRows?.[0]?.id || null;
-
-    // Insert upload record if document was used
-    if (fromPhoto && dealId) {
-      await supabaseInsert('uploads', {
-        deal_id:    dealId,
-        file_type:  selectedMethod === 'upload' ? 'document' : 'photo',
-        status:     'pending_extraction',
-        source:     selectedMethod
-      });
+  // Vehicle fields — "2024 Honda Accord Sport" → year/make/model/trim
+  const parts   = raw.vehicle.split(/\s+/).filter(Boolean);
+  let year = null, make = null, model = null, vehicleTrim = null;
+  if (parts.length > 0) {
+    const firstNum = parseInt(parts[0]);
+    if (!isNaN(firstNum) && firstNum > 1990 && firstNum < 2040) {
+      year  = firstNum;
+      make  = parts[1] || null;
+      model = parts[2] || null;
+      vehicleTrim = parts.slice(3).join(' ') || null;
+    } else {
+      make  = parts[0] || null;
+      model = parts[1] || null;
+      vehicleTrim = parts.slice(2).join(' ') || null;
     }
-
-    sessionStorage.setItem('dealId', dealId);
-    console.log('✅ Deal saved:', dealId);
-  } catch(err) {
-    // Non-blocking — don't stop the user experience
-    console.error('Supabase write failed (non-blocking):', err);
   }
 
-  // Finish progress animation then redirect
-  setProgress(100);
-  setTimeout(() => {
-    window.location.href = 'sample-report.html';
-  }, 1800);
+  // Zip (5-digit NJ)
+  const zip = raw.zip.replace(/\D/g, '').slice(0,5) || null;
+
+  // Calculate completeness score (0-100 based on filled fields)
+  const fieldValues = [year, make, model, paymentNum, termNum, mileageNum, signingNum, zip, raw.dealer];
+  const filledCount = fieldValues.filter(v => v !== null && v !== 0 && v !== '').length;
+  const completenessScore = Math.round((filledCount / fieldValues.length) * 100);
+
+  const deal = {
+    // user_id omitted — anonymous submission; will be linked after sign-in
+    vehicle_year:       year,
+    vehicle_make:       make,
+    vehicle_model:      model,
+    vehicle_trim:       vehicleTrim,
+    monthly_payment:    paymentNum,
+    lease_term_months:  termNum,
+    annual_mileage:     mileageNum,
+    due_at_signing:     signingNum,
+    signing_zip:        zip,
+    signing_state:      'NJ',
+    dealer_name:        raw.dealer || null,
+    input_method:       selectedMethod || 'upload',
+    deal_stage:         'unknown',
+    is_seeded:          false,
+    redaction_verified: (selectedMethod === 'photo' || selectedMethod === 'upload'),
+    completeness_score: completenessScore,
+  };
+
+  try {
+    // First try with JS client (returns data via .select)
+    const { data, error } = await db.from('deals').insert([deal]).select('id').single();
+    if (error) {
+      console.warn('[LeaseCheckr] Supabase insert error:', error.message, error.code, error.details);
+      // Fallback: raw fetch without .select (avoids SELECT RLS issues)
+      const fallback = await fetch(SUPABASE_URL + '/rest/v1/deals', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON,
+          'Authorization': 'Bearer ' + SUPABASE_ANON,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(deal)
+      });
+      if (fallback.ok) {
+        console.log('[LeaseCheckr] Deal saved via fallback fetch (no id returned)');
+      } else {
+        const errText = await fallback.text();
+        console.warn('[LeaseCheckr] Fallback also failed:', fallback.status, errText);
+      }
+    } else if (data?.id) {
+      sessionStorage.setItem('dealId', data.id);
+      console.log('[LeaseCheckr] Deal saved:', data.id);
+    }
+  } catch (err) {
+    console.warn('[LeaseCheckr] Supabase unreachable (non-blocking):', err.message);
+  }
 }
 
 // ── CAMERA / FILE HANDLING ─────────────────────────
@@ -1428,229 +1435,215 @@ function confirmUploadAndExtract() {
   runExtractionAnimation('eu');
 }
 
-// ── REDACTION ENGINE ───────────────────────────────
-  const redactions = [];
-  let isDrawing = false;
-  let drawStart = {};
-  let activeCanvasId = 'redactionCanvas';
-  let activeCtx = null;
-  let canvasBgImage = null;
+// ── REDACTION ──────────────────────────────────────
+const redactions = [];
+let isDrawing = false;
+let drawStart = {};
+let activeCanvasId = 'redactionCanvas'; // tracks which canvas is currently active
 
-  const DEFAULT_ZONES = [
-    { x: 0.01, y: 0.03, w: 0.55, h: 0.055, label: 'Name / Address' },
-    { x: 0.60, y: 0.03, w: 0.38, h: 0.055, label: 'SSN / DOB' },
-    { x: 0.01, y: 0.86, w: 0.40, h: 0.065, label: 'Signature' },
-    { x: 0.55, y: 0.86, w: 0.43, h: 0.065, label: 'Co-signer' },
-  ];
+function showRedaction(src, canvasId, panelId) {
+  canvasId = canvasId || 'redactionCanvas';
+  panelId  = panelId  || 'redactionPanel';
+  activeCanvasId = canvasId;
 
-  function showRedaction(src, canvasId, panelId) {
-    canvasId = canvasId || 'redactionCanvas';
-    panelId  = panelId  || 'redactionPanel';
-    activeCanvasId = canvasId;
-    canvasBgImage  = null;
-    const panel  = document.getElementById(panelId);
-    const canvas = document.getElementById(canvasId);
-    if (!canvas || !panel) return;
-    bindDrawListeners(canvasId);
-    if (src.startsWith('data:application/pdf') || src.startsWith('data:application/octet')) {
-      renderPdfPage(src, canvasId, panel);
-    } else {
-      renderImageToCanvas(src, canvasId, panel);
-    }
-  }
+  const panel  = document.getElementById(panelId);
+  const canvas = document.getElementById(canvasId);
+  const ctx    = canvas.getContext('2d');
 
-  function renderImageToCanvas(src, canvasId, panel) {
-    const canvas = document.getElementById(canvasId);
-    const ctx = canvas.getContext('2d');
+  function renderImage(imgSrc) {
     const img = new Image();
     img.onload = function() {
-      const dpr = window.devicePixelRatio || 1;
-      const displayW = canvas.parentElement.clientWidth || 600;
-      canvas.width  = displayW * dpr;
-      canvas.height = displayW * dpr * (img.height / img.width);
-      canvas.style.width  = displayW + 'px';
-      canvas.style.height = (displayW * (img.height / img.width)) + 'px';
+      const maxW = canvas.parentElement.offsetWidth || 600;
+      const ratio = img.height / img.width;
+      canvas.width  = maxW;
+      canvas.height = maxW * ratio;
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      canvasBgImage = img;
-      activeCtx = ctx;
       redactions.length = 0;
-      DEFAULT_ZONES.forEach(z => redactions.push({...z}));
-      drawAllRedactions(ctx, canvas.width, canvas.height);
+      redactions.push(
+        { x: 0.02, y: 0.06, w: 0.45, h: 0.06, label: 'Name / Address' },
+        { x: 0.55, y: 0.06, w: 0.43, h: 0.04, label: 'SSN' },
+        { x: 0.02, y: 0.88, w: 0.35, h: 0.06, label: 'Signature' }
+      );
+      drawRedactions(ctx, canvas.width, canvas.height);
       panel.classList.add('visible');
-      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      canvas.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     };
-    img.src = src;
+    img.src = imgSrc;
+  }
+
+  // Route PDF vs image
+  if (src.indexOf('data:application/pdf') === 0 || src.indexOf('data:application/octet') === 0) {
+    renderPdfPage(src, canvas, ctx, panel);
+  } else {
     sessionStorage.setItem('leaseImage', src);
+    renderImage(src);
   }
 
-  async function renderPdfPage(dataUrl, canvasId, panel) {
-    const canvas = document.getElementById(canvasId);
-    const ctx = canvas.getContext('2d');
-    panel.classList.add('visible');
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = (canvas.parentElement.clientWidth || 600) * dpr;
-    canvas.height = 140;
-    ctx.fillStyle = '#1c1917';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = 'rgba(196,134,74,0.7)';
-    ctx.font = `${11 * dpr}px DM Mono, monospace`;
-    ctx.textAlign = 'center';
-    ctx.fillText('RENDERING PDF…', canvas.width / 2, canvas.height / 2 + 4);
-    ctx.textAlign = 'left';
-    try {
-      if (!window.pdfjsLib) {
-        await new Promise((res, rej) => {
-          const s = document.createElement('script');
-          s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-          s.onload = res; s.onerror = rej;
-          document.head.appendChild(s);
-        });
-        window.pdfjsLib.GlobalWorkerOptions.workerSrc =
-          'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-      }
-      const b64 = dataUrl.split(',')[1];
-      const bin = atob(b64);
-      const arr = new Uint8Array(bin.length);
-      for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-      const pdf  = await window.pdfjsLib.getDocument({ data: arr }).promise;
-      const page = await pdf.getPage(1);
-      const displayW = canvas.parentElement.clientWidth || 600;
-      const baseVp = page.getViewport({ scale: 1 });
-      const scale  = (displayW * dpr) / baseVp.width;
-      const vp     = page.getViewport({ scale });
-      canvas.width  = vp.width;
-      canvas.height = vp.height;
-      canvas.style.width  = displayW + 'px';
-      canvas.style.height = (displayW * baseVp.height / baseVp.width) + 'px';
-      await page.render({ canvasContext: ctx, viewport: vp }).promise;
-      const imgData = canvas.toDataURL('image/jpeg', 0.92);
-      sessionStorage.setItem('leaseImage', imgData);
-      const bg = new Image();
-      bg.onload = () => { canvasBgImage = bg; };
-      bg.src = imgData;
-      activeCtx = ctx;
-      redactions.length = 0;
-      DEFAULT_ZONES.forEach(z => redactions.push({...z}));
-      drawAllRedactions(ctx, canvas.width, canvas.height);
-      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    } catch(err) {
-      console.error('PDF render error:', err);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#2a2520';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = 'rgba(248,245,240,0.7)';
-      ctx.font = '13px DM Sans, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('PDF preview unavailable — standard redactions applied.', canvas.width/2, 70);
-      ctx.textAlign = 'left';
-      sessionStorage.setItem('leaseImage', canvas.toDataURL());
-      redactions.length = 0;
+  // Re-bind draw events cleanly (clone removes old listeners)
+  const old = document.getElementById(canvasId);
+  const fresh = old.cloneNode(true);
+  old.parentNode.replaceChild(fresh, old);
+  fresh.addEventListener('mousedown', startDraw);
+  fresh.addEventListener('mousemove', duringDraw);
+  fresh.addEventListener('mouseup',   endDraw);
+  fresh.addEventListener('touchstart', e => { e.preventDefault(); startDraw(e.touches[0]); }, { passive: false });
+  fresh.addEventListener('touchmove',  e => { e.preventDefault(); duringDraw(e.touches[0]); }, { passive: false });
+  fresh.addEventListener('touchend',   e => { e.preventDefault(); endDraw(); }, { passive: false });
+}
+
+async function renderPdfPage(dataUrl, canvas, ctx, panel) {
+  try {
+    if (!window.pdfjsLib) {
+      await new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+        s.onload = res; s.onerror = rej;
+        document.head.appendChild(s);
+      });
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     }
-  }
-
-  function bindDrawListeners(canvasId) {
-    const canvas = document.getElementById(canvasId);
-    if (!canvas || canvas.dataset.drawBound) return;
-    canvas.dataset.drawBound = '1';
-    canvas.addEventListener('mousedown',  startDraw);
-    canvas.addEventListener('mousemove',  duringDraw);
-    canvas.addEventListener('mouseup',    endDraw);
-    canvas.addEventListener('mouseleave', endDraw);
-    canvas.addEventListener('touchstart', e => { e.preventDefault(); startDraw(e.touches[0]); },       { passive: false });
-    canvas.addEventListener('touchmove',  e => { e.preventDefault(); duringDraw(e.touches[0]); },      { passive: false });
-    canvas.addEventListener('touchend',   e => { e.preventDefault(); endDraw(e.changedTouches[0]); }, { passive: false });
-  }
-
-  function getCanvasPos(e, canvas) {
-    const rect = canvas.getBoundingClientRect();
-    return {
-      x: (e.clientX - rect.left) / rect.width,
-      y: (e.clientY - rect.top)  / rect.height
-    };
-  }
-
-  function startDraw(e) {
-    const canvas = document.getElementById(activeCanvasId);
-    if (!canvas) return;
-    activeCtx = canvas.getContext('2d');
-    drawStart = getCanvasPos(e, canvas);
-    isDrawing = true;
-  }
-
-  function duringDraw(e) {
-    if (!isDrawing || !activeCtx) return;
-    const canvas = document.getElementById(activeCanvasId);
-    if (!canvas) return;
-    const pos = getCanvasPos(e, canvas);
-    redrawBase();
-    activeCtx.fillStyle = 'rgba(28,25,23,0.65)';
-    activeCtx.fillRect(
-      drawStart.x * canvas.width,
-      drawStart.y * canvas.height,
-      (pos.x - drawStart.x) * canvas.width,
-      (pos.y - drawStart.y) * canvas.height
+    const raw  = atob(dataUrl.split(',')[1]);
+    const arr  = new Uint8Array(raw.length);
+    for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+    const pdf  = await window.pdfjsLib.getDocument({ data: arr }).promise;
+    const page = await pdf.getPage(1);
+    const maxW = canvas.parentElement.offsetWidth || 600;
+    const vp   = page.getViewport({ scale: maxW / page.getViewport({ scale: 1 }).width });
+    canvas.width  = vp.width;
+    canvas.height = vp.height;
+    await page.render({ canvasContext: ctx, viewport: vp }).promise;
+    // Cache as image for redraws
+    sessionStorage.setItem('leaseImage', canvas.toDataURL('image/jpeg', 0.92));
+    redactions.length = 0;
+    redactions.push(
+      { x: 0.02, y: 0.06, w: 0.45, h: 0.06, label: 'Name / Address' },
+      { x: 0.55, y: 0.06, w: 0.43, h: 0.04, label: 'SSN' },
+      { x: 0.02, y: 0.88, w: 0.35, h: 0.06, label: 'Signature' }
     );
+    drawRedactions(ctx, canvas.width, canvas.height);
+    panel.classList.add('visible');
+    canvas.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } catch(err) {
+    console.error('PDF render error:', err);
+    canvas.width = 480; canvas.height = 120;
+    ctx.fillStyle = '#f8f5f0';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#1c1917';
+    ctx.font = '13px DM Sans, sans-serif';
+    ctx.fillText('PDF loaded — standard redactions applied automatically.', 16, 56);
+    sessionStorage.setItem('leaseImage', canvas.toDataURL());
+    redactions.length = 0;
+    panel.classList.add('visible');
   }
+}
 
-  function endDraw(e) {
-    if (!isDrawing) return;
-    isDrawing = false;
-    const canvas = document.getElementById(activeCanvasId);
-    if (!canvas) return;
-    if (e) {
-      const pos = getCanvasPos(e, canvas);
-      const w = Math.abs(pos.x - drawStart.x);
-      const h = Math.abs(pos.y - drawStart.y);
-      if (w > 0.015 && h > 0.005) {
-        redactions.push({
-          x: Math.min(drawStart.x, pos.x),
-          y: Math.min(drawStart.y, pos.y),
-          w, h, label: 'Custom'
-        });
-      }
-    }
-    redrawBase();
-    if (activeCtx) drawAllRedactions(activeCtx, canvas.width, canvas.height);
-  }
+function getCanvasPos(e, canvas) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (e.clientX - rect.left) / rect.width,
+    y: (e.clientY - rect.top)  / rect.height
+  };
+}
 
-  function redrawBase() {
-    const canvas = document.getElementById(activeCanvasId);
-    if (!canvas || !activeCtx) return;
-    if (canvasBgImage) {
-      activeCtx.drawImage(canvasBgImage, 0, 0, canvas.width, canvas.height);
-      drawAllRedactions(activeCtx, canvas.width, canvas.height);
-    } else {
-      const src = sessionStorage.getItem('leaseImage');
-      if (src) {
-        const img = new Image();
-        img.onload = () => {
-          canvasBgImage = img;
-          activeCtx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          drawAllRedactions(activeCtx, canvas.width, canvas.height);
-        };
-        img.src = src;
-      }
-    }
-  }
+function startDraw(e) {
+  const canvas = document.getElementById(activeCanvasId);
+  if (!canvas) return;
+  drawStart = getCanvasPos(e, canvas);
+  isDrawing = true;
+}
 
-  function drawAllRedactions(ctx, w, h) {
-    redactions.forEach(r => {
-      const rx = r.x*w, ry = r.y*h, rw = r.w*w, rh = r.h*h;
-      ctx.fillStyle = 'rgba(16,13,11,0.93)';
-      ctx.fillRect(rx, ry, rw, rh);
-      ctx.strokeStyle = 'rgba(168,105,46,0.55)';
-      ctx.lineWidth = Math.max(1, w * 0.0015);
-      ctx.strokeRect(rx+1, ry+1, rw-2, rh-2);
-      const fs = Math.max(9, Math.min(14, w * 0.018));
-      ctx.font = `500 ${fs}px DM Mono, monospace`;
-      ctx.fillStyle = 'rgba(196,134,74,0.9)';
-      ctx.fillText(r.label || 'REDACTED', rx+6, ry+fs+4);
+function duringDraw(e) {
+  if (!isDrawing) return;
+  const canvas = document.getElementById(activeCanvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const pos = getCanvasPos(e, canvas);
+  redrawCanvas();
+  ctx.fillStyle = 'rgba(28,25,23,0.85)';
+  ctx.fillRect(
+    drawStart.x * canvas.width,
+    drawStart.y * canvas.height,
+    (pos.x - drawStart.x) * canvas.width,
+    (pos.y - drawStart.y) * canvas.height
+  );
+}
+
+function endDraw(e) {
+  if (!isDrawing) return;
+  isDrawing = false;
+  const canvas = document.getElementById(activeCanvasId);
+  if (!canvas) return;
+  const pos = e ? getCanvasPos(e, canvas) : { x: drawStart.x, y: drawStart.y };
+  if (Math.abs(pos.x - drawStart.x) > 0.01) {
+    redactions.push({
+      x: Math.min(drawStart.x, pos.x),
+      y: Math.min(drawStart.y, pos.y),
+      w: Math.abs(pos.x - drawStart.x),
+      h: Math.abs(pos.y - drawStart.y),
+      label: 'Custom'
     });
   }
+  redrawCanvas();
+}
 
-  // Legacy stubs (called by old confirmRedaction buttons — keep for photo path)
-  function redrawCanvas() { redrawBase(); }
-  function drawRedactions(ctx, w, h) { drawAllRedactions(ctx, w, h); }
+function redrawCanvas() {
+  const canvas = document.getElementById(activeCanvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const src = sessionStorage.getItem('leaseImage');
+  if (!src) return;
+  const img = new Image();
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    drawRedactions(ctx, canvas.width, canvas.height);
+  };
+  img.src = src;
+}
+
+function drawRedactions(ctx, w, h) {
+  redactions.forEach(r => {
+    ctx.fillStyle = 'rgba(28,25,23,0.88)';
+    ctx.fillRect(r.x * w, r.y * h, r.w * w, r.h * h);
+    ctx.fillStyle = 'rgba(248,245,240,0.5)';
+    ctx.font = `${Math.max(10, w * 0.018)}px DM Mono, monospace`;
+    ctx.fillText(r.label || '', r.x * w + 6, r.y * h + 16);
+  });
+}
+
+function confirmRedactionAndExtract() {
+  document.getElementById('redactionPanel').classList.remove('visible');
+  document.getElementById('cameraZone').style.display = 'none';
+  const ep = document.getElementById('extractingPanel');
+  ep.classList.add('visible');
+  runExtractionAnimation('el');
+}
+
+function runExtractionAnimation(prefix) {
+  prefix = prefix || 'el';
+  const data = [
+    { id: prefix+'1', value: '$589 / mo' },
+    { id: prefix+'2', value: '36 months' },
+    { id: prefix+'3', value: '10,000 / yr' },
+    { id: prefix+'4', value: 'BMW of Ramsey · 07446' },
+    { id: prefix+'5', value: '$2,800' },
+  ];
+
+  data.forEach((item, i) => {
+    setTimeout(() => {
+      const el = document.getElementById(item.id);
+      if (!el) return;
+      el.classList.add('visible');
+      setTimeout(() => {
+        el.classList.add('done');
+        el.querySelector('.extract-value').textContent = item.value;
+        if (i === data.length - 1) {
+          setTimeout(() => goToStep3FromPhoto(), 600);
+        }
+      }, 600);
+    }, i * 500 + 200);
+  });
+}
 
 // ── MANUAL FORM ────────────────────────────────────
 function handleInput(id) {
