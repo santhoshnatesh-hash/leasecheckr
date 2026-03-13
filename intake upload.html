@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Get Full Access — LeaseCheckr</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --canvas: #f8f5f0;
+      --ink: #1c1917;
+      --ink-light: #44403c;
+      --ink-muted: #78716c;
+      --copper: #a8692e;
+      --copper-lt: #c4864a;
+      --copper-pale: #f0e4d4;
+      --sage: #5c7a65;
+      --sage-pale: #e8f0ea;
+      --cream: #fdfaf6;
+      --border: rgba(28,25,23,0.11);
+      --border-strong: rgba(28,25,23,0.22);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--canvas);
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* NAV */
+    nav {
+      padding: 0 48px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: var(--canvas);
+    }
+
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem;
+      font-weight: 500;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .nav-logo span { color: var(--copper); }
+
+    .nav-back {
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+
+    .nav-back:hover { color: var(--ink); }
+
+    /* MAIN */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 48px 80px;
+    }
+
+    /* HEADER */
+    .page-header {
+      text-align: center;
+      margin-bottom: 56px;
+      max-width: 540px;
+    }
+
+    .page-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--copper);
+      margin-bottom: 16px;
+    }
+
+    .page-header h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.2rem, 4vw, 3rem);
+      font-weight: 400;
+      line-height: 1.15;
+      color: var(--ink);
+      margin-bottom: 14px;
+    }
+
+    .page-header h1 em {
+      font-style: italic;
+      color: var(--copper);
+    }
+
+    .page-header p {
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+    }
+
+    /* CARDS */
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      width: 100%;
+      max-width: 860px;
+      min-width: 0;
+      align-items: stretch;
+      position: relative;
+    }
+
+    .cards::after {
+      content: 'or';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--canvas);
+      border: 1px solid var(--border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      color: var(--ink-muted);
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* OPTION CARD BASE */
+    .option-card {
+      border-radius: 4px;
+      padding: 44px 40px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s;
+    }
+
+    .option-card:hover { transform: translateY(-2px); }
+
+    /* PAY CARD — dark */
+    .card-pay {
+      background: var(--ink);
+      color: var(--canvas);
+    }
+
+    .card-pay::before {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 260px; height: 260px;
+      background: radial-gradient(circle, rgba(168,105,46,0.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* CONTRIBUTE CARD — light */
+    .card-contribute {
+      background: var(--cream);
+      border: 1px solid var(--border-strong);
+      color: var(--ink);
+    }
+
+    .card-contribute::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 220px; height: 220px;
+      background: radial-gradient(circle, rgba(92,122,101,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* OR DIVIDER */
+    .or-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .or-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--canvas);
+      border: 1px solid var(--border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      color: var(--ink-muted);
+      z-index: 2;
+      flex-shrink: 0;
+    }
+
+    /* CARD INNER */
+    .card-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card-pay .card-tag { color: var(--copper-lt); }
+    .card-contribute .card-tag { color: var(--sage); }
+
+    .card-tag-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+    }
+
+    .card-pay .card-tag-dot { background: var(--copper-lt); }
+    .card-contribute .card-tag-dot { background: var(--sage); }
+
+    .card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.9rem;
+      font-weight: 400;
+      line-height: 1.15;
+      margin-bottom: 12px;
+    }
+
+    .card-pay .card-title { color: var(--canvas); }
+    .card-contribute .card-title { color: var(--ink); }
+
+    .card-pay .card-title em { font-style: italic; color: var(--copper-lt); }
+    .card-contribute .card-title em { font-style: italic; color: var(--sage); }
+
+    .card-desc {
+      font-size: 0.88rem;
+      line-height: 1.7;
+      margin-bottom: 28px;
+      flex: 1;
+    }
+
+    .card-pay .card-desc { color: rgba(253,250,246,0.6); }
+    .card-contribute .card-desc { color: var(--ink-muted); }
+
+    /* FEATURE LIST */
+    .card-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      margin-bottom: 32px;
+    }
+
+    .card-features li {
+      font-size: 0.83rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-pay .card-features li { color: rgba(253,250,246,0.75); }
+    .card-contribute .card-features li { color: var(--ink-light); }
+
+    .feat-check {
+      width: 18px; height: 18px;
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      flex-shrink: 0;
+    }
+
+    .card-pay .feat-check {
+      background: rgba(168,105,46,0.2);
+      color: var(--copper-lt);
+    }
+
+    .card-contribute .feat-check {
+      background: var(--sage-pale);
+      color: var(--sage);
+    }
+
+    /* PRICE */
+    .card-price {
+      margin-bottom: 24px;
+      padding-top: 20px;
+      border-top: 1px solid;
+    }
+
+    .card-pay .card-price { border-color: rgba(253,250,246,0.1); }
+    .card-contribute .card-price { border-color: var(--border); }
+
+    .price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      margin-bottom: 4px;
+    }
+
+    .price-currency {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+      font-weight: 300;
+    }
+
+    .card-pay .price-currency { color: var(--copper-lt); }
+    .card-contribute .price-currency { color: var(--sage); }
+
+    .price-amount {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3rem;
+      font-weight: 300;
+      line-height: 1;
+    }
+
+    .card-pay .price-amount { color: var(--canvas); }
+    .card-contribute .price-amount { color: var(--ink); }
+
+    .price-label {
+      font-size: 0.78rem;
+      margin-left: 4px;
+    }
+
+    .card-pay .price-label { color: rgba(253,250,246,0.4); }
+    .card-contribute .price-label { color: var(--ink-muted); }
+
+    .price-note {
+      font-size: 0.75rem;
+      font-style: italic;
+    }
+
+    .card-pay .price-note { color: rgba(253,250,246,0.35); }
+    .card-contribute .price-note { color: var(--ink-muted); }
+
+    /* BUTTONS */
+    .card-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 16px 28px;
+      border-radius: 2px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+      width: 100%;
+    }
+
+    .btn-pay {
+      background: var(--copper);
+      color: var(--canvas);
+    }
+
+    .btn-pay:hover { background: var(--copper-lt); }
+
+    .btn-contribute {
+      background: var(--ink);
+      color: var(--canvas);
+    }
+
+    .btn-contribute:hover { background: var(--ink-light); }
+
+    .coming-soon {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: rgba(168,105,46,0.25);
+      color: var(--copper-lt);
+      border: 1px solid rgba(168,105,46,0.3);
+      padding: 3px 8px;
+      border-radius: 2px;
+    }
+
+    .btn-sub-note {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 0.72rem;
+    }
+
+    .card-pay .btn-sub-note { color: rgba(253,250,246,0.3); }
+    .card-contribute .btn-sub-note { color: var(--ink-muted); }
+
+    /* FOUNDING MEMBER NUDGE */
+    .founder-nudge {
+      margin-top: 48px;
+      text-align: center;
+      max-width: 480px;
+      padding: 24px 32px;
+      border: 1px solid var(--border-strong);
+      border-radius: 3px;
+      background: var(--cream);
+      position: relative;
+    }
+
+    .founder-nudge::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--copper);
+      border-radius: 3px 0 0 3px;
+    }
+
+    .founder-nudge-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--copper);
+      margin-bottom: 8px;
+    }
+
+    .founder-nudge p {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      line-height: 1.65;
+      margin-bottom: 14px;
+    }
+
+    .founder-nudge p strong { color: var(--ink); font-weight: 500; }
+
+    .founder-nudge a {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--copper);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(168,105,46,0.3);
+      padding-bottom: 1px;
+      transition: border-color 0.2s;
+    }
+
+    .founder-nudge a:hover { border-color: var(--copper); }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate { opacity: 0; animation: fadeUp 0.5s ease forwards; }
+    .d1 { animation-delay: 0.05s; }
+    .d2 { animation-delay: 0.15s; }
+    .d3 { animation-delay: 0.25s; }
+    .d4 { animation-delay: 0.35s; }
+
+    @media (max-width: 540px) {
+      nav { padding: 0 20px; }
+      .cards { grid-template-columns: 1fr; }
+      .or-divider { display: none; }
+      .option-card { padding: 32px 28px; }
+      .page-header { margin-bottom: 40px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">Lease<span>Checkr</span></a>
+    <a href="pricing.html" class="nav-back">← Back to Pricing</a>
+  </nav>
+
+  <main>
+
+    <!-- HEADER -->
+    <div class="page-header animate d1">
+      <p class="page-eyebrow">Full Report Access</p>
+      <h1>Two ways to get<br>your <em>full report.</em></h1>
+      <p>Pay once and get your complete deal analysis instantly — or contribute your verified lease and get full access free.</p>
+    </div>
+
+    <!-- CARDS -->
+    <div class="cards animate d2">
+
+      <!-- OPTION 1: PAY -->
+      <div class="option-card card-pay">
+        <div class="card-tag">
+          <span class="card-tag-dot"></span>
+          Instant Access
+        </div>
+        <div class="card-title">Pay once.<br><em>Know everything.</em></div>
+        <p class="card-desc">Get your complete deal analysis immediately. No upload required, no waiting for verification.</p>
+
+        <ul class="card-features">
+          <li><span class="feat-check">✓</span> Full deal breakdown — every number explained</li>
+          <li><span class="feat-check">✓</span> Money factor analysis vs. buy rate</li>
+          <li><span class="feat-check">✓</span> Comparable NJ deals on your vehicle</li>
+          <li><span class="feat-check">✓</span> Dealer pricing signals & flags</li>
+          <li><span class="feat-check">✓</span> Recent market trends by county</li>
+          <li><span class="feat-check">✓</span> Downloadable PDF report</li>
+        </ul>
+
+        <div class="card-price">
+          <div class="price-row">
+            <span class="price-currency">$</span>
+            <span class="price-amount">19</span>
+            <span class="price-label">.99 per report</span>
+          </div>
+          <p class="price-note">One-time. No subscription. Yours to keep.</p>
+        </div>
+
+        <a href="#" class="card-btn btn-pay">
+          Pay $19.99 &nbsp;<span class="coming-soon">Coming Soon</span>
+        </a>
+        <p class="btn-sub-note">Stripe payment — launching soon</p>
+      </div>
+
+      <!-- OPTION 2: CONTRIBUTE -->
+      <div class="option-card card-contribute">
+        <div class="card-tag">
+          <span class="card-tag-dot"></span>
+          Free via Contribution
+        </div>
+        <div class="card-title">Upload your lease.<br><em>Get access free.</em></div>
+        <p class="card-desc">Submit your verified NJ lease document and get full Premium access at no cost. You help build the benchmark — we give you the full picture in return.</p>
+
+        <ul class="card-features">
+          <li><span class="feat-check">✓</span> Everything in Premium — free</li>
+          <li><span class="feat-check">✓</span> Your data is redacted & anonymized</li>
+          <li><span class="feat-check">✓</span> Name, address & VIN never stored</li>
+          <li><span class="feat-check">✓</span> NJ lease signed within 36 months</li>
+          <li><span class="feat-check">✓</span> PDF, JPG, or PNG accepted</li>
+          <li><span class="feat-check">✓</span> Report ready after verification (48hrs)</li>
+        </ul>
+
+        <div class="card-price">
+          <div class="price-row">
+            <span class="price-currency">$</span>
+            <span class="price-amount">0</span>
+            <span class="price-label">with lease upload</span>
+          </div>
+          <p class="price-note">Requires a verified NJ lease document.</p>
+        </div>
+
+        <a href="intake-upload.html" class="card-btn btn-contribute">
+          Upload My Lease Contract →
+        </a>
+        <p class="btn-sub-note">Takes 2 minutes · Document required</p>
+      </div>
+
+    </div>
+
+    <!-- FOUNDING MEMBER NUDGE -->
+    <div class="founder-nudge animate d3">
+      <div class="founder-nudge-eyebrow">Better option</div>
+      <p>Founding Members get <strong>all future Premium reports free — forever.</strong> Only 847 spots remain. Submit one verified lease and lock in lifetime access.</p>
+      <a href="founder.html">Claim a Founding Member spot instead →</a>
+    </div>
+
+  </main>
+
+</body>
+</html>
