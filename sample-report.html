@@ -854,86 +854,190 @@
         <span class="section-status status-good">4 Nearby Deals Found</span>
       </div>
       <div class="section-card-body">
-        <p style="font-size:0.83rem;color:var(--ink-3);line-height:1.65;margin-bottom:20px;">
-          Verified lease deals for the same vehicle submitted by drivers within your county in the last 60 days. These are real transactions — not estimates.
-        </p>
 
-        <div style="overflow-x:auto;">
-          <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">
-            <thead>
-              <tr style="border-bottom:2px solid var(--border-2);">
-                <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Vehicle</th>
-                <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Payment</th>
-                <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Term</th>
-                <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Drive-Off</th>
-                <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Submitted</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr style="border-bottom:1px solid var(--border);">
-                <td style="padding:12px;color:var(--ink-2);">2024 CR-V EX-L AWD</td>
-                <td style="padding:12px;"><strong style="color:var(--sage);">$408/mo</strong></td>
-                <td style="padding:12px;color:var(--ink-3);">36 mo · 10k</td>
-                <td style="padding:12px;color:var(--ink-3);">$1,800</td>
-                <td style="padding:12px;font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-4);">11 days ago</td>
-              </tr>
-              <tr style="border-bottom:1px solid var(--border);">
-                <td style="padding:12px;color:var(--ink-2);">2024 CR-V EX-L AWD</td>
-                <td style="padding:12px;"><strong style="color:var(--sage);">$421/mo</strong></td>
-                <td style="padding:12px;color:var(--ink-3);">36 mo · 10k</td>
-                <td style="padding:12px;color:var(--ink-3);">$2,100</td>
-                <td style="padding:12px;font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-4);">18 days ago</td>
-              </tr>
-              <tr style="border-bottom:1px solid var(--border);">
-                <td style="padding:12px;color:var(--ink-2);">2024 CR-V EX-L FWD</td>
-                <td style="padding:12px;"><strong style="color:var(--copper);">$398/mo</strong></td>
-                <td style="padding:12px;color:var(--ink-3);">36 mo · 12k</td>
-                <td style="padding:12px;color:var(--ink-3);">$2,500</td>
-                <td style="padding:12px;font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-4);">24 days ago</td>
-              </tr>
-              <tr>
-                <td style="padding:12px;color:var(--ink-2);">2024 CR-V EX-L AWD</td>
-                <td style="padding:12px;"><strong style="color:var(--rose);">$449/mo</strong></td>
-                <td style="padding:12px;color:var(--ink-3);">39 mo · 10k</td>
-                <td style="padding:12px;color:var(--ink-3);">$1,500</td>
-                <td style="padding:12px;font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-4);">31 days ago</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <!-- ═══ STATE 1: ZIP DATA EXISTS (default shown in sample) ═══ -->
+        <div id="nhState1">
+          <p style="font-size:0.83rem;color:var(--ink-3);line-height:1.65;margin-bottom:20px;">
+            Verified lease deals for the same vehicle submitted by drivers within your county in the last 60 days. These are real transactions — not estimates.
+          </p>
 
-        <div style="margin-top:18px;padding:12px 16px;background:var(--canvas-2);border-radius:3px;border:1px solid var(--border);font-size:0.76rem;color:var(--ink-4);line-height:1.6;">
-          Payments shown are effective monthly cost normalised to the same drive-off for comparability. FWD vs AWD affects residual and payment — your quote is AWD.
-        </div>
-
-        <!-- NEARBY DEALERS -->
-        <div style="margin-top:28px;padding-top:24px;border-top:1px solid var(--border);">
-          <div style="font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--copper);margin-bottom:16px;">Honda Dealers Within 10 Miles — Bergen County</div>
-          <p style="font-size:0.78rem;color:var(--ink-4);line-height:1.6;margin-bottom:18px;">Average lease payment for a 2024 CR-V EX-L AWD · 36mo · 10k · based on verified submissions at each location.</p>
-
-          <div style="display:flex;flex-direction:column;gap:0;">
-
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border);">
-              <div style="font-size:0.85rem;font-weight:500;color:var(--ink);">DCH Paramus Honda</div>
-              <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:400;color:var(--ink);line-height:1;">$428<span style="font-size:0.7rem;color:var(--ink-4);font-family:'DM Sans',sans-serif;">/mo avg</span></div>
-            </div>
-              </div>
-            </div>
-
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border);">
-              <div style="font-size:0.85rem;font-weight:500;color:var(--ink);">Wayne Honda</div>
-              <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:400;color:var(--ink);line-height:1;">$441<span style="font-size:0.7rem;color:var(--ink-4);font-family:'DM Sans',sans-serif;">/mo avg</span></div>
-            </div>
-
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 0;">
-              <div style="font-size:0.85rem;font-weight:500;color:var(--ink);">Meadowlands Honda</div>
-              <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:400;color:var(--ink);line-height:1;">$452<span style="font-size:0.7rem;color:var(--ink-4);font-family:'DM Sans',sans-serif;">/mo avg</span></div>
-            </div>
-
+          <div style="overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">
+              <thead>
+                <tr style="border-bottom:2px solid var(--border-2);">
+                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Vehicle</th>
+                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Payment</th>
+                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Term</th>
+                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Drive-Off</th>
+                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Submitted</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom:1px solid var(--border);">
+                  <td style="padding:12px;color:var(--ink-2);">2024 CR-V EX-L AWD</td>
+                  <td style="padding:12px;"><strong style="color:var(--sage);">$408/mo</strong></td>
+                  <td style="padding:12px;color:var(--ink-3);">36 mo · 10k</td>
+                  <td style="padding:12px;color:var(--ink-3);">$1,800</td>
+                  <td style="padding:12px;font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-4);">11 days ago</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--border);">
+                  <td style="padding:12px;color:var(--ink-2);">2024 CR-V EX-L AWD</td>
+                  <td style="padding:12px;"><strong style="color:var(--sage);">$421/mo</strong></td>
+                  <td style="padding:12px;color:var(--ink-3);">36 mo · 10k</td>
+                  <td style="padding:12px;color:var(--ink-3);">$2,100</td>
+                  <td style="padding:12px;font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-4);">18 days ago</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--border);">
+                  <td style="padding:12px;color:var(--ink-2);">2024 CR-V EX-L FWD</td>
+                  <td style="padding:12px;"><strong style="color:var(--copper);">$398/mo</strong></td>
+                  <td style="padding:12px;color:var(--ink-3);">36 mo · 12k</td>
+                  <td style="padding:12px;color:var(--ink-3);">$2,500</td>
+                  <td style="padding:12px;font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-4);">24 days ago</td>
+                </tr>
+                <tr>
+                  <td style="padding:12px;color:var(--ink-2);">2024 CR-V EX-L AWD</td>
+                  <td style="padding:12px;"><strong style="color:var(--rose);">$449/mo</strong></td>
+                  <td style="padding:12px;color:var(--ink-3);">39 mo · 10k</td>
+                  <td style="padding:12px;color:var(--ink-3);">$1,500</td>
+                  <td style="padding:12px;font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-4);">31 days ago</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
-          <div style="margin-top:14px;font-size:0.72rem;font-style:italic;color:var(--ink-4);line-height:1.55;">
-            Dealer averages are based on verified submissions only. Fewer submissions means less certainty — treat single-deal figures as directional, not definitive.
+          <div style="margin-top:18px;padding:12px 16px;background:var(--canvas-2);border-radius:3px;border:1px solid var(--border);font-size:0.76rem;color:var(--ink-4);line-height:1.6;">
+            Payments shown are effective monthly cost normalised to the same drive-off for comparability. FWD vs AWD affects residual and payment — your quote is AWD.
+          </div>
+
+          <!-- NEARBY DEALERS -->
+          <div style="margin-top:28px;padding-top:24px;border-top:1px solid var(--border);">
+            <div style="font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--copper);margin-bottom:16px;">Honda Dealers Within 10 Miles — Bergen County</div>
+            <p style="font-size:0.78rem;color:var(--ink-4);line-height:1.6;margin-bottom:18px;">Average lease payment for a 2024 CR-V EX-L AWD · 36mo · 10k · based on verified submissions at each location.</p>
+            <div style="display:flex;flex-direction:column;gap:0;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border);">
+                <div style="font-size:0.85rem;font-weight:500;color:var(--ink);">DCH Paramus Honda</div>
+                <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:400;color:var(--ink);line-height:1;">$428<span style="font-size:0.7rem;color:var(--ink-4);font-family:'DM Sans',sans-serif;">/mo avg</span></div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border);">
+                <div style="font-size:0.85rem;font-weight:500;color:var(--ink);">Wayne Honda</div>
+                <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:400;color:var(--ink);line-height:1;">$441<span style="font-size:0.7rem;color:var(--ink-4);font-family:'DM Sans',sans-serif;">/mo avg</span></div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 0;">
+                <div style="font-size:0.85rem;font-weight:500;color:var(--ink);">Meadowlands Honda</div>
+                <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:400;color:var(--ink);line-height:1;">$452<span style="font-size:0.7rem;color:var(--ink-4);font-family:'DM Sans',sans-serif;">/mo avg</span></div>
+              </div>
+            </div>
+            <div style="margin-top:14px;font-size:0.72rem;font-style:italic;color:var(--ink-4);line-height:1.55;">
+              Dealer averages are based on verified submissions only. Fewer submissions means less certainty — treat single-deal figures as directional, not definitive.
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ STATE 2: COUNTY DATA ONLY — no zip-level deals ═══ -->
+        <div id="nhState2" style="display:none;">
+          <div style="padding:14px 16px;background:#faf3ea;border:1px solid rgba(168,105,46,0.2);border-radius:6px;margin-bottom:20px;">
+            <div style="font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--copper);margin-bottom:6px;">No zip-level data for your area yet</div>
+            <p style="font-size:0.8rem;color:var(--ink-3);line-height:1.6;margin:0;">
+              We don't have verified deals from your zip code yet — so we're showing Bergen County benchmarks instead. County-level data is still useful, but local zip comparisons are more precise.
+            </p>
+            <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(168,105,46,0.15);font-size:0.75rem;color:var(--ink-3);">
+              Have a signed lease? <a href="intake-upload.html" style="color:var(--copper);text-decoration:none;border-bottom:1px solid rgba(168,105,46,0.3);">Upload it and be the first from your zip</a> — future neighbors will see your deal and you'll unlock your full report free.
+            </div>
+          </div>
+
+          <p style="font-size:0.83rem;color:var(--ink-3);line-height:1.65;margin-bottom:20px;">
+            Verified deals for the same vehicle across Bergen County in the last 90 days.
+          </p>
+          <div style="overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">
+              <thead>
+                <tr style="border-bottom:2px solid var(--border-2);">
+                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Vehicle</th>
+                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Payment</th>
+                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Term</th>
+                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Drive-Off</th>
+                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Submitted</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom:1px solid var(--border);">
+                  <td style="padding:12px;color:var(--ink-2);">2024 CR-V EX-L AWD</td>
+                  <td style="padding:12px;"><strong style="color:var(--sage);">$408/mo</strong></td>
+                  <td style="padding:12px;color:var(--ink-3);">36 mo · 10k</td>
+                  <td style="padding:12px;color:var(--ink-3);">$1,800</td>
+                  <td style="padding:12px;font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-4);">Bergen Co. · 11 days ago</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--border);">
+                  <td style="padding:12px;color:var(--ink-2);">2024 CR-V EX-L AWD</td>
+                  <td style="padding:12px;"><strong style="color:var(--copper);">$421/mo</strong></td>
+                  <td style="padding:12px;color:var(--ink-3);">36 mo · 10k</td>
+                  <td style="padding:12px;color:var(--ink-3);">$2,100</td>
+                  <td style="padding:12px;font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-4);">Bergen Co. · 28 days ago</td>
+                </tr>
+                <tr>
+                  <td style="padding:12px;color:var(--ink-2);">2024 CR-V EX-L AWD</td>
+                  <td style="padding:12px;"><strong style="color:var(--rose);">$449/mo</strong></td>
+                  <td style="padding:12px;color:var(--ink-3);">39 mo · 10k</td>
+                  <td style="padding:12px;color:var(--ink-3);">$1,500</td>
+                  <td style="padding:12px;font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-4);">Bergen Co. · 45 days ago</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ═══ STATE 3: NO LOCAL DATA — show neighboring counties ═══ -->
+        <div id="nhState3" style="display:none;">
+          <div style="padding:14px 16px;background:var(--canvas-2);border:1px solid var(--border);border-radius:6px;margin-bottom:24px;">
+            <div style="font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-4);margin-bottom:6px;">We're still building data for your county</div>
+            <p style="font-size:0.8rem;color:var(--ink-3);line-height:1.6;margin:0;">
+              We don't have enough verified deals in your county yet to show local benchmarks. The grade in this report uses the NJ statewide average — it's directional, but not as precise as county-level data would be.
+            </p>
+            <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:0.75rem;color:var(--ink-3);">
+              Be among the first to contribute from your county. <a href="intake-upload.html" style="color:var(--copper);text-decoration:none;border-bottom:1px solid rgba(168,105,46,0.3);">Upload your lease and unlock your full report free →</a>
+            </div>
+          </div>
+
+          <div style="font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-4);margin-bottom:16px;">Neighboring Counties — For Reference Only</div>
+          <p style="font-size:0.8rem;color:var(--ink-3);line-height:1.6;margin-bottom:18px;">
+            These deals are from adjacent counties. Markets differ — use these as a directional reference, not a direct comparison.
+          </p>
+
+          <div style="overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">
+              <thead>
+                <tr style="border-bottom:2px solid var(--border-2);">
+                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Vehicle</th>
+                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">County</th>
+                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Payment</th>
+                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Term</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom:1px solid var(--border);">
+                  <td style="padding:12px;color:var(--ink-2);">2024 CR-V EX-L AWD</td>
+                  <td style="padding:12px;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--ink-4);">Morris</td>
+                  <td style="padding:12px;"><strong style="color:var(--sage);">$428/mo</strong></td>
+                  <td style="padding:12px;color:var(--ink-3);">36 mo · 10k</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--border);">
+                  <td style="padding:12px;color:var(--ink-2);">2024 CR-V EX-L AWD</td>
+                  <td style="padding:12px;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--ink-4);">Somerset</td>
+                  <td style="padding:12px;"><strong style="color:var(--copper);">$435/mo</strong></td>
+                  <td style="padding:12px;color:var(--ink-3);">36 mo · 10k</td>
+                </tr>
+                <tr>
+                  <td style="padding:12px;color:var(--ink-2);">2024 CR-V EX-L AWD</td>
+                  <td style="padding:12px;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--ink-4);">Middlesex</td>
+                  <td style="padding:12px;"><strong style="color:var(--copper);">$432/mo</strong></td>
+                  <td style="padding:12px;color:var(--ink-3);">36 mo · 10k</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div style="margin-top:14px;padding:10px 14px;background:var(--canvas-2);border-radius:4px;border:1px solid var(--border);font-size:0.72rem;font-style:italic;color:var(--ink-4);line-height:1.55;">
+            These deals are from neighboring counties, not your local market. Treat them as a broad reference only. Dealer incentives, local demand, and tax structures vary by county.
           </div>
         </div>
 
