@@ -831,6 +831,34 @@
   </div>
 
   <script>
+    // ── Supabase config ──────────────────────────────────────────
+    const SUPABASE_URL = 'https://xqjsvlhdpdfvzixlmdxk.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxanN2bGhkcGRmdnppeGxtZHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzg2ODcsImV4cCI6MjA4ODg1NDY4N30.MT0tEDMLaBDLtZkX9xEVEkaUfPdIA9QsJrWjGDpeWsE';
+
+    async function saveEmailToSupabase(email) {
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/email_leads`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({
+            email: email,
+            source: 'report_gate',
+            consent_marketing: false
+          })
+        });
+        return res.ok || res.status === 409;
+      } catch (err) {
+        console.warn('Supabase write failed, falling back to localStorage', err);
+        return false;
+      }
+    }
+    // ────────────────────────────────────────────────────────────
+
     function openModal() {
       document.getElementById('emailOverlay').classList.add('open');
       setTimeout(() => document.getElementById('gateEmail').focus(), 300);
@@ -838,7 +866,6 @@
 
     function closeModal() {
       document.getElementById('emailOverlay').classList.remove('open');
-      // Reset form state
       document.getElementById('gateEmail').value = '';
       document.getElementById('gateEmail').classList.remove('error');
       document.getElementById('emailError').classList.remove('visible');
@@ -850,8 +877,9 @@
       return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
 
-    function handleEmailSubmit() {
+    async function handleEmailSubmit() {
       const emailInput = document.getElementById('gateEmail');
+      const btn = document.getElementById('continueBtn');
       const errorEl = document.getElementById('emailError');
       const email = emailInput.value.trim();
 
@@ -862,31 +890,33 @@
         return;
       }
 
-      // Clear error
       emailInput.classList.remove('error');
       errorEl.classList.remove('visible');
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
 
-      // Store email locally (will write to Supabase when wired)
+      // Write to Supabase + localStorage backup
+      saveEmailToSupabase(email);
       localStorage.setItem('lc_email', email);
 
-      // Show success state
-      document.getElementById('modalForm').classList.add('hidden');
       setTimeout(() => {
-        document.getElementById('modalSuccess').classList.add('visible');
-      }, 200);
+        btn.disabled = false;
+        btn.textContent = 'Continue to Payment →';
+        document.getElementById('modalForm').classList.add('hidden');
+        setTimeout(() => {
+          document.getElementById('modalSuccess').classList.add('visible');
+        }, 200);
+      }, 600);
     }
 
-    // Close on overlay click
     document.getElementById('emailOverlay').addEventListener('click', function(e) {
       if (e.target === this) closeModal();
     });
 
-    // Close on Escape key
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') closeModal();
     });
 
-    // Allow Enter key to submit
     document.getElementById('gateEmail').addEventListener('keydown', function(e) {
       if (e.key === 'Enter') handleEmailSubmit();
     });

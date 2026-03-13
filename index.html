@@ -5,14 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LeaseCheckr — Is Your NJ Lease a Fair Deal?</title>
   <meta name="description" content="Compare your NJ car lease quote against real local data. Find out instantly if you're getting a fair deal — before you sign.">
-  <meta property="og:title" content="LeaseCheckr — Is Your NJ Lease a Fair Deal?">
-  <meta property="og:description" content="Compare your NJ car lease quote against real local data. Find out instantly if you're getting a fair deal — before you sign.">
-  <meta property="og:url" content="https://leasecheckr.vercel.app">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="LeaseCheckr">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="LeaseCheckr — Is Your NJ Lease a Fair Deal?">
-  <meta name="twitter:description" content="Compare your NJ car lease quote against real local data. Find out instantly if you're getting a fair deal — before you sign.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
@@ -216,7 +208,7 @@
     .form-panel { transition: all 0.45s var(--ease); }
     .form-panel.hidden { opacity: 0; transform: translateX(-16px); pointer-events: none; height: 0; overflow: hidden; }
 
-    .form-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.85rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); font-weight: 700; margin-bottom: 18px; }
+    .form-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-4); margin-bottom: 18px; }
 
     /* FIELDS */
     .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 9px; }
@@ -295,51 +287,6 @@
     .pay-box-value { font-family: 'Cormorant Garamond', serif; font-size: 1.7rem; font-weight: 400; color: var(--ink); line-height: 1; }
     .pay-box-delta { font-size: 0.7rem; margin-top: 4px; }
     .delta-good { color: var(--sage); } .delta-bad { color: var(--rose); }
-
-    /* ── DATA STATE BANNER ── */
-    .data-state-banner {
-      display: none;
-      margin: 12px 0 4px;
-      padding: 12px 14px;
-      border-radius: 6px;
-      font-size: 0.78rem;
-      line-height: 1.55;
-    }
-    .data-state-banner.state-county {
-      display: block;
-      background: #faf3ea;
-      border: 1px solid rgba(168,105,46,0.2);
-      color: var(--ink-3);
-    }
-    .data-state-banner.state-none {
-      display: block;
-      background: var(--canvas-2);
-      border: 1px solid var(--border);
-      color: var(--ink-3);
-    }
-    .data-state-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.58rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-bottom: 5px;
-    }
-    .state-county .data-state-label { color: var(--copper); }
-    .state-none .data-state-label { color: var(--ink-4); }
-    .data-state-contribute {
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid rgba(168,105,46,0.15);
-      font-size: 0.75rem;
-    }
-    .state-none .data-state-contribute { border-top-color: var(--border); }
-    .data-state-contribute a {
-      color: var(--copper);
-      text-decoration: none;
-      border-bottom: 1px solid rgba(168,105,46,0.3);
-      padding-bottom: 1px;
-    }
-    .data-state-contribute a:hover { color: var(--copper-lt); }
 
     .confidence-line { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.08em; color: var(--ink-4); margin-bottom: 20px; display: flex; align-items: center; gap: 6px; }
     .conf-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--sage); flex-shrink: 0; }
@@ -1059,13 +1006,6 @@
           <span id="tConfidence">Based on comparable NJ lease submissions in the last 60 days</span>
         </div>
 
-        <!-- DATA STATE BANNER — shown when zip or county data is thin -->
-        <div class="data-state-banner" id="tDataBanner">
-          <div class="data-state-label" id="tDataLabel">No zip-level data yet</div>
-          <div id="tDataMsg"></div>
-          <div class="data-state-contribute" id="tDataContribute"></div>
-        </div>
-
         <div class="locked-hint">
           <span class="locked-icon">🔒</span>
           <div class="locked-text">
@@ -1074,10 +1014,10 @@
         </div>
 
         <div class="teaser-ctas">
-          <a href="access.html" class="cta-primary">
+          <button onclick="openEmailGate()" class="cta-primary" style="width:100%;border:none;cursor:pointer;text-align:left;">
             <span class="cta-primary-label">Get Full Report</span>
             <span class="cta-primary-price">$19.99 one-time · or free with lease upload</span>
-          </a>
+          </button>
           <a href="sample-report.html" target="_blank" class="cta-secondary">See what the full report includes →</a>
         </div>
       </div>
@@ -1442,64 +1382,6 @@
     monmouth:441, passaic:447, union:449, somerset:435, ocean:443
   };
 
-  // Neighbouring counties map — used when county has no data
-  const COUNTY_NEIGHBORS = {
-    bergen:   ['Hudson Co.','Passaic Co.','Essex Co.'],
-    essex:    ['Bergen Co.','Hudson Co.','Union Co.'],
-    hudson:   ['Bergen Co.','Essex Co.','Union Co.'],
-    morris:   ['Somerset Co.','Passaic Co.','Sussex Co.'],
-    middlesex:['Union Co.','Monmouth Co.','Somerset Co.'],
-    passaic:  ['Bergen Co.','Morris Co.','Essex Co.'],
-    union:    ['Essex Co.','Middlesex Co.','Hudson Co.'],
-    somerset: ['Morris Co.','Middlesex Co.','Union Co.'],
-    monmouth: ['Middlesex Co.','Ocean Co.'],
-    ocean:    ['Monmouth Co.','Burlington Co.'],
-    nj:       []
-  };
-
-  // ZIP-level data state simulation
-  // In production this will query Supabase — for now uses placeholder logic
-  // Returns: 'zip' = rich zip data, 'county' = county-only, 'none' = no local data
-  function getDataState(zip, county) {
-    if (!zip || zip.length < 5) return 'county';
-    // Placeholder: zips ending in 0-4 = full zip data, 5-7 = county only, 8-9 = no data
-    const lastDigit = parseInt(zip[4]);
-    if (lastDigit <= 4) return 'zip';
-    if (lastDigit <= 7) return 'county';
-    return 'none';
-  }
-
-  function renderDataState(state, zip, county, label) {
-    const banner = document.getElementById('tDataBanner');
-    const lbl = document.getElementById('tDataLabel');
-    const msg = document.getElementById('tDataMsg');
-    const contribute = document.getElementById('tDataContribute');
-
-    if (state === 'zip') {
-      banner.className = 'data-state-banner';
-      return;
-    }
-
-    if (state === 'county') {
-      banner.className = 'data-state-banner state-county';
-      lbl.textContent = 'No zip-level data for ' + zip + ' yet';
-      msg.textContent = 'We\'re showing ' + label + ' benchmarks — the closest available comparison. Zip-level data builds as more drivers in your area contribute.';
-      contribute.innerHTML = 'Have a signed lease? <a href="intake-upload.html">Upload it and be the first from ' + zip + '</a> — future neighbors will see your deal.';
-      return;
-    }
-
-    if (state === 'none') {
-      banner.className = 'data-state-banner state-none';
-      const neighbors = COUNTY_NEIGHBORS[county] || [];
-      lbl.textContent = 'We\'re still building data for ' + label;
-      msg.textContent = 'We don\'t have enough verified deals in ' + label + ' yet to show local benchmarks. The grade above uses the NJ statewide average as a proxy — it\'s directional, not precise.';
-      const neighborText = neighbors.length
-        ? ' Neighboring counties with data: ' + neighbors.join(', ') + '.'
-        : '';
-      contribute.innerHTML = 'Be among the first to contribute from ' + label + '.' + neighborText + ' <a href="intake-upload.html">Upload your lease →</a>';
-    }
-  }
-
   function getCounty(zip) {
     if (!zip || zip.length < 3) return { county:'nj', label:'NJ Average', avg:440 };
     const p = zip.substring(0,3);
@@ -1535,10 +1417,6 @@
     const diff = Math.round(pay - avg);
     const vehicle = [make, model, trim].filter(Boolean).join(' ') || 'Your Vehicle';
 
-    // Determine data state and render banner
-    const dataState = getDataState(zip, county);
-    renderDataState(dataState, zip, county, label);
-
     document.getElementById('tVehicle').textContent = vehicle;
     document.getElementById('tGrade').textContent = g;
     document.getElementById('tGrade').className = 'grade-letter ' + cls;
@@ -1549,14 +1427,10 @@
     document.getElementById('tAvg').textContent = '$' + avg.toLocaleString();
     document.getElementById('tCountyLbl').textContent = label + ' Average';
 
-    // Confidence line — reflects data state
+    // Stable, non-random confidence line
     const modelName = model || 'lease';
-    const confText = dataState === 'zip'
-      ? `Based on verified ${modelName} submissions in ${zip} over the last 60 days`
-      : dataState === 'county'
-      ? `Showing ${label} benchmarks — zip-level data not yet available for ${zip}`
-      : `Using NJ statewide average — ${label} benchmarks not yet available`;
-    document.getElementById('tConfidence').textContent = confText;
+    document.getElementById('tConfidence').textContent =
+      `Based on comparable NJ ${modelName} submissions in ${label} over the last 60 days`;
 
     const deltaEl = document.getElementById('tDelta');
     if (diff < 0) { deltaEl.textContent = '↓ $' + Math.abs(diff) + '/mo below avg'; deltaEl.className = 'pay-box-delta delta-good'; }
@@ -1617,5 +1491,180 @@
   revealEls.forEach(el => observer.observe(el));
 </script>
 
+
+<!-- ═══ EMAIL GATE MODAL ═══ -->
+<style>
+  .eg-overlay {
+    display: none; position: fixed; inset: 0; z-index: 9999;
+    background: rgba(28,25,23,0.55); backdrop-filter: blur(3px);
+    align-items: center; justify-content: center;
+  }
+  .eg-overlay.open { display: flex; }
+  .eg-modal {
+    background: var(--canvas, #f8f5f0); border-radius: 6px;
+    padding: 44px 40px 36px; width: 90%; max-width: 460px;
+    position: relative; box-shadow: 0 24px 64px rgba(28,25,23,0.22);
+  }
+  .eg-close {
+    position: absolute; top: 16px; right: 18px; background: none;
+    border: none; font-size: 1.2rem; cursor: pointer; color: #78716c; line-height: 1; padding: 4px;
+  }
+  .eg-close:hover { color: #1c1917; }
+  .eg-eyebrow {
+    font-family: 'DM Mono', monospace; font-size: 0.58rem;
+    letter-spacing: 0.14em; text-transform: uppercase; color: #a8692e; margin-bottom: 10px;
+  }
+  .eg-title {
+    font-family: 'Cormorant Garamond', serif; font-size: 2rem;
+    font-weight: 400; line-height: 1.2; color: #1c1917; margin-bottom: 10px;
+  }
+  .eg-title em { font-style: italic; color: #a8692e; }
+  .eg-desc { font-size: 0.86rem; color: #44403c; line-height: 1.6; margin-bottom: 24px; }
+  .eg-label {
+    font-family: 'DM Mono', monospace; font-size: 0.58rem;
+    letter-spacing: 0.1em; text-transform: uppercase; color: #78716c;
+    display: block; margin-bottom: 8px;
+  }
+  .eg-input {
+    width: 100%; padding: 14px 16px; border: 1.5px solid rgba(28,25,23,0.18);
+    border-radius: 4px; font-family: 'DM Sans', sans-serif; font-size: 0.92rem;
+    background: #fdfaf6; color: #1c1917; outline: none; transition: border-color 0.2s;
+  }
+  .eg-input:focus { border-color: #a8692e; }
+  .eg-input.error { border-color: #c0392b; }
+  .eg-error { font-size: 0.78rem; color: #c0392b; margin-top: 6px; display: none; }
+  .eg-error.visible { display: block; }
+  .eg-btn {
+    width: 100%; margin-top: 16px; padding: 16px; background: #a8692e;
+    color: #fdfaf6; border: none; border-radius: 4px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500;
+    cursor: pointer; transition: background 0.2s, transform 0.15s;
+  }
+  .eg-btn:hover { background: #c4864a; transform: translateY(-1px); }
+  .eg-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .eg-privacy { font-size: 0.73rem; color: #78716c; text-align: center; margin-top: 12px; line-height: 1.5; }
+  .eg-privacy a { color: #a8692e; text-decoration: none; }
+  .eg-success { display: none; text-align: center; padding: 8px 0; }
+  .eg-success.visible { display: block; }
+  .eg-check {
+    width: 48px; height: 48px; border-radius: 50%; background: #e8f0ea;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; margin: 0 auto 16px;
+  }
+  .eg-success-title { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 400; margin-bottom: 8px; }
+  .eg-success-desc { font-size: 0.85rem; color: #44403c; line-height: 1.6; margin-bottom: 20px; }
+  .eg-continue-btn {
+    display: inline-block; padding: 14px 28px; background: #1c1917;
+    color: #fdfaf6; border-radius: 4px; text-decoration: none;
+    font-size: 0.88rem; font-weight: 500; transition: background 0.2s;
+  }
+  .eg-continue-btn:hover { background: #44403c; }
+  .eg-form.hidden { display: none; }
+</style>
+
+<div class="eg-overlay" id="egOverlay">
+  <div class="eg-modal" role="dialog" aria-modal="true" aria-labelledby="egTitle">
+    <button class="eg-close" onclick="closeEmailGate()" aria-label="Close">✕</button>
+    <div class="eg-form" id="egForm">
+      <div class="eg-eyebrow">One last step</div>
+      <h2 class="eg-title" id="egTitle">Where should we send your <em>report?</em></h2>
+      <p class="eg-desc">Enter your email and we’ll deliver your full report there — and send a copy you can reference any time.</p>
+      <label class="eg-label" for="egEmail">Email address</label>
+      <input type="email" class="eg-input" id="egEmail" placeholder="you@email.com" autocomplete="email">
+      <div class="eg-error" id="egError">Please enter a valid email address.</div>
+      <button class="eg-btn" id="egBtn" onclick="submitEmailGate()">Continue to Payment →</button>
+      <p class="eg-privacy">No spam. Your report, one receipt, and occasional product updates.<br>
+        <a href="privacy.html">Privacy policy</a></p>
+    </div>
+    <div class="eg-success" id="egSuccess">
+      <div class="eg-check">✓</div>
+      <div class="eg-success-title">You’re all set.</div>
+      <p class="eg-success-desc">We’ve saved your email. You’ll be redirected to payment — your report will be waiting when you return.</p>
+      <a href="access.html" class="eg-continue-btn">Continue to Payment →</a>
+      <p style="font-size:0.72rem;color:#78716c;margin-top:10px;">Stripe checkout launching soon — check back shortly.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://xqjsvlhdpdfvzixlmdxk.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxanN2bGhkcGRmdnppeGxtZHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzg2ODcsImV4cCI6MjA4ODg1NDY4N30.MT0tEDMLaBDLtZkX9xEVEkaUfPdIA9QsJrWjGDpeWsE';
+
+  async function saveEmailLead(email, source) {
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/email_leads`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ email, source, consent_marketing: false })
+      });
+      return res.ok || res.status === 409;
+    } catch (e) {
+      console.warn('Supabase email save failed:', e);
+      return false;
+    }
+  }
+
+  function openEmailGate() {
+    document.getElementById('egOverlay').classList.add('open');
+    setTimeout(() => document.getElementById('egEmail').focus(), 300);
+  }
+
+  function closeEmailGate() {
+    document.getElementById('egOverlay').classList.remove('open');
+    document.getElementById('egEmail').value = '';
+    document.getElementById('egEmail').classList.remove('error');
+    document.getElementById('egError').classList.remove('visible');
+    document.getElementById('egForm').classList.remove('hidden');
+    document.getElementById('egSuccess').classList.remove('visible');
+  }
+
+  async function submitEmailGate() {
+    const input = document.getElementById('egEmail');
+    const btn = document.getElementById('egBtn');
+    const errorEl = document.getElementById('egError');
+    const email = input.value.trim();
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      input.classList.add('error');
+      errorEl.classList.add('visible');
+      input.focus();
+      return;
+    }
+
+    input.classList.remove('error');
+    errorEl.classList.remove('visible');
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+
+    saveEmailLead(email, 'report_gate');
+    localStorage.setItem('lc_email', email);
+
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = 'Continue to Payment →';
+      document.getElementById('egForm').classList.add('hidden');
+      setTimeout(() => document.getElementById('egSuccess').classList.add('visible'), 150);
+    }, 600);
+  }
+
+  document.getElementById('egOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeEmailGate();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && document.getElementById('egOverlay').classList.contains('open')) {
+      closeEmailGate();
+    }
+  });
+
+  document.getElementById('egEmail').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') submitEmailGate();
+  });
+</script>
 </body>
 </html>
