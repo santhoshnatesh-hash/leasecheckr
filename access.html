@@ -376,22 +376,11 @@
     .btn-pay {
       background: var(--copper);
       color: var(--canvas);
+      text-decoration: none;
+      text-align: center;
     }
 
-    .btn-pay:hover:not(:disabled) { background: var(--copper-lt); }
-    .btn-pay:disabled { opacity: 0.7; cursor: wait; }
-
-    .btn-spinner {
-      display: inline-block;
-      width: 14px; height: 14px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-      vertical-align: -2px;
-      margin-right: 6px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn-pay:hover { background: var(--copper-lt); }
 
     .btn-contribute {
       background: var(--ink);
@@ -528,9 +517,9 @@
           <p class="price-note">One-time. No subscription. Yours to keep.</p>
         </div>
 
-        <button id="stripePayBtn" class="card-btn btn-pay" onclick="handleStripeCheckout()">
+        <a href="YOUR_STRIPE_PAYMENT_LINK" class="card-btn btn-pay">
           Pay $19.99 — Secure Checkout
-        </button>
+        </a>
         <p class="btn-sub-note">
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:4px;opacity:0.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           Powered by Stripe · 256-bit encryption
@@ -579,68 +568,9 @@
       <a href="founder.html">Claim a Founding Member spot instead →</a>
     </div>
 
-  <!-- Stripe JS -->
-  <script src="https://js.stripe.com/v3/"></script>
   <script>
-    // ══════════════════════════════════════════════════════
-    // STRIPE CONFIGURATION
-    // Replace these with your actual Stripe values:
-    //   1. YOUR_STRIPE_PUBLISHABLE_KEY  → from Stripe Dashboard > Developers > API keys
-    //   2. YOUR_PRICE_ID                → from Stripe Dashboard > Products > your $19.99 product > Price ID (starts with price_)
-    // ══════════════════════════════════════════════════════
-    const STRIPE_PK    = 'pk_test_veE7qLfiPqwxRxe0yidQZB17';   //  or pk_live_...
-    const PRICE_ID     = 'price_1TAcPPGhzQNKEDK6D8RHQDMX';                 // 
-    const SUCCESS_URL  = window.location.origin + '/access.html?session_id={CHECKOUT_SESSION_ID}&status=success';
-    const CANCEL_URL   = window.location.origin + '/access.html?status=cancelled';
-
-    // Initialize Stripe (only if key is set)
-    let stripe = null;
-    if (STRIPE_PK !== 'YOUR_STRIPE_PUBLISHABLE_KEY') {
-      stripe = Stripe(STRIPE_PK);
-    }
-
-    async function handleStripeCheckout() {
-      const btn = document.getElementById('stripePayBtn');
-
-      // Guard: keys not configured yet
-      if (!stripe) {
-        btn.textContent = 'Payment setup in progress';
-        btn.style.opacity = '0.6';
-        setTimeout(() => {
-          btn.textContent = 'Pay $19.99 — Secure Checkout';
-          btn.style.opacity = '1';
-        }, 2000);
-        return;
-      }
-
-      // Loading state
-      btn.disabled = true;
-      btn.innerHTML = '<span class="btn-spinner"></span> Redirecting to Stripe…';
-
-      try {
-        const { error } = await stripe.redirectToCheckout({
-          lineItems: [{ price: PRICE_ID, quantity: 1 }],
-          mode: 'payment',
-          successUrl: SUCCESS_URL,
-          cancelUrl: CANCEL_URL,
-          billingAddressCollection: 'auto',
-        });
-
-        if (error) {
-          console.error('Stripe error:', error);
-          btn.disabled = false;
-          btn.textContent = 'Something went wrong — try again';
-          setTimeout(() => { btn.textContent = 'Pay $19.99 — Secure Checkout'; }, 3000);
-        }
-      } catch (err) {
-        console.error('Checkout error:', err);
-        btn.disabled = false;
-        btn.textContent = 'Connection error — try again';
-        setTimeout(() => { btn.textContent = 'Pay $19.99 — Secure Checkout'; }, 3000);
-      }
-    }
-
     // ── Handle return from Stripe ──────────────────────
+    // After payment, Stripe redirects back here. We check the URL for status.
     (function handleReturnStatus() {
       const params = new URLSearchParams(window.location.search);
       const status = params.get('status');
@@ -659,7 +589,6 @@
             </div>
           </div>
         `;
-        // Clean URL
         window.history.replaceState({}, '', '/access.html');
       }
 
