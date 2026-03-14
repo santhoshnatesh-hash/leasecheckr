@@ -650,7 +650,23 @@
 </footer>
 
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+
+<script>
   const revealEls = document.querySelectorAll('.reveal');
   const observer = new IntersectionObserver((entries) => {
-    entries.forEach
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in-view');
+      }
+    });
+  }, { threshold: 0.08 });
+  revealEls.forEach(el => observer.observe(el));
+
+  // Fallback: reveal all after 1 second in case observer doesn't fire
+  setTimeout(() => {
+    revealEls.forEach(el => el.classList.add('in-view'));
+  }, 1000);
+</script>
+
+</body>
+</html>
