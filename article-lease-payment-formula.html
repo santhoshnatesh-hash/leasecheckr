@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How Car Lease Payments Are Calculated — LeaseCheckr</title>
+<meta name="description" content="Every lease payment is two charges: depreciation and financing. Learn the exact formula dealers use and how each number affects what you pay monthly in NJ.">
+<meta property="og:title" content="How Car Lease Payments Are Calculated — LeaseCheckr">
+<meta property="og:description" content="The complete breakdown of how your NJ lease payment is calculated — and where dealers have room to adjust.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}:root{--bg:#faf7f2;--bg2:#f3efe7;--cream:#fefcf8;--ink:#1a1613;--ink2:#38332c;--ink3:#635c52;--ink4:#9e968a;--ink5:#c8c1b6;--copper:#b3722f;--copper-lt:#d49040;--copper-bg:#f6ecdf;--sage:#3d7a4e;--sage-bg:#e4f0e7;--rose:#c24838;--rose-bg:#fae6e3;--dark:#0b0907;--dark3:#1c1915;--on-dark:#f2ede5;--on-dark2:#c4bdb2;--on-dark3:#8a847a;--serif:'Cormorant Garamond',Georgia,serif;--sans:'DM Sans',system-ui,sans-serif;--mono:'DM Mono','Menlo',monospace;--border:rgba(28,25,23,0.10);--border2:rgba(28,25,23,0.18);--ease:cubic-bezier(0.22,1,0.36,1)}html{font-size:17px;scroll-behavior:smooth}body{font-family:var(--sans);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.65}body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:999;opacity:0.35}nav{position:fixed;top:0;left:0;right:0;z-index:100;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;background:rgba(248,245,240,0.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}.nav-logo{font-family:var(--serif);font-size:1.3rem;font-weight:500;color:var(--ink);text-decoration:none}.nav-logo span{color:var(--copper)}.nav-right{display:flex;align-items:center;gap:28px}.nav-link{font-size:0.73rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3);text-decoration:none;transition:color 0.2s}.nav-link:hover{color:var(--ink)}.nav-founder{font-size:0.72rem;font-weight:500;letter-spacing:0.06em;color:var(--copper);text-decoration:none;border-bottom:1px solid rgba(179,114,47,0.3);padding-bottom:1px}.article{max-width:680px;margin:0 auto;padding:120px 28px 80px}.a-tag{font-family:var(--mono);font-size:0.58rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--copper);margin-bottom:16px;display:flex;align-items:center;gap:10px}.a-tag::before{content:'';width:22px;height:1px;background:var(--copper)}.a-title{font-family:var(--serif);font-size:clamp(2rem,4vw,2.8rem);font-weight:400;line-height:1.12;margin-bottom:16px}.a-title em{font-style:italic;color:var(--copper)}.a-meta{font-size:0.78rem;color:var(--ink4);margin-bottom:32px;display:flex;gap:16px}.takeaway{background:var(--cream);border:1px solid var(--border);border-left:3px solid var(--sage);border-radius:0 10px 10px 0;padding:22px 26px;margin-bottom:36px}.takeaway-label{font-family:var(--mono);font-size:0.54rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--sage);margin-bottom:8px}.takeaway ul{list-style:none;padding:0}.takeaway li{font-size:0.86rem;color:var(--ink2);line-height:1.7;padding:4px 0 4px 20px;position:relative}.takeaway li::before{content:'→';position:absolute;left:0;color:var(--sage);font-weight:600}.a-body h2{font-family:var(--serif);font-size:1.5rem;font-weight:400;margin:44px 0 14px;line-height:1.2}.a-body h2 em{font-style:italic;color:var(--copper)}.a-body h3{font-family:var(--sans);font-size:0.95rem;font-weight:600;margin:28px 0 8px;color:var(--ink)}.a-body p{font-size:0.92rem;color:var(--ink2);line-height:1.88;margin-bottom:16px}.a-body p strong{color:var(--ink);font-weight:600}.a-body p em{color:var(--copper);font-style:normal;font-weight:500}.callout{background:var(--copper-bg);border:1px solid rgba(179,114,47,0.15);border-left:3px solid var(--copper);border-radius:0 8px 8px 0;padding:18px 22px;margin:24px 0}.callout-label{font-family:var(--mono);font-size:0.52rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--copper);margin-bottom:6px}.callout p{margin-bottom:0;font-size:0.86rem}.warning{background:var(--rose-bg);border:1px solid rgba(194,72,56,0.15);border-left:3px solid var(--rose);border-radius:0 8px 8px 0;padding:18px 22px;margin:24px 0}.warning-label{font-family:var(--mono);font-size:0.52rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--rose);margin-bottom:6px}.warning p{margin-bottom:0;font-size:0.86rem}.formula{background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:22px 26px;margin:24px 0;font-family:var(--mono);font-size:0.8rem;line-height:2.2;color:var(--ink2)}.formula strong{color:var(--ink)}.diagram{background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:24px;margin:28px 0;text-align:center}.diagram svg{max-width:100%;height:auto}.checklist{margin:28px 0}.checklist-title{font-family:var(--mono);font-size:0.58rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--copper);margin-bottom:14px}.check-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}.check-item:last-child{border-bottom:none}.check-box{width:20px;height:20px;border:1.5px solid var(--ink5);border-radius:4px;flex-shrink:0;margin-top:2px}.check-text{font-size:0.86rem;color:var(--ink2);line-height:1.55}.check-text strong{color:var(--ink)}.related{margin-top:48px;padding-top:32px;border-top:1px solid var(--border)}.related-title{font-family:var(--mono);font-size:0.58rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--copper);margin-bottom:16px}.related-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.related-card{background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:18px 20px;text-decoration:none;transition:transform 0.2s,border-color 0.2s}.related-card:hover{transform:translateY(-2px);border-color:var(--border2)}.related-card-tag{font-family:var(--mono);font-size:0.48rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--copper);margin-bottom:6px}.related-card-title{font-family:var(--serif);font-size:1rem;font-weight:500;color:var(--ink);line-height:1.25}.a-cta{background:var(--dark);border-radius:10px;padding:32px;margin:44px 0;text-align:center}.a-cta-text{color:rgba(250,245,240,0.75);font-size:0.88rem;margin-bottom:16px}.a-cta-text strong{color:rgba(250,245,240,0.95)}.a-cta a{display:inline-block;padding:13px 30px;background:var(--copper);color:var(--bg);border-radius:4px;text-decoration:none;font-size:0.88rem;font-weight:500;transition:all 0.2s}.a-cta a:hover{background:var(--copper-lt);transform:translateY(-1px)}.a-nav{display:flex;justify-content:space-between;padding-top:36px;margin-top:36px;border-top:1px solid var(--border)}.a-nav a{font-size:0.82rem;color:var(--copper);text-decoration:none;border-bottom:1px solid rgba(179,114,47,0.3);padding-bottom:1px}footer{border-top:1px solid var(--border);padding:28px 64px;display:flex;align-items:center;justify-content:space-between;background:var(--bg)}.footer-logo{font-family:var(--serif);font-size:1rem;color:var(--ink3)}.footer-logo span{color:var(--copper)}.footer-links{display:flex;gap:24px}.footer-links a{font-size:0.71rem;color:var(--ink4);text-decoration:none;transition:color 0.2s}.footer-links a:hover{color:var(--ink)}@media(max-width:768px){nav{padding:0 24px}.nav-right{gap:16px}.article{padding:100px 20px 60px}.related-grid{grid-template-columns:1fr}footer{padding:24px;flex-direction:column;gap:16px;text-align:center}.footer-links{flex-wrap:wrap;justify-content:center}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">Lease<span>Checkr</span></a>
+  <div class="nav-right">
+    <a href="blog.html" class="nav-link">Learn</a>
+    <a href="calculator.html" class="nav-link">Calculator</a>
+    <a href="pricing.html" class="nav-link">Pricing</a>
+    <a href="sample-report.html" class="nav-link">Sample Report</a>
+    <a href="founder.html" class="nav-founder">Founding Member →</a>
+  </div>
+</nav>
+
+<article class="article">
+  <div class="a-tag">Essential Guide</div>
+  <h1 class="a-title">How Car Lease Payments Are <em>Calculated</em></h1>
+  <div class="a-meta"><span>8 min read</span><span>Updated March 2026</span></div>
+
+  <div class="takeaway">
+    <div class="takeaway-label">Key Takeaways</div>
+    <ul>
+      <li>Every lease payment = depreciation charge + finance charge + tax</li>
+      <li>The cap cost (negotiated price) is the single biggest lever you control</li>
+      <li>The money factor is your hidden interest rate — and dealers can mark it up</li>
+      <li>Residual value is set by the manufacturer, not the dealer — you can't negotiate it</li>
+      <li>NJ taxes your monthly payment, not the full vehicle price — a real advantage</li>
+    </ul>
+  </div>
+
+  <div class="a-body">
+
+    <p>Every car lease payment in America is built from two charges: <strong>depreciation</strong> and <strong>financing</strong>. The depreciation charge covers how much value the car loses during your lease. The finance charge is the cost of borrowing that value — similar to interest, but calculated differently.</p>
+
+    <p>Understanding this formula gives you something most shoppers don't have: the ability to verify whether the numbers on your dealer's worksheet actually add up. You don't need a finance degree. You just need to know what you're looking at.</p>
+
+    <h2>The <em>formula</em></h2>
+
+    <div class="formula">
+      <strong>Monthly Payment</strong> = Depreciation + Finance Charge + Tax<br><br>
+      <strong>Depreciation</strong> = (Adjusted Cap Cost − Residual Value) ÷ Term<br>
+      <strong>Finance Charge</strong> = (Adjusted Cap Cost + Residual Value) × Money Factor<br>
+      <strong>NJ Tax</strong> = (Depreciation + Finance Charge) × 6.625%
+    </div>
+
+    <p>That's the entire formula. Every lease payment — Honda, BMW, Toyota, Tesla — is calculated this way. The differences are in the input numbers, and those are where the negotiation happens.</p>
+
+    <!-- VISUAL: Payment Breakdown Diagram -->
+    <div class="diagram">
+      <svg viewBox="0 0 600 180" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="0" width="600" height="180" rx="8" fill="#fefcf8" stroke="#e5e0d9" stroke-width="1"/>
+        <text x="300" y="24" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="#9e968a" letter-spacing="0.12em">MONTHLY PAYMENT BREAKDOWN — EXAMPLE</text>
+        <!-- Total bar -->
+        <rect x="40" y="44" width="520" height="36" rx="6" fill="#eae5db"/>
+        <!-- Depreciation -->
+        <rect x="40" y="44" width="312" height="36" rx="6" fill="#b3722f" opacity="0.85"/>
+        <text x="196" y="66" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="12" fill="#fff" font-weight="500">Depreciation — $296</text>
+        <!-- Finance -->
+        <rect x="352" y="44" width="125" height="36" rx="0" fill="#3d7a4e" opacity="0.8"/>
+        <text x="414" y="66" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="12" fill="#fff" font-weight="500">Finance — $118</text>
+        <!-- Tax -->
+        <rect x="477" y="44" width="83" height="36" rx="0 6 6 0" fill="#635c52" opacity="0.7"/>
+        <text x="518" y="66" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="#fff" font-weight="500">Tax — $27</text>
+        <!-- Labels below -->
+        <text x="196" y="105" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="#9e968a" letter-spacing="0.08em">67% OF PAYMENT</text>
+        <text x="414" y="105" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="#9e968a" letter-spacing="0.08em">27%</text>
+        <text x="518" y="105" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="#9e968a" letter-spacing="0.08em">6%</text>
+        <!-- Total -->
+        <text x="300" y="145" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="14" fill="#1a1613" font-weight="500">Total Monthly Payment: $441</text>
+        <text x="300" y="165" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="#9e968a">Based on $38,400 MSRP · 57% residual · .00189 MF · 36 months</text>
+      </svg>
+    </div>
+
+    <h2>Adjusted <em>cap cost</em> — what you negotiate</h2>
+
+    <p>The adjusted capitalized cost is the effective price of the vehicle for lease purposes. It starts with the negotiated selling price, then adds any rolled-in fees (dealer doc fee, acquisition fee, accessories) and subtracts reductions (your down payment, trade-in equity, rebates).</p>
+
+    <p><strong>This is the single most important number to negotiate.</strong> Every dollar you reduce the cap cost lowers your payment for the entire term. On a 36-month lease, reducing the cap cost by $1,000 saves roughly $28 per month — that's $1,008 over the lease.</p>
+
+    <div class="callout">
+      <div class="callout-label">What to ask</div>
+      <p><strong>"What is the selling price before any fees or add-ons?"</strong> — This separates the vehicle price from everything the dealer stacks on top. Negotiate the vehicle price first, then deal with fees separately.</p>
+    </div>
+
+    <h2>Residual <em>value</em> — set by the manufacturer</h2>
+
+    <p>The residual value is what the leasing company predicts the car will be worth when your lease ends. It's expressed as a percentage of MSRP — for example, 57% residual on a $38,400 MSRP means the end-of-lease value is $21,888.</p>
+
+    <p>The residual is set by the manufacturer's leasing arm (Honda Financial, Toyota Financial, BMW Financial) — <strong>not the dealer</strong>. It varies by vehicle, term length, and mileage allowance. A higher residual means less depreciation, which means a lower payment.</p>
+
+    <p>You can't negotiate the residual directly. But you can choose a term and mileage combination that gives you a better one. A 36-month/10,000-mile lease almost always has a better residual than a 48-month/15,000-mile lease on the same vehicle.</p>
+
+    <h2>The <em>money factor</em> — your hidden interest rate</h2>
+
+    <p>The money factor is your lease interest rate expressed as a small decimal — typically something like 0.00125 or 0.00189. To convert to an approximate APR, multiply by 2,400. So 0.00125 × 2,400 = 3.0% APR.</p>
+
+    <p>Unlike the residual, the money factor <strong>can be marked up by the dealer</strong>. The manufacturer sets a "buy rate" (the base money factor), and the dealer can add to it. This markup is pure dealer profit — and most shoppers never know it happened because the money factor doesn't appear on standard lease quotes.</p>
+
+    <div class="warning">
+      <div class="warning-label">Watch out</div>
+      <p>A money factor markup of just 0.0005 can cost you <strong>$500–$1,500 over a 36-month lease</strong>, depending on the vehicle's MSRP. This is the most common way dealers increase profit on a lease — and the hardest for shoppers to detect without asking directly.</p>
+    </div>
+
+    <h2>NJ sales <em>tax</em> — the monthly advantage</h2>
+
+    <p>New Jersey taxes your monthly lease payment at 6.625% — not the full vehicle price. This is a meaningful advantage over states that tax the entire capitalized cost upfront. On a $38,000 vehicle, you pay tax only on the monthly depreciation and finance charges, not on $38,000.</p>
+
+    <p>The tax is applied to each payment: (Depreciation + Finance Charge) × 6.625%. This means NJ drivers pay significantly less in total tax compared to states like Texas or Illinois that tax the full cap cost at signing.</p>
+
+    <h2>How each number affects your <em>payment</em></h2>
+
+    <p>Here's the practical impact of each lever, using a typical NJ lease on a $38,400 vehicle:</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="0" width="600" height="200" rx="8" fill="#fefcf8" stroke="#e5e0d9" stroke-width="1"/>
+        <text x="300" y="24" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="#9e968a" letter-spacing="0.12em">IMPACT ON MONTHLY PAYMENT</text>
+        <!-- Bars -->
+        <text x="40" y="60" font-family="DM Sans,sans-serif" font-size="11" fill="#635c52">$1,000 off cap cost</text>
+        <rect x="220" y="48" width="140" height="18" rx="4" fill="#b3722f" opacity="0.8"/>
+        <text x="370" y="61" font-family="DM Mono,monospace" font-size="11" fill="#1a1613" font-weight="500">−$28/mo</text>
+
+        <text x="40" y="95" font-family="DM Sans,sans-serif" font-size="11" fill="#635c52">5% higher residual</text>
+        <rect x="220" y="83" width="270" height="18" rx="4" fill="#3d7a4e" opacity="0.8"/>
+        <text x="500" y="96" font-family="DM Mono,monospace" font-size="11" fill="#1a1613" font-weight="500">−$53/mo</text>
+
+        <text x="40" y="130" font-family="DM Sans,sans-serif" font-size="11" fill="#635c52">MF markup +0.0005</text>
+        <rect x="220" y="118" width="90" height="18" rx="4" fill="#c24838" opacity="0.8"/>
+        <text x="320" y="131" font-family="DM Mono,monospace" font-size="11" fill="#1a1613" font-weight="500">+$19/mo</text>
+
+        <text x="40" y="165" font-family="DM Sans,sans-serif" font-size="11" fill="#635c52">36mo → 39mo term</text>
+        <rect x="220" y="153" width="75" height="18" rx="4" fill="#635c52" opacity="0.6"/>
+        <text x="305" y="166" font-family="DM Mono,monospace" font-size="11" fill="#1a1613" font-weight="500">−$15/mo</text>
+
+        <text x="300" y="195" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#9e968a">Based on $38,400 MSRP · 57% residual · .00189 MF · Bergen County, NJ</text>
+      </svg>
+    </div>
+
+    <p>Notice that the residual has the biggest impact per percentage point — but you can't negotiate it. The cap cost and money factor are the two levers you can actually move. That's where informed shoppers focus their energy.</p>
+
+    <h2>Putting it <em>together</em> — a real example</h2>
+
+    <h3>2024 Honda CR-V EX-L AWD — Bergen County, NJ</h3>
+
+    <div class="formula">
+      MSRP: <strong>$38,400</strong><br>
+      Negotiated selling price: <strong>$37,200</strong> (3.1% off MSRP)<br>
+      Down payment: <strong>$1,200</strong><br>
+      Adjusted cap cost: $37,200 − $1,200 = <strong>$36,000</strong><br>
+      Residual: 57% × $38,400 = <strong>$21,888</strong><br>
+      Money factor: <strong>0.00189</strong><br>
+      Term: <strong>36 months</strong><br><br>
+      Depreciation: ($36,000 − $21,888) ÷ 36 = <strong>$392/mo</strong><br>
+      Finance charge: ($36,000 + $21,888) × 0.00189 = <strong>$109/mo</strong><br>
+      Pre-tax payment: $392 + $109 = <strong>$501/mo</strong><br>
+      NJ tax: $501 × 6.625% = <strong>$33/mo</strong><br><br>
+      <strong>Total monthly payment: $534/mo</strong>
+    </div>
+
+    <p>If you see this same vehicle quoted at $412/mo with $2,500 due at signing, the effective monthly cost is actually $481 when you amortize the drive-off. The headline number ($412) looks better but costs more in total. This is exactly the kind of comparison the <a href="index.html" style="color:var(--copper);text-decoration:none;border-bottom:1px solid rgba(179,114,47,0.3)">LeaseCheckr tool</a> makes for you automatically.</p>
+
+    <!-- CHECKLIST -->
+    <div class="checklist">
+      <div class="checklist-title">Your action items</div>
+      <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>Ask for the selling price before fees</strong> — negotiate this number first, before anything else</div></div>
+      <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>Ask "What money factor are you using?"</strong> — then multiply by 2,400 to see the APR</div></div>
+      <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>Confirm the residual percentage and mileage</strong> — make sure they match the term you want</div></div>
+      <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>Calculate the effective monthly cost</strong> — add (due at signing ÷ term) to the monthly payment</div></div>
+      <div class="check-item"><div class="check-box"></div><div class="check-text"><strong>Run your numbers through LeaseCheckr</strong> — see how your deal compares to verified NJ leases</div></div>
+    </div>
+
+    <!-- RELATED -->
+    <div class="related">
+      <div class="related-title">Continue learning</div>
+      <div class="related-grid">
+        <a href="article-money-factor.html" class="related-card">
+          <div class="related-card-tag">Core Concept</div>
+          <div class="related-card-title">What Is a Money Factor?</div>
+        </a>
+        <a href="article-residual-value.html" class="related-card">
+          <div class="related-card-tag">Core Concept</div>
+          <div class="related-card-title">Residual Value Explained</div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="a-cta">
+    <div class="a-cta-text"><strong>Ready to check your deal?</strong> Enter your numbers and compare against verified NJ lease data.</div>
+    <a href="index.html">Check My Lease Free →</a>
+  </div>
+  <div class="a-nav">
+    <a href="blog.html">← Back to Learning Center</a>
+    <a href="index.html">Check your lease →</a>
+  </div>
+</article>
+
+<footer>
+  <span class="footer-logo">Lease<span>Checkr</span></span>
+  <div class="footer-links">
+    <a href="pricing.html">Pricing</a>
+    <a href="founder.html">Founding Member</a>
+    <a href="sample-report.html">Sample Report</a>
+    <a href="blog.html">Learn</a>
+    <a href="calculator.html">Calculator</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms</a>
+  </div>
+</footer>
+</body>
+</html>
