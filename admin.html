@@ -380,7 +380,7 @@ function showDetail(id) {
     actions += `<button class="action-btn btn-approve" onclick="approve(${r.id});closeModal();">Approve</button>`;
     actions += `<button class="action-btn btn-reject" onclick="reject(${r.id});closeModal();">Reject</button>`;
   }
-  if (r.email) {
+  if (r.email && r.submission_type !== 'seed') {
     actions += `<button class="action-btn btn-send" onclick="sendReport(${r.id});closeModal();">Send Full Report</button>`;
   }
   document.getElementById('modalActions').innerHTML = actions;
