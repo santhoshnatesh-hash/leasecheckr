@@ -242,15 +242,25 @@ if (sessionStorage.getItem('lc_admin') === '1') {
 // LOAD DATA
 // ═══════════════════════════════════
 async function loadData() {
-  const { data, error } = await sb.from('lease_submissions')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(500);
+  try {
+    const { data, error } = await sb.from('lease_submissions')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(500);
 
-  if (error) { showToast('Failed to load data: ' + error.message, 'error'); return; }
-  allData = data || [];
-  updateStats();
-  renderTable();
+    if (error) {
+      const msg = typeof error === 'string' ? error : (error.message || JSON.stringify(error, null, 2) || 'Unknown error');
+      showToast('Failed to load: ' + msg, 'error');
+      console.error('Load error:', error);
+      return;
+    }
+    allData = data || [];
+    updateStats();
+    renderTable();
+  } catch (e) {
+    showToast('Load error: ' + String(e), 'error');
+    console.error('Load exception:', e);
+  }
 }
 
 function updateStats() {
