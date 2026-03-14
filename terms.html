@@ -4,15 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Terms of Use — LeaseCheckr</title>
-  <meta name="description" content="LeaseCheckr's terms of use — the rules and conditions for using our NJ lease benchmarking service.">
-  <meta property="og:title" content="Terms of Use — LeaseCheckr">
-  <meta property="og:description" content="LeaseCheckr's terms of use — the rules and conditions for using our NJ lease benchmarking service.">
-  <meta property="og:url" content="https://leasecheckr.vercel.app/terms.html">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="LeaseCheckr">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Terms of Use — LeaseCheckr">
-  <meta name="twitter:description" content="LeaseCheckr's terms of use — the rules and conditions for using our NJ lease benchmarking service.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
@@ -59,9 +50,16 @@
 </head>
 <body>
 
+<!-- NAV -->
 <nav>
-  <a href="index.html" class="nav-logo">Lease<span>Checkr</span></a>
-  <a href="index.html" class="nav-back">← Back to LeaseCheckr</a>
+  <a class="nav-logo" href="index.html">Lease<span>Checkr</span></a>
+  <div class="nav-right">
+    <a class="nav-link" href="blog.html">Learn</a>
+    <a class="nav-link" href="calculator.html">Calculator</a>
+    <a class="nav-link" href="pricing.html">Pricing</a>
+    <a class="nav-link" href="sample-report.html">Sample Report</a>
+    <a class="nav-founder" href="founder.html">Founding Member →</a>
+  </div>
 </nav>
 
 <div class="page-wrap">
@@ -97,18 +95,33 @@
     <p>We may update these terms from time to time. Continued use of the platform following any changes constitutes acceptance of the revised terms.</p>
 
     <h2>Contact</h2>
-    <p>If you have questions about these terms, please contact us at <a href="/cdn-cgi/l/email-protection#1e727b797f725e727b7f6d7b7d767b7d756c307d7173"><span class="__cf_email__" data-cfemail="bcd0d9dbddd0fcd0d9ddcfd9dfd4d9dfd7ce92dfd3d1">[email&#160;protected]</span></a>.</p>
+    <p>If you have questions about these terms, please contact us at <a href="mailto:legal@leasecheckr.com">legal@leasecheckr.com</a>.</p>
   </div>
 </div>
 
+<!-- FOOTER -->
 <footer>
   <span class="footer-logo">Lease<span>Checkr</span></span>
   <div class="footer-links">
-    <a href="index.html">Check a Lease</a>
+    <a href="index.html">Home</a>
+    <a href="blog.html">Learn</a>
+    <a href="calculator.html">Calculator</a>
     <a href="pricing.html">Pricing</a>
+    <a href="founder.html">Founding Member</a>
+    <a href="sample-report.html">Sample Report</a>
     <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms</a>
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-  window.addEventListener('load', 
+<script>
+  window.addEventListener('load', function() {
+    const termlyEmbed = document.querySelector('[data-id]');
+    if (termlyEmbed && termlyEmbed.children.length > 0) {
+      document.getElementById('placeholderContent').style.display = 'none';
+    }
+  });
+</script>
+
+</body>
+</html>

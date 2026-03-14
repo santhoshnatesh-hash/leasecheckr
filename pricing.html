@@ -4,15 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pricing — LeaseCheckr</title>
-  <meta name="description" content="Check your NJ lease quote free. Unlock the full report for $19.99 — or upload your signed lease document and get one full report free.">
-  <meta property="og:title" content="Pricing — LeaseCheckr">
-  <meta property="og:description" content="Check your NJ lease quote free. Unlock the full report for $19.99 — or upload your signed lease document and get one full report free.">
-  <meta property="og:url" content="https://leasecheckr.vercel.app/pricing.html">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="LeaseCheckr">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Pricing — LeaseCheckr">
-  <meta name="twitter:description" content="Check your NJ lease quote free. Unlock the full report for $19.99 — or upload your signed lease document and get one full report free.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
@@ -42,13 +33,13 @@
     .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
     .nav-links a { font-size: 0.8rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); text-decoration: none; transition: color 0.2s; }
     .nav-links a:hover { color: var(--ink); }
-    .nav-cta { background: var(--ink) !important; color: var(--canvas) !important; padding: 8px 20px; border-radius: 2px; font-size: 0.75rem !important; }
+    .nav-cta { background: var(--ink) !important; color: var(--canvas) !important; padding: 8px 20px; border-radius: 2px; font-size: 0.82rem !important; }
 
     .hero { padding: 140px 48px 80px; text-align: center; max-width: 720px; margin: 0 auto; }
     .hero-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--copper); margin-bottom: 20px; }
     .hero h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.8rem, 5vw, 4rem); font-weight: 400; line-height: 1.1; color: var(--ink); margin-bottom: 20px; }
     .hero h1 em { font-style: italic; color: var(--copper); }
-    .hero-sub { font-size: 1rem; color: var(--ink-muted); line-height: 1.7; max-width: 520px; margin: 0 auto; }
+    .hero-sub { font-size: 1.1rem; color: var(--ink-muted); line-height: 1.7; max-width: 520px; margin: 0 auto; }
 
     .free-section { padding: 60px 48px; max-width: 1000px; margin: 0 auto; }
     .section-label { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 32px; display: flex; align-items: center; gap: 12px; }
@@ -57,7 +48,7 @@
     .free-description h2 { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-weight: 400; line-height: 1.2; margin-bottom: 16px; }
     .free-description p { font-size: 0.92rem; color: var(--ink-muted); line-height: 1.75; margin-bottom: 24px; }
     .free-includes { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-    .free-includes li { font-size: 0.85rem; color: var(--ink-light); display: flex; align-items: center; gap: 10px; }
+    .free-includes li { font-size: 0.92rem; color: var(--ink-light); display: flex; align-items: center; gap: 10px; }
     .free-includes li::before { content: '✓'; color: var(--sage); font-weight: 600; font-size: 0.8rem; flex-shrink: 0; }
 
     .result-mockup { background: var(--cream); border: 1px solid var(--border); border-radius: 4px; padding: 32px; position: relative; box-shadow: 0 4px 24px rgba(28,25,23,0.06); }
@@ -83,11 +74,11 @@
     .upload-band { max-width: 1000px; margin: 0 auto; padding: 40px 48px 0; }
     .upload-band-inner { display: flex; align-items: center; justify-content: space-between; gap: 32px; background: var(--copper-bg); border: 1px solid rgba(168,105,46,0.2); border-radius: 4px; padding: 22px 32px; }
     .upload-band-left { display: flex; align-items: center; gap: 16px; }
-    .upload-band-icon { font-size: 1rem; color: var(--copper); flex-shrink: 0; }
-    .upload-band-text { font-size: 0.88rem; color: var(--ink-light); line-height: 1.55; }
+    .upload-band-icon { font-size: 1.1rem; color: var(--copper); flex-shrink: 0; }
+    .upload-band-text { font-size: 0.95rem; color: var(--ink-light); line-height: 1.55; }
     .upload-band-text strong { color: var(--ink); font-weight: 500; }
     .upload-band-sub { font-family: 'DM Mono', monospace; font-size: 0.57rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); margin-top: 3px; }
-    .upload-band-cta { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: var(--copper); border: 1px solid rgba(168,105,46,0.35); padding: 10px 20px; border-radius: 2px; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none; transition: all 0.2s; white-space: nowrap; flex-shrink: 0; }
+    .upload-band-cta { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: var(--copper); border: 1px solid rgba(168,105,46,0.35); padding: 10px 20px; border-radius: 2px; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none; transition: all 0.2s; white-space: nowrap; flex-shrink: 0; }
     .upload-band-cta:hover { background: var(--copper); color: var(--canvas); border-color: var(--copper); }
 
     .premium-section { padding: 80px 48px; max-width: 1000px; margin: 0 auto; }
@@ -98,33 +89,33 @@
     .premium-left .eyebrow { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--copper-lt); margin-bottom: 16px; }
     .premium-left h2 { font-family: 'Cormorant Garamond', serif; font-size: 2.8rem; font-weight: 400; line-height: 1.1; margin-bottom: 16px; color: var(--canvas); }
     .premium-left h2 em { font-style: italic; color: var(--copper-lt); }
-    .premium-left p { font-size: 0.9rem; color: rgba(253,250,246,0.65); line-height: 1.75; margin-bottom: 36px; }
+    .premium-left p { font-size: 0.95rem; color: rgba(253,250,246,0.65); line-height: 1.75; margin-bottom: 36px; }
     .price-display { display: flex; align-items: baseline; gap: 4px; margin-bottom: 36px; }
     .price-currency { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--copper-lt); font-weight: 300; }
     .price-amount { font-family: 'Cormorant Garamond', serif; font-size: 4.5rem; font-weight: 300; line-height: 1; color: var(--canvas); }
     .price-period { font-size: 0.8rem; color: rgba(253,250,246,0.5); margin-left: 4px; }
-    .price-note { font-size: 0.75rem; color: rgba(253,250,246,0.4); margin-top: -28px; margin-bottom: 36px; font-style: italic; }
+    .price-note { font-size: 0.82rem; color: rgba(253,250,246,0.4); margin-top: -28px; margin-bottom: 36px; font-style: italic; }
     .premium-cta { display: inline-flex; align-items: center; gap: 10px; background: var(--copper); color: var(--canvas); padding: 16px 32px; border-radius: 2px; font-size: 0.8rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none; transition: background 0.2s, transform 0.15s; border: none; cursor: pointer; }
     .premium-cta:hover { background: var(--copper-lt); transform: translateY(-1px); }
     .premium-features { display: flex; flex-direction: column; gap: 0; }
     .premium-feature { display: flex; align-items: flex-start; gap: 16px; padding: 18px 0; border-bottom: 1px solid rgba(253,250,246,0.08); }
     .premium-feature:last-child { border-bottom: none; }
-    .feature-icon { width: 32px; height: 32px; background: rgba(168,105,46,0.15); border-radius: 2px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.85rem; }
-    .feature-title { font-size: 0.88rem; font-weight: 500; color: var(--canvas); margin-bottom: 3px; }
-    .feature-desc { font-size: 0.78rem; color: rgba(253,250,246,0.45); line-height: 1.5; }
+    .feature-icon { width: 32px; height: 32px; background: rgba(168,105,46,0.15); border-radius: 2px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.92rem; }
+    .feature-title { font-size: 0.95rem; font-weight: 500; color: var(--canvas); margin-bottom: 3px; }
+    .feature-desc { font-size: 0.86rem; color: rgba(253,250,246,0.45); line-height: 1.5; }
 
     .founder-section { padding: 60px 48px 100px; max-width: 1000px; margin: 0 auto; }
     .founder-band { border: 1px solid var(--border-strong); border-radius: 4px; padding: 48px; display: grid; grid-template-columns: 1fr auto; gap: 48px; align-items: center; background: var(--cream); position: relative; overflow: hidden; }
     .founder-band::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--copper); }
     .founder-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--copper); margin-bottom: 12px; }
     .founder-band h2 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 400; line-height: 1.2; margin-bottom: 12px; }
-    .founder-band p { font-size: 0.88rem; color: var(--ink-muted); line-height: 1.7; max-width: 480px; }
+    .founder-band p { font-size: 0.95rem; color: var(--ink-muted); line-height: 1.7; max-width: 480px; }
     .founder-perks { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
     .founder-perk { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; background: var(--copper-pale); color: var(--copper); padding: 5px 10px; border-radius: 2px; }
     .founder-right { text-align: center; flex-shrink: 0; }
     .founder-price { font-family: 'Cormorant Garamond', serif; font-size: 3rem; font-weight: 300; color: var(--ink); line-height: 1; margin-bottom: 4px; }
     .founder-price-label { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--copper); margin-bottom: 20px; }
-    .founder-cta { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: var(--ink); border: 1px solid var(--border-strong); padding: 12px 24px; border-radius: 2px; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none; transition: all 0.2s; white-space: nowrap; }
+    .founder-cta { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: var(--ink); border: 1px solid var(--border-strong); padding: 12px 24px; border-radius: 2px; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none; transition: all 0.2s; white-space: nowrap; }
     .founder-cta:hover { background: var(--ink); color: var(--canvas); border-color: var(--ink); }
     .spots-remaining { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); margin-top: 10px; }
     .spots-remaining strong { color: var(--copper); }
@@ -133,18 +124,18 @@
     .compare-table { width: 100%; border-collapse: collapse; }
     .compare-table th { padding: 14px 20px; font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); text-align: left; border-bottom: 2px solid var(--border-strong); }
     .compare-table th:not(:first-child) { text-align: center; }
-    .compare-table td { padding: 14px 20px; font-size: 0.85rem; color: var(--ink-light); border-bottom: 1px solid var(--border); }
+    .compare-table td { padding: 14px 20px; font-size: 0.92rem; color: var(--ink-light); border-bottom: 1px solid var(--border); }
     .compare-table td:not(:first-child) { text-align: center; }
     .compare-table tr:last-child td { border-bottom: none; }
     .compare-table tr:hover td { background: rgba(168,105,46,0.03); }
-    .check { color: var(--sage); font-size: 1rem; }
-    .cross { color: var(--border-strong); font-size: 1rem; }
+    .check { color: var(--sage); font-size: 1.1rem; }
+    .cross { color: var(--border-strong); font-size: 1.1rem; }
     .col-premium { background: rgba(28,25,23,0.03); }
 
     footer { border-top: 1px solid var(--border); padding: 32px 48px; display: flex; align-items: center; justify-content: space-between; max-width: 1000px; margin: 0 auto; }
     .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: var(--ink-muted); }
     .footer-logo span { color: var(--copper); }
-    .footer-note { font-size: 0.75rem; color: var(--ink-muted); }
+    .footer-note { font-size: 0.82rem; color: var(--ink-muted); }
 
     @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     .animate { opacity: 0; animation: fadeUp 0.6s ease forwards; }
@@ -166,17 +157,21 @@
       .upload-band-inner { flex-direction: column; align-items: flex-start; gap: 16px; }
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-  <nav>
-    <a href="index.html" class="nav-logo">Lease<span>Checkr</span></a>
-    <ul class="nav-links">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="index.html">Check My Deal</a></li>
-      <li><a href="founder.html" class="nav-cta">Founding Member</a></li>
-    </ul>
-  </nav>
+  <!-- NAV -->
+<nav>
+  <a class="nav-logo" href="index.html">Lease<span>Checkr</span></a>
+  <div class="nav-right">
+    <a class="nav-link" href="blog.html">Learn</a>
+    <a class="nav-link" href="calculator.html">Calculator</a>
+    <a class="nav-link" href="pricing.html">Pricing</a>
+    <a class="nav-link" href="sample-report.html">Sample Report</a>
+    <a class="nav-founder" href="founder.html">Founding Member →</a>
+  </div>
+</nav>
 
   <section class="hero">
     <p class="hero-eyebrow animate delay-1">How It Works</p>
@@ -252,11 +247,25 @@
       <div class="upload-band-left">
         <span class="upload-band-icon">📄</span>
         <div>
-          <div class="upload-band-text"><strong>Have a lease document already?</strong> Upload it and unlock one full report free.</div>
-          <div class="upload-band-sub">Verified contribution · NJ leases only · One report per document</div>
+          <div class="upload-band-text"><strong>Have a lease document?</strong> Upload it and get your full report free.</div>
+          <div class="upload-band-sub">You redact personal info · Verified contribution · One free report per document</div>
         </div>
       </div>
-      <a href="intake-upload.html" class="upload-band-cta">Upload a Document →</a>
+      <a href="intake-upload.html" class="upload-band-cta">Upload Lease — Free →</a>
+    </div>
+  </div>
+
+  <!-- MANUAL DEAL BAND -->
+  <div class="upload-band" style="margin-top:12px;">
+    <div class="upload-band-inner" style="background:var(--cream,#fdfaf6);border-color:var(--border);">
+      <div class="upload-band-left">
+        <span class="upload-band-icon">📋</span>
+        <div>
+          <div class="upload-band-text"><strong>No document to upload?</strong> Submit your signed deal terms manually for $9.99.</div>
+          <div class="upload-band-sub">10 fields + credibility check · Signed deals only · Discounted report</div>
+        </div>
+      </div>
+      <a href="submit-deal.html" class="upload-band-cta" style="border-color:var(--border);color:var(--ink-3,#6b6259);">Submit Deal — $9.99 →</a>
     </div>
   </div>
 
@@ -277,6 +286,9 @@
           <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
             <a href="access.html" class="premium-cta">Get Full Access →</a>
             <a href="sample-report.html" target="_blank" style="font-size:0.78rem; color:rgba(253,250,246,0.55); text-decoration:none; border-bottom:1px solid rgba(253,250,246,0.2); padding-bottom:2px;">View sample report →</a>
+          </div>
+          <div style="margin-top:18px;padding:14px 16px;background:rgba(253,250,246,0.06);border:1px solid rgba(253,250,246,0.08);border-radius:6px;font-size:0.76rem;color:rgba(253,250,246,0.5);line-height:1.6;">
+            <strong style="color:rgba(253,250,246,0.7);">Our data promise:</strong> We only generate reports when we have at least 3 verified comparable deals for your vehicle in your area. If we don't have enough data yet, we'll tell you — and invite you to help build the benchmark instead.
           </div>
         </div>
 
@@ -350,36 +362,61 @@
       <thead>
         <tr>
           <th>Feature</th>
-          <th>Free</th>
-          <th class="col-premium">Premium — $19.99 / report</th>
+          <th>Free Check</th>
+          <th>Submit Deal — $9.99</th>
+          <th class="col-premium">Full Report — $19.99</th>
+          <th>Upload Lease — Free</th>
           <th>Founding Member</th>
         </tr>
       </thead>
       <tbody>
-        <tr><td>Deal grade (A–F)</td><td><span class="check">✓</span></td><td class="col-premium"><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>Pass / Fair / Overpaying verdict</td><td><span class="check">✓</span></td><td class="col-premium"><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>County average comparison</td><td><span class="check">✓</span></td><td class="col-premium"><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>Estimated gap vs. market</td><td><span class="check">✓</span></td><td class="col-premium"><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>Full downloadable report</td><td><span class="cross">—</span></td><td class="col-premium"><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>Money factor analysis</td><td><span class="cross">—</span></td><td class="col-premium"><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>Comparable NJ deal insights</td><td><span class="cross">—</span></td><td class="col-premium"><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>Dealer pricing observations</td><td><span class="cross">—</span></td><td class="col-premium"><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>Recent comparable trends</td><td><span class="cross">—</span></td><td class="col-premium"><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>Founding Member status</td><td><span class="cross">—</span></td><td class="col-premium"><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>Early feature access</td><td><span class="cross">—</span></td><td class="col-premium"><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>
-        <tr><td>Included Premium access</td><td><span class="cross">—</span></td><td class="col-premium"><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Deal grade (A–F)</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td class="col-premium"><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Pass / Fair / Overpaying verdict</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td class="col-premium"><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>County average comparison</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td class="col-premium"><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Full downloadable report</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td class="col-premium"><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Money factor analysis</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td class="col-premium"><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Comparable NJ deal insights</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td class="col-premium"><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Dealer pricing observations</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td class="col-premium"><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Negotiation playbook</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td class="col-premium"><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Contributes to NJ benchmark</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td class="col-premium"><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Verification required</td><td><span class="cross">—</span></td><td><span class="cross">—</span></td><td class="col-premium"><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Founder status + lifetime access</td><td><span class="cross">—</span></td><td><span class="cross">—</span></td><td class="col-premium"><span class="cross">—</span></td><td><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Early feature access</td><td><span class="cross">—</span></td><td><span class="cross">—</span></td><td class="col-premium"><span class="cross">—</span></td><td><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>
       </tbody>
     </table>
   </section>
 
-  <footer>
-    <span class="footer-logo">Lease<span>Checkr</span></span>
-    <span class="footer-note">NJ lease benchmarking · Free to check · $19.99 for the full report</span>
-  </footer>
+  <!-- FOOTER -->
+<footer>
+  <span class="footer-logo">Lease<span>Checkr</span></span>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="blog.html">Learn</a>
+    <a href="calculator.html">Calculator</a>
+    <a href="pricing.html">Pricing</a>
+    <a href="founder.html">Founding Member</a>
+    <a href="sample-report.html">Sample Report</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms</a>
+  </div>
+</footer>
 
   <script>
-    const claimed = 153;
-    document.getElementById('spotsLeft').textContent = (1000 - claimed).toLocaleString();
+    const SUPABASE_URL='YOUR_SUPABASE_URL';
+    const SUPABASE_KEY='YOUR_SUPABASE_ANON_KEY';
+    let sb=null;
+    try{if(SUPABASE_URL!=='YOUR_SUPABASE_URL'&&window.supabase){sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}}catch(e){}
+
+    (async function(){
+      let claimed=153;
+      if(sb){
+        try{
+          const{data}=await sb.from('founder_slots').select('claimed_count').eq('id',1).single();
+          if(data)claimed=data.claimed_count;
+        }catch(e){}
+      }
+      document.getElementById('spotsLeft').textContent=(1000-claimed).toLocaleString();
+    })();
   </script>
 
 </body>

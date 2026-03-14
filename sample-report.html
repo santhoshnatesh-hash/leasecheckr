@@ -1,1491 +1,433 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sample Premium Report — LeaseCheckr</title>
-  <meta name="description" content="See exactly what a full LeaseCheckr report looks like — deal score, money factor analysis, comparable NJ leases, and dealer pricing observations.">
-  <meta property="og:title" content="Sample Premium Report — LeaseCheckr">
-  <meta property="og:description" content="See exactly what a full LeaseCheckr report looks like — deal score, money factor analysis, comparable NJ leases, and dealer pricing observations.">
-  <meta property="og:url" content="https://leasecheckr.vercel.app/sample-report.html">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="LeaseCheckr">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Sample Premium Report — LeaseCheckr">
-  <meta name="twitter:description" content="See exactly what a full LeaseCheckr report looks like — deal score, money factor analysis, comparable NJ leases, and dealer pricing observations.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --canvas: #f8f5f0;
-      --ink: #1c1917;
-      --ink-light: #44403c;
-      --ink-muted: #78716c;
-      --copper: #a8692e;
-      --copper-lt: #c4864a;
-      --copper-pale: #f0e4d4;
-      --sage: #5c7a65;
-      --sage-pale: #e8f0ea;
-      --rose: #a85a4a;
-      --rose-pale: #f5e8e5;
-      --cream: #fdfaf6;
-      --border: rgba(28,25,23,0.10);
-      --border-strong: rgba(28,25,23,0.20);
-    }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--canvas);
-      color: var(--ink);
-      min-height: 100vh;
-    }
-
-    /* SAMPLE BANNER */
-    .sample-banner {
-      background: var(--ink);
-      color: var(--canvas);
-      text-align: center;
-      padding: 12px 24px;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-    }
-
-    .sample-banner a {
-      color: var(--copper-lt);
-      text-decoration: none;
-      border-bottom: 1px solid rgba(196,134,74,0.4);
-      padding-bottom: 1px;
-      transition: border-color 0.2s;
-    }
-
-    .sample-banner a:hover { border-color: var(--copper-lt); }
-
-    /* NAV */
-    nav {
-      padding: 0 48px;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--cream);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .nav-logo {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.35rem;
-      font-weight: 500;
-      color: var(--ink);
-      text-decoration: none;
-    }
-
-    .nav-logo span { color: var(--copper); }
-
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .nav-right a {
-      font-size: 0.78rem;
-      font-weight: 500;
-      color: var(--ink-muted);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-
-    .nav-cta {
-      background: var(--copper) !important;
-      color: var(--canvas) !important;
-      padding: 9px 20px;
-      border-radius: 2px;
-      font-size: 0.75rem !important;
-      letter-spacing: 0.04em;
-    }
-
-    /* REPORT WRAPPER */
-    .report-wrapper {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 48px 48px 80px;
-    }
-
-    /* REPORT HEADER */
-    .report-header {
-      background: var(--ink);
-      color: var(--canvas);
-      border-radius: 4px;
-      padding: 40px 48px;
-      margin-bottom: 32px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .report-header::before {
-      content: '';
-      position: absolute;
-      top: -60px; right: -60px;
-      width: 240px; height: 240px;
-      background: radial-gradient(circle, rgba(168,105,46,0.2) 0%, transparent 70%);
-    }
-
-    .report-meta {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 28px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .report-id {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: rgba(253,250,246,0.4);
-    }
-
-    .report-date {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      color: rgba(253,250,246,0.4);
-    }
-
-    .report-vehicle {
-      position: relative;
-      z-index: 1;
-      margin-bottom: 28px;
-    }
-
-    .report-vehicle h1 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 2.4rem;
-      font-weight: 400;
-      line-height: 1.1;
-      margin-bottom: 6px;
-    }
-
-    .report-vehicle-sub {
-      font-size: 0.85rem;
-      color: rgba(253,250,246,0.5);
-      display: flex;
-      gap: 16px;
-    }
-
-    .report-vehicle-sub span::before {
-      content: '·';
-      margin-right: 16px;
-      opacity: 0.4;
-    }
-
-    .report-vehicle-sub span:first-child::before { display: none; }
-
-    .report-scores {
-      display: grid;
-      grid-template-columns: auto 1fr 1fr 1fr;
-      gap: 0;
-      position: relative;
-      z-index: 1;
-      border-top: 1px solid rgba(253,250,246,0.1);
-      padding-top: 28px;
-      align-items: center;
-    }
-
-    .score-grade {
-      padding-right: 32px;
-      border-right: 1px solid rgba(253,250,246,0.1);
-      margin-right: 32px;
-    }
-
-    .grade-big {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 5rem;
-      font-weight: 300;
-      line-height: 1;
-      color: #7ab87f;
-    }
-
-    .grade-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: rgba(253,250,246,0.4);
-      margin-top: 4px;
-    }
-
-    .score-metric {
-      padding: 0 20px;
-      border-right: 1px solid rgba(253,250,246,0.1);
-    }
-
-    .score-metric:last-child { border-right: none; }
-
-    .score-metric-value {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.8rem;
-      font-weight: 400;
-      color: var(--canvas);
-      line-height: 1.1;
-    }
-
-    .score-metric-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.58rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: rgba(253,250,246,0.4);
-      margin-top: 4px;
-    }
-
-    .score-metric-delta {
-      font-size: 0.75rem;
-      color: #7ab87f;
-      margin-top: 2px;
-    }
-
-    .score-metric-delta.negative { color: #d47a6a; }
-
-    /* SECTION CARDS */
-    .section-card {
-      background: var(--cream);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      margin-bottom: 20px;
-      overflow: hidden;
-    }
-
-    .section-card-header {
-      padding: 20px 28px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .section-card-title {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--ink-muted);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .section-card-title .icon { font-size: 0.9rem; }
-
-    .section-status {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 4px 10px;
-      border-radius: 2px;
-    }
-
-    .status-good { background: var(--sage-pale); color: var(--sage); }
-    .status-fair { background: var(--copper-pale); color: var(--copper); }
-    .status-poor { background: var(--rose-pale); color: var(--rose); }
-
-    .section-card-body { padding: 28px; }
-
-    /* DEAL BREAKDOWN TABLE */
-    .breakdown-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .breakdown-item {
-      background: var(--canvas);
-      border-radius: 3px;
-      padding: 16px 20px;
-      position: relative;
-    }
-
-    .breakdown-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--ink-muted);
-      margin-bottom: 6px;
-    }
-
-    .breakdown-value {
-      font-size: 1.15rem;
-      font-weight: 500;
-      color: var(--ink);
-    }
-
-    .breakdown-context {
-      font-size: 0.75rem;
-      color: var(--ink-muted);
-      margin-top: 3px;
-    }
-
-    .breakdown-flag {
-      position: absolute;
-      top: 12px; right: 12px;
-      font-size: 0.7rem;
-      padding: 2px 8px;
-      border-radius: 2px;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.55rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .flag-good { background: var(--sage-pale); color: var(--sage); }
-    .flag-watch { background: var(--copper-pale); color: var(--copper); }
-    .flag-high { background: var(--rose-pale); color: var(--rose); }
-
-    /* MONEY FACTOR SECTION */
-    .mf-comparison {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-
-    .mf-card {
-      background: var(--canvas);
-      border-radius: 3px;
-      padding: 20px;
-      text-align: center;
-    }
-
-    .mf-card.highlight {
-      background: var(--ink);
-      color: var(--canvas);
-    }
-
-    .mf-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.58rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--ink-muted);
-      margin-bottom: 8px;
-    }
-
-    .mf-card.highlight .mf-label { color: rgba(253,250,246,0.5); }
-
-    .mf-value {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.6rem;
-      font-weight: 400;
-      color: var(--ink);
-    }
-
-    .mf-card.highlight .mf-value { color: var(--canvas); }
-
-    .mf-apr {
-      font-size: 0.75rem;
-      color: var(--ink-muted);
-      margin-top: 4px;
-    }
-
-    .mf-card.highlight .mf-apr { color: rgba(253,250,246,0.5); }
-
-    .mf-verdict {
-      background: var(--copper-pale);
-      border-left: 3px solid var(--copper);
-      padding: 14px 18px;
-      border-radius: 0 3px 3px 0;
-      font-size: 0.85rem;
-      color: var(--ink-light);
-      line-height: 1.6;
-    }
-
-    /* COMPARABLE DEALS */
-    .comps-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .comps-table th {
-      padding: 10px 14px;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.58rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--ink-muted);
-      text-align: left;
-      border-bottom: 1px solid var(--border-strong);
-    }
-
-    .comps-table td {
-      padding: 13px 14px;
-      font-size: 0.83rem;
-      color: var(--ink-light);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .comps-table tr.your-deal td {
-      background: rgba(92,122,101,0.06);
-      font-weight: 500;
-      color: var(--ink);
-    }
-
-    .comps-table tr.your-deal td:first-child::before {
-      content: '▶ ';
-      color: var(--sage);
-      font-size: 0.6rem;
-    }
-
-    .deal-badge {
-      display: inline-block;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.55rem;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      padding: 2px 7px;
-      border-radius: 2px;
-    }
-
-    /* DEALER SIGNALS */
-    .signals-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .signal-item {
-      background: var(--canvas);
-      border-radius: 3px;
-      padding: 18px 20px;
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-    }
-
-    .signal-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      margin-top: 5px;
-      flex-shrink: 0;
-    }
-
-    .dot-good { background: var(--sage); }
-    .dot-watch { background: var(--copper); }
-    .dot-bad { background: var(--rose); }
-
-    .signal-title {
-      font-size: 0.84rem;
-      font-weight: 500;
-      color: var(--ink);
-      margin-bottom: 4px;
-    }
-
-    .signal-desc {
-      font-size: 0.76rem;
-      color: var(--ink-muted);
-      line-height: 1.55;
-    }
-
-    /* MARKET TREND */
-    .trend-bars {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    .trend-row {
-      display: grid;
-      grid-template-columns: 80px 1fr 70px;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .trend-month {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.62rem;
-      color: var(--ink-muted);
-      text-align: right;
-    }
-
-    .trend-bar-track {
-      background: var(--canvas);
-      border-radius: 2px;
-      height: 8px;
-      overflow: hidden;
-    }
-
-    .trend-bar-fill {
-      height: 100%;
-      border-radius: 2px;
-      background: var(--sage);
-      transition: width 1s ease;
-    }
-
-    .trend-bar-fill.current { background: var(--copper); }
-
-    .trend-value {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem;
-      color: var(--ink-light);
-      text-align: right;
-    }
-
-    .trend-insight {
-      background: var(--sage-pale);
-      border-left: 3px solid var(--sage);
-      padding: 14px 18px;
-      border-radius: 0 3px 3px 0;
-      font-size: 0.84rem;
-      color: var(--ink-light);
-      line-height: 1.6;
-    }
-
-    /* SUMMARY / WHAT TO DO */
-    .summary-card {
-      background: var(--ink);
-      color: var(--canvas);
-      border-radius: 4px;
-      padding: 40px 48px;
-      margin-bottom: 20px;
-    }
-
-    .summary-card h2 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 2rem;
-      font-weight: 400;
-      margin-bottom: 20px;
-    }
-
-    .summary-card h2 em {
-      font-style: italic;
-      color: var(--copper-lt);
-    }
-
-    .summary-points {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      margin-bottom: 32px;
-    }
-
-    .summary-point {
-      display: flex;
-      gap: 14px;
-      align-items: flex-start;
-    }
-
-    .summary-point-num {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      color: var(--copper-lt);
-      width: 20px;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-
-    .summary-point-text {
-      font-size: 0.88rem;
-      color: rgba(253,250,246,0.75);
-      line-height: 1.65;
-    }
-
-    .summary-point-text strong {
-      color: var(--canvas);
-      font-weight: 500;
-    }
-
-    .summary-cta-row {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-      padding-top: 24px;
-      border-top: 1px solid rgba(253,250,246,0.1);
-    }
-
-    .cta-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--copper);
-      color: var(--canvas);
-      padding: 14px 28px;
-      border-radius: 2px;
-      font-size: 0.78rem;
-      font-weight: 500;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      text-decoration: none;
-      transition: background 0.2s;
-    }
-
-    .cta-primary:hover { background: var(--copper-lt); }
-
-    .cta-secondary {
-      font-size: 0.8rem;
-      color: rgba(253,250,246,0.5);
-      text-decoration: none;
-      border-bottom: 1px solid rgba(253,250,246,0.2);
-      padding-bottom: 1px;
-    }
-
-    /* WATERMARK / SAMPLE OVERLAY */
-    .watermark {
-      position: fixed;
-      bottom: 32px;
-      right: 32px;
-      background: var(--ink);
-      color: var(--canvas);
-      padding: 14px 20px;
-      border-radius: 3px;
-      box-shadow: 0 8px 32px rgba(28,25,23,0.2);
-      z-index: 200;
-      max-width: 260px;
-    }
-
-    .watermark-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.58rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--copper-lt);
-      margin-bottom: 6px;
-    }
-
-    .watermark-text {
-      font-size: 0.78rem;
-      color: rgba(253,250,246,0.7);
-      line-height: 1.5;
-      margin-bottom: 12px;
-    }
-
-    .watermark-cta {
-      display: block;
-      text-align: center;
-      background: var(--copper);
-      color: var(--canvas);
-      padding: 9px 16px;
-      border-radius: 2px;
-      font-size: 0.72rem;
-      font-weight: 500;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      text-decoration: none;
-      transition: background 0.2s;
-    }
-
-    .watermark-cta:hover { background: var(--copper-lt); }
-
-    .watermark-dismiss {
-      text-align: center;
-      margin-top: 8px;
-      font-size: 0.68rem;
-      color: rgba(253,250,246,0.3);
-      cursor: pointer;
-    }
-
-    .watermark-dismiss:hover { color: rgba(253,250,246,0.6); }
-
-    @media (max-width: 768px) {
-      nav, .report-wrapper { padding-left: 20px; padding-right: 20px; }
-      .report-header { padding: 28px 24px; }
-      .report-scores { grid-template-columns: 1fr 1fr; gap: 20px; }
-      .score-grade { border-right: none; }
-      .breakdown-grid, .mf-comparison, .signals-grid { grid-template-columns: 1fr; }
-      .summary-card { padding: 28px 24px; }
-      .watermark { bottom: 16px; right: 16px; left: 16px; max-width: none; }
-    }
-    footer { border-top: 1px solid var(--border); padding: 28px 64px; display: flex; align-items: center; justify-content: space-between; background: var(--canvas); }
-    .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--ink-3); }
-    .footer-logo span { color: var(--copper); }
-    .footer-links { display: flex; gap: 24px; }
-    .footer-links a { font-size: 0.71rem; color: var(--ink-4); text-decoration: none; transition: color 0.2s; }
-    .footer-links a:hover { color: var(--ink); }
-    @media (max-width: 768px) {
-      footer { padding: 24px; flex-direction: column; gap: 16px; text-align: center; }
-      .footer-links { flex-wrap: wrap; justify-content: center; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Lease Report — LeaseCheckr</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#faf7f2;--bg2:#f3efe7;--bg3:#eae5db;--cream:#fefcf8;
+  --dark:#0b0907;--dark2:#13110e;--dark3:#1c1915;--dark4:#282420;--dark5:#3a3530;
+  --ink:#1a1613;--ink2:#38332c;--ink3:#635c52;--ink4:#9e968a;--ink5:#c8c1b6;
+  --copper:#b3722f;--copper-lt:#d49040;--copper-bg:#f6ecdf;--copper-dim:rgba(179,114,47,0.1);
+  --sage:#3d7a4e;--sage-bg:#e4f0e7;--sage-dim:rgba(61,122,78,0.08);
+  --rose:#c24838;--rose-bg:#fae6e3;--rose-dim:rgba(194,72,56,0.08);
+  --amber:#c08e22;--amber-bg:#f8f0dc;
+  --green:#3bb85e;--green-dim:rgba(59,184,94,0.1);
+  --white:#fff;
+  --on-dark:#f2ede5;--on-dark2:#c4bdb2;--on-dark3:#8a847a;--on-dark4:#5a544c;
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono','Menlo',monospace;
+  --ease:cubic-bezier(0.22,1,0.36,1);
+}
+
+html{font-size:17px;scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.65}
+
+.r{max-width:700px;margin:0 auto;padding:0 28px}
+
+/* ══ ANIMATIONS ══ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.anim{opacity:0;animation:fadeUp 0.6s var(--ease) forwards}
+.a1{animation-delay:0.05s}.a2{animation-delay:0.12s}.a3{animation-delay:0.2s}.a4{animation-delay:0.28s}.a5{animation-delay:0.36s}
+
+/* ══ COVER ══ */
+.cover{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:48px 28px;position:relative}
+.cover::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--copper),var(--copper-lt),var(--sage))}
+.cover::after{content:'';position:absolute;top:60px;left:50%;transform:translateX(-50%);width:500px;height:500px;background:radial-gradient(circle,rgba(179,114,47,0.04) 0%,transparent 70%);pointer-events:none}
+
+.cv-brand{font-family:var(--mono);font-size:0.58rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--copper);margin-bottom:48px}
+.cv-vehicle{font-family:var(--serif);font-size:clamp(2.6rem,5.5vw,3.8rem);font-weight:300;line-height:1.06;margin-bottom:6px}
+.cv-vehicle em{font-style:italic;color:var(--copper)}
+.cv-trim{font-family:var(--serif);font-size:1.2rem;font-weight:300;color:var(--ink3);margin-bottom:24px;font-style:italic}
+.cv-meta{font-size:0.78rem;color:var(--ink4);line-height:2}
+
+.cv-grade{margin:48px 0 10px;position:relative;display:inline-block}
+.cv-grade-ring{width:140px;height:140px;border-radius:50%;border:2.5px solid;display:flex;align-items:center;justify-content:center;position:relative}
+.cv-grade-ring::after{content:'';position:absolute;inset:-8px;border-radius:50%;border:1px solid;opacity:0.15}
+.cv-grade-ring.ga{border-color:var(--sage)}.cv-grade-ring.ga::after{border-color:var(--sage)}
+.cv-grade-ring.gb{border-color:var(--copper)}.cv-grade-ring.gb::after{border-color:var(--copper)}
+.cv-grade-ring.gc{border-color:var(--amber)}.cv-grade-ring.gc::after{border-color:var(--amber)}
+.cv-grade-ring.gd{border-color:var(--rose)}.cv-grade-ring.gd::after{border-color:var(--rose)}
+.cv-letter{font-family:var(--serif);font-size:5rem;font-weight:300;line-height:1}
+.ga .cv-letter{color:var(--sage)}.gb .cv-letter{color:var(--copper)}.gc .cv-letter{color:var(--amber)}.gd .cv-letter{color:var(--rose)}
+.cv-verdict{font-family:var(--mono);font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;margin-top:14px}
+.cv-date{font-family:var(--mono);font-size:0.52rem;letter-spacing:0.15em;color:var(--ink5);text-transform:uppercase;margin-top:48px}
+
+/* ══ PART BREAK ══ */
+.part{padding:56px 0 36px;text-align:center;border-top:1px solid var(--bg3);position:relative}
+.part::before{content:'';position:absolute;top:-1px;left:50%;transform:translateX(-50%);width:40px;height:3px;background:var(--copper)}
+.part-num{font-family:var(--mono);font-size:0.5rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--copper);margin-bottom:8px}
+.part-name{font-family:var(--serif);font-size:1.8rem;font-weight:400}
+.part-name em{font-style:italic;color:var(--copper)}
+.part-sub{font-size:0.8rem;color:var(--ink4);margin-top:6px}
+
+/* ══ LIGHT SECTIONS ══ */
+.sec{padding:44px 0;border-top:1px solid var(--bg3)}
+.sec:first-of-type{border-top:none}
+.sn{font-family:var(--mono);font-size:0.48rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--copper);margin-bottom:5px}
+.sh{font-family:var(--serif);font-size:1.6rem;font-weight:400;line-height:1.15;margin-bottom:6px}
+.sh em{font-style:italic;color:var(--copper)}
+.ss{font-size:0.82rem;color:var(--ink3);margin-bottom:24px;line-height:1.7;max-width:540px}
+
+.nar{font-size:0.88rem;color:var(--ink2);line-height:1.9;margin-bottom:18px}
+.nar strong{color:var(--ink);font-weight:600}
+.nar em{color:var(--copper);font-style:normal;font-weight:500}
+
+/* ══ METRICS ══ */
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
+.m{background:var(--white);border:1px solid rgba(0,0,0,0.05);border-radius:10px;padding:16px 18px;transition:transform 0.2s}
+.m:hover{transform:translateY(-1px)}
+.ml{font-family:var(--mono);font-size:0.48rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink4);margin-bottom:4px}
+.mv{font-family:var(--serif);font-size:1.65rem;font-weight:400;color:var(--ink)}
+.ms{font-size:0.68rem;color:var(--ink4);margin-top:3px}
+.m.hi{border-left:3px solid var(--copper);background:var(--copper-bg)}
+.m.ok{border-left:3px solid var(--sage);background:var(--sage-bg)}
+.m.bad{border-left:3px solid var(--rose);background:var(--rose-bg)}
+.mf{grid-column:1/-1}
+
+/* ══ SCORES ══ */
+.scores{margin:22px 0}
+.sr{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.sc{width:120px;font-family:var(--mono);font-size:0.52rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3);flex-shrink:0}
+.st{flex:1;height:5px;background:var(--bg3);border-radius:5px;overflow:hidden}
+.sf{height:100%;border-radius:5px;transition:width 0.8s var(--ease)}
+.sf.a{background:var(--sage)}.sf.b{background:var(--sage);opacity:0.65}.sf.c{background:var(--copper)}.sf.d{background:var(--rose)}
+.sg{width:24px;font-family:var(--mono);font-size:0.58rem;font-weight:500;text-align:center}
+
+/* ══ INSIGHT ══ */
+.ins{display:flex;gap:12px;padding:16px 18px;background:var(--white);border:1px solid rgba(0,0,0,0.05);border-radius:10px;margin:16px 0;border-left:3px solid var(--copper)}
+.ins-i{font-size:1rem;flex-shrink:0;margin-top:1px}
+.ins-t{font-size:0.8rem;color:var(--ink2);line-height:1.7}
+.ins-t strong{color:var(--ink)}
+
+/* ══ COMPARISON BAR ══ */
+.cbar{padding:16px 18px;background:var(--white);border:1px solid rgba(0,0,0,0.05);border-radius:10px;margin:18px 0}
+.cbar-l{font-family:var(--mono);font-size:0.48rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink4);margin-bottom:12px}
+.cbar-track{height:6px;background:var(--bg3);border-radius:6px;position:relative;margin-bottom:14px}
+.cbar-fill{height:100%;border-radius:6px;position:absolute;left:0;top:0}
+.cbar-you{background:var(--copper);z-index:2}
+.cbar-avg{background:var(--sage);opacity:0.3;z-index:1}
+.cbar-marks{display:flex;justify-content:space-between}
+.cm{text-align:center}
+.cm-v{font-family:var(--serif);font-size:0.95rem;font-weight:500}
+.cm-l{font-family:var(--mono);font-size:0.44rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink4)}
+.cm.you .cm-v{color:var(--copper)}.cm.avg .cm-v{color:var(--sage)}
+
+/* ══ DEAL TABLE ══ */
+.dtbl{width:100%;border-collapse:collapse;margin:18px 0;font-size:0.76rem}
+.dtbl th{font-family:var(--mono);font-size:0.46rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink4);text-align:left;padding:9px 12px;border-bottom:2px solid var(--bg3);font-weight:500}
+.dtbl td{padding:10px 12px;border-bottom:1px solid var(--bg2);color:var(--ink2)}
+.dtbl .you{background:var(--copper-bg);font-weight:500;color:var(--ink)}
+.dtbl .you td:first-child::before{content:'→ ';color:var(--copper)}
+.dtbl-note{font-size:0.72rem;color:var(--ink4);font-style:italic;margin-top:8px;line-height:1.5}
+
+/* ══ DEALER CARD ══ */
+.dlr{background:var(--white);border:1px solid rgba(0,0,0,0.05);border-radius:10px;padding:20px;margin:18px 0}
+.dlr-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--bg2)}
+.dlr-name{font-size:0.92rem;font-weight:600;color:var(--ink)}
+.dlr-badge{font-family:var(--mono);font-size:0.46rem;letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;border-radius:4px}
+.dlr-badge.avg{background:var(--amber-bg);color:var(--amber)}
+.dlr-badge.good{background:var(--sage-bg);color:var(--sage)}
+.dlr-badge.high{background:var(--rose-bg);color:var(--rose)}
+.dlr-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.dlr-stat-l{font-family:var(--mono);font-size:0.44rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink4);margin-bottom:2px}
+.dlr-stat-v{font-family:var(--serif);font-size:1.15rem;font-weight:400;color:var(--ink)}
+.dlr-obs{font-size:0.78rem;color:var(--ink3);line-height:1.65;padding-top:12px;border-top:1px solid var(--bg2)}
+
+/* ══ DARK SECTIONS ══ */
+.dk{background:var(--dark);color:var(--on-dark);padding:44px 32px;margin:28px -28px;border-radius:14px;position:relative;overflow:hidden}
+.dk::before{content:'';position:absolute;top:0;right:0;width:300px;height:300px;background:radial-gradient(circle,rgba(179,114,47,0.06) 0%,transparent 70%);pointer-events:none}
+.dk .sn{color:var(--copper-lt)}
+.dk .sh{color:var(--on-dark)}
+.dk .ss{color:var(--on-dark3)}
+
+/* ══ NUMBER VS ══ */
+.nvs{display:grid;grid-template-columns:1fr auto 1fr;gap:0;margin:18px 0;align-items:center}
+.nb{background:var(--dark2);border-radius:10px;padding:16px;text-align:center;border:1px solid var(--dark4)}
+.nb.you{border-color:var(--copper-dim)}
+.nb.tgt{border-color:var(--green-dim)}
+.nb-l{font-family:var(--mono);font-size:0.44rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--on-dark3);margin-bottom:4px}
+.nb-v{font-size:1.4rem;font-weight:600}
+.nb.you .nb-v{color:var(--copper-lt)}
+.nb.tgt .nb-v{color:var(--green)}
+.nb-n{font-size:0.56rem;color:var(--on-dark4);margin-top:3px}
+.narr{font-size:1.2rem;color:var(--on-dark4);padding:0 12px}
+
+/* ══ SAVINGS / WARNING ══ */
+.sav{background:var(--green-dim);border:1px solid rgba(59,184,94,0.18);border-radius:12px;padding:22px;margin:16px 0;position:relative;overflow:hidden}
+.sav::after{content:'$';position:absolute;right:14px;top:-6px;font-size:4.5rem;font-weight:800;opacity:0.05;color:var(--green)}
+.sav-l{font-family:var(--mono);font-size:0.48rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--green);margin-bottom:5px}
+.sav-v{font-size:1.8rem;font-weight:700;color:var(--green);margin-bottom:3px}
+.sav-d{font-size:0.78rem;color:var(--on-dark2);line-height:1.6}
+
+.wrn{background:var(--rose-dim);border:1px solid rgba(194,72,56,0.18);border-radius:12px;padding:22px;margin:16px 0}
+.wrn-l{font-family:var(--mono);font-size:0.48rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--rose);margin-bottom:5px}
+.wrn-t{font-size:1.05rem;font-weight:600;color:var(--on-dark);margin-bottom:4px}
+.wrn-d{font-size:0.78rem;color:var(--on-dark2);line-height:1.7}
+
+/* ══ SCRIPTS ══ */
+.scr{background:var(--dark3);border-radius:12px;padding:20px;margin:10px 0;border:1px solid var(--dark4)}
+.scr-c{font-family:var(--mono);font-size:0.46rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--copper-lt);margin-bottom:8px}
+.scr-q{font-family:var(--serif);font-size:1rem;font-weight:300;font-style:italic;line-height:1.7;color:rgba(242,237,229,0.85);padding-left:14px;border-left:2px solid var(--copper-lt);margin-bottom:8px}
+.scr-w{font-size:0.68rem;color:var(--on-dark3);line-height:1.5}
+.scr-w strong{color:var(--on-dark2)}
+
+/* ══ POWER MOVES ══ */
+.pm{display:flex;gap:12px;padding:16px 18px;margin:9px 0;background:var(--dark2);border-radius:10px;border:1px solid var(--dark4)}
+.pm-n{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:0.6rem;font-weight:600;flex-shrink:0;background:var(--copper-dim);color:var(--copper-lt)}
+.pm-t{font-size:0.84rem;font-weight:600;color:var(--on-dark);margin-bottom:2px}
+.pm-d{font-size:0.72rem;color:var(--on-dark3);line-height:1.6}
+.pm-i{font-family:var(--mono);font-size:0.5rem;letter-spacing:0.06em;color:var(--green);margin-top:5px;display:inline-block;padding:2px 7px;background:var(--green-dim);border-radius:3px}
+
+/* ══ CHECKLIST ══ */
+.cl{margin:18px 0}
+.ci{display:flex;align-items:flex-start;gap:11px;padding:10px 0;border-bottom:1px solid var(--bg2)}
+.ci:last-child{border-bottom:none}
+.cb{width:18px;height:18px;border:1.5px solid var(--ink5);border-radius:3px;flex-shrink:0;margin-top:2px}
+.ct{font-size:0.8rem;color:var(--ink2);line-height:1.5}
+.ct strong{color:var(--ink);font-weight:600}
+
+/* ══ FOOTER ══ */
+.rf{padding:44px 0;text-align:center;border-top:1px solid var(--bg3);margin-top:44px}
+.rf-b{font-family:var(--serif);font-size:1.15rem;color:var(--ink);margin-bottom:5px}
+.rf-b span{color:var(--copper)}
+.rf-n{font-size:0.7rem;color:var(--ink4);line-height:1.6;max-width:420px;margin:0 auto}
+.rf-d{font-size:0.56rem;color:var(--ink5);margin-top:18px;line-height:1.6;max-width:500px;margin-left:auto;margin-right:auto}
+
+/* ══ WATERMARK ══ */
+.wm{position:fixed;bottom:0;left:0;right:0;background:var(--dark);padding:14px 24px;display:flex;align-items:center;justify-content:center;gap:18px;z-index:100;border-top:2px solid var(--copper)}
+.wm-badge{font-family:var(--mono);font-size:0.5rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--copper-lt);padding:3px 8px;border:1px solid var(--copper-dim);border-radius:4px;flex-shrink:0}
+.wm-text{font-size:0.74rem;color:var(--on-dark2)}
+.wm-cta{font-size:0.7rem;font-weight:600;color:var(--dark);background:var(--copper-lt);padding:6px 14px;border-radius:6px;text-decoration:none;flex-shrink:0;transition:background 0.2s}
+.wm-cta:hover{background:var(--copper)}
+.wm-x{color:var(--on-dark4);cursor:pointer;font-size:0.7rem;padding:4px 8px;flex-shrink:0}
+
+@media(max-width:520px){
+  html{font-size:16px}
+  .mg{grid-template-columns:1fr}
+  .nvs{grid-template-columns:1fr;gap:6px}
+  .narr{transform:rotate(90deg);justify-self:center;padding:4px 0}
+  .dk{margin:20px -16px;padding:32px 18px;border-radius:10px}
+  .sc{width:90px;font-size:0.44rem}
+  .cover{padding:36px 20px}
+  .dlr-stats{grid-template-columns:1fr 1fr}
+  .wm{flex-wrap:wrap;gap:10px;padding:12px 16px}
+}
+@media print{
+  .dk{break-inside:avoid;border-radius:0;margin:20px 0}
+  .wm{display:none}
+  @page{margin:0.5in}
+  .cover{min-height:auto;padding:40px 0}
+}
+</style>
 </head>
 <body>
+<div class="r">
 
-  <!-- SAMPLE BANNER -->
-  <div class="sample-banner">
-    ⚠ This is a sample report using fictional data &nbsp;·&nbsp;
-    <a href="pricing.html">Unlock your real report for $19.99 →</a>
+<!-- ═══════════ COVER ═══════════ -->
+<div class="cover">
+  <div class="cv-brand anim a1">LeaseCheckr · Full Deal Report</div>
+  <h1 class="cv-vehicle anim a2">2024 Honda CR-V<br><em>EX-L AWD</em></h1>
+  <div class="cv-trim anim a3">36 months · 10,000 mi/yr · Bergen County, NJ</div>
+  <div class="cv-meta anim a3">Honda of Paramus · Signed January 2025</div>
+  <div class="cv-grade anim a4">
+    <div class="cv-grade-ring gb"><div class="cv-letter">B+</div></div>
+  </div>
+  <div class="cv-verdict anim a5" style="color:var(--copper)">Good Deal — One Fix Makes It Great</div>
+  <div class="cv-date anim a5">Generated March 14, 2026</div>
+</div>
+
+<!-- ═══════════ PART 1 ═══════════ -->
+<div class="part">
+  <div class="part-num">Part One</div>
+  <div class="part-name">Deal <em>Analysis</em></div>
+  <div class="part-sub">Every number explained and benchmarked.</div>
+</div>
+
+<!-- 01 GLANCE -->
+<div class="sec">
+  <div class="sn">01</div>
+  <h2 class="sh">Your deal at <em>a glance</em></h2>
+  <p class="ss">How your lease compares to real signed deals on the same vehicle in your area.</p>
+  <div class="mg">
+    <div class="m hi"><div class="ml">Your Payment</div><div class="mv">$412<span style="font-size:0.8rem;color:var(--ink4)">/mo</span></div><div class="ms">$2,500 due at signing</div></div>
+    <div class="m ok"><div class="ml">Bergen Co. Average</div><div class="mv">$438<span style="font-size:0.8rem;color:var(--ink4)">/mo</span></div><div class="ms">Based on 12 verified deals</div></div>
+    <div class="m"><div class="ml">Effective Monthly</div><div class="mv">$481</div><div class="ms">Payment + signing amortized</div></div>
+    <div class="m"><div class="ml">Total Lease Cost</div><div class="mv">$17,332</div><div class="ms">Over 36 months</div></div>
+  </div>
+  <div class="nar">Your monthly payment of <em>$412</em> is <strong>$26 below the Bergen County average</strong> for this vehicle. Over 36 months, that's roughly <strong>$936 saved</strong> compared to the typical deal. However, your money factor suggests there's about $1,200 in negotiable financing markup — fix that and this becomes an A- deal.</div>
+  <div class="cbar">
+    <div class="cbar-l">Your payment vs. local range</div>
+    <div class="cbar-track"><div class="cbar-fill cbar-avg" style="width:78%"></div><div class="cbar-fill cbar-you" style="width:70%"></div></div>
+    <div class="cbar-marks">
+      <div class="cm"><div class="cm-v" style="color:var(--ink5)">$350</div><div class="cm-l">Best</div></div>
+      <div class="cm you"><div class="cm-v">$412</div><div class="cm-l">You</div></div>
+      <div class="cm avg"><div class="cm-v">$438</div><div class="cm-l">Avg</div></div>
+      <div class="cm"><div class="cm-v" style="color:var(--ink5)">$500</div><div class="cm-l">High</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 02 SCORES -->
+<div class="sec">
+  <div class="sn">02</div>
+  <h2 class="sh">Score <em>breakdown</em></h2>
+  <p class="ss">Five dimensions. Each affects your total cost differently.</p>
+  <div class="scores">
+    <div class="sr"><div class="sc">Monthly Payment</div><div class="st"><div class="sf a" style="width:82%"></div></div><div class="sg" style="color:var(--sage)">A-</div></div>
+    <div class="sr"><div class="sc">Due at Signing</div><div class="st"><div class="sf b" style="width:68%"></div></div><div class="sg" style="color:var(--sage)">B</div></div>
+    <div class="sr"><div class="sc">Money Factor</div><div class="st"><div class="sf c" style="width:52%"></div></div><div class="sg" style="color:var(--copper)">C+</div></div>
+    <div class="sr"><div class="sc">Residual Value</div><div class="st"><div class="sf b" style="width:72%"></div></div><div class="sg" style="color:var(--sage)">B+</div></div>
+    <div class="sr"><div class="sc">Selling Price</div><div class="st"><div class="sf a" style="width:78%"></div></div><div class="sg" style="color:var(--sage)">A-</div></div>
+  </div>
+  <div class="ins"><div class="ins-i">💡</div><div class="ins-t"><strong>Your biggest opportunity is the money factor.</strong> At 0.00189 (4.5% APR), you're paying above the buy rate of 0.00125 (3.0% APR). That markup costs <strong>~$34/mo — or $1,224 over the lease.</strong> Everything else scores well.</div></div>
+</div>
+
+<!-- 03 MF DEEP DIVE -->
+<div class="sec">
+  <div class="sn">03</div>
+  <h2 class="sh">The money factor: <em>your hidden cost</em></h2>
+  <p class="ss">The single biggest lever dealers use to increase profit. Most shoppers never see it.</p>
+  <div class="mg">
+    <div class="m bad"><div class="ml">Your Money Factor</div><div class="mv">0.00189</div><div class="ms">≈ 4.54% APR</div></div>
+    <div class="m ok"><div class="ml">Buy Rate (Base)</div><div class="mv">0.00125</div><div class="ms">≈ 3.00% APR</div></div>
+  </div>
+  <div class="m hi mf" style="margin:10px 0 18px"><div class="ml">Dealer Markup</div><div class="mv">+0.00064 <span style="font-size:0.82rem;color:var(--copper)">→ $1,224 over your lease</span></div><div class="ms">Pure dealer profit on financing — added in 30 seconds, costs you $34/month</div></div>
+  <div class="nar">Honda Financial sets a base money factor of <strong>0.00125</strong>. Your dealer marked it up to <strong>0.00189</strong>. That 0.00064 difference adds <strong>$34 to every monthly payment</strong>. It doesn't appear on any standard dealer quote — which is exactly why it works.</div>
+</div>
+
+<!-- 04 COMPARABLES -->
+<div class="sec">
+  <div class="sn">04</div>
+  <h2 class="sh">What others paid <em>nearby</em></h2>
+  <p class="ss">Recent verified CR-V deals in Bergen and surrounding NJ counties. Your deal is highlighted.</p>
+  <table class="dtbl">
+    <thead><tr><th>Trim</th><th>Payment</th><th>Due at Sign</th><th>MF</th><th>County</th></tr></thead>
+    <tbody>
+      <tr class="you"><td>EX-L AWD</td><td>$412/mo</td><td>$2,500</td><td>.00189</td><td>Bergen</td></tr>
+      <tr><td>Sport Hybrid</td><td>$389/mo</td><td>$2,000</td><td>.00195</td><td>Essex</td></tr>
+      <tr><td>EX-L AWD</td><td>$425/mo</td><td>$2,800</td><td>.00165</td><td>Bergen</td></tr>
+      <tr><td>EX-L AWD</td><td>$445/mo</td><td>$3,000</td><td>.00150</td><td>Morris</td></tr>
+      <tr><td>Sport</td><td>$395/mo</td><td>$2,200</td><td>.00170</td><td>Passaic</td></tr>
+      <tr><td>Hybrid Sport-L</td><td>$465/mo</td><td>$1,500</td><td>.00140</td><td>Hudson</td></tr>
+    </tbody>
+  </table>
+  <div class="dtbl-note">6 verified NJ deals from the last 90 days · Showing up to 8 comparable deals · Search expanded from Bergen → neighboring counties</div>
+  <div class="ins"><div class="ins-i">📊</div><div class="ins-t">Your payment ranks in the <strong>lower third</strong> — that's good. But notice the Morris County deal: $445/mo with a <strong>0.00150 MF</strong>. Higher payment, <strong>lower total cost</strong> because of better financing. Fix the MF and you get the best of both.</div></div>
+</div>
+
+<!-- 05 DEALER SIGNALS -->
+<div class="sec">
+  <div class="sn">05</div>
+  <h2 class="sh">Dealer pricing <em>signals</em></h2>
+  <p class="ss">How Honda of Paramus priced your deal — and how they compare to other NJ Honda dealers.</p>
+
+  <div class="dlr">
+    <div class="dlr-head">
+      <div class="dlr-name">Honda of Paramus</div>
+      <div class="dlr-badge avg">Average Pricing</div>
+    </div>
+    <div class="dlr-stats">
+      <div><div class="dlr-stat-l">Discount off MSRP</div><div class="dlr-stat-v">3.1%</div></div>
+      <div><div class="dlr-stat-l">MF Markup</div><div class="dlr-stat-v">+0.00064</div></div>
+      <div><div class="dlr-stat-l">Deals Observed</div><div class="dlr-stat-v">4</div></div>
+    </div>
+    <div class="dlr-obs">This dealer typically offers average vehicle discounts (2-4% off MSRP) but marks up the money factor. Their margin comes from financing, not the sticker price. Shoppers who negotiate the MF specifically tend to get better overall deals here.</div>
   </div>
 
-  <!-- NAV -->
-  <nav>
-    <a href="index.html" class="nav-logo">Lease<span>Checkr</span></a>
-    <div class="nav-right">
-      <a href="pricing.html">Pricing</a>
-      <a href="founder.html" class="nav-cta">Founding Member</a>
-    </div>
-  </nav>
-
-  <div class="report-wrapper">
-
-    <!-- REPORT HEADER -->
-    <div class="report-header">
-      <div class="report-meta">
-        <span class="report-id">Report #NJ-2024-08847 · Sample</span>
-        <span class="report-date">March 2026 · Bergen County, NJ</span>
-      </div>
-      <div class="report-vehicle">
-        <h1>2024 Honda CR-V EX-L AWD</h1>
-        <div class="report-vehicle-sub">
-          <span>36-month lease</span>
-          <span>10,000 mi/yr</span>
-          <span>Submitted by NJ Driver</span>
-        </div>
-      </div>
-      <div class="report-scores">
-        <div class="score-grade">
-          <div class="grade-big">B+</div>
-          <div class="grade-label">Overall Grade</div>
-        </div>
-        <div class="score-metric">
-          <div class="score-metric-value">$412/mo</div>
-          <div class="score-metric-label">Your Payment</div>
-          <div class="score-metric-delta">↓ $26 below avg</div>
-        </div>
-        <div class="score-metric">
-          <div class="score-metric-value">Fair Deal</div>
-          <div class="score-metric-label">Verdict</div>
-          <div class="score-metric-delta">Top 38% in county</div>
-        </div>
-        <div class="score-metric">
-          <div class="score-metric-value">$312</div>
-          <div class="score-metric-label">Potential Savings</div>
-          <div class="score-metric-delta negative">Over 36 months</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SECTION 1: DEAL BREAKDOWN -->
-    <div class="section-card">
-      <div class="section-card-header">
-        <div class="section-card-title"><span class="icon">📋</span> Full Deal Breakdown</div>
-        <span class="section-status status-fair">Review Needed</span>
-      </div>
-      <div class="section-card-body">
-        <div class="breakdown-grid">
-          <div class="breakdown-item">
-            <div class="breakdown-label">Monthly Payment</div>
-            <div class="breakdown-value">$412.00</div>
-            <div class="breakdown-context">Incl. taxes &amp; fees</div>
-            <span class="breakdown-flag flag-good">Good</span>
-          </div>
-          <div class="breakdown-item">
-            <div class="breakdown-label">Capitalized Cost</div>
-            <div class="breakdown-value">$36,450</div>
-            <div class="breakdown-context">MSRP: $37,200 · Discount: $750</div>
-            <span class="breakdown-flag flag-watch">Low Discount</span>
-          </div>
-          <div class="breakdown-item">
-            <div class="breakdown-label">Residual Value</div>
-            <div class="breakdown-value">57% · $21,204</div>
-            <div class="breakdown-context">Honda Financial — March 2026</div>
-            <span class="breakdown-flag flag-good">At Program</span>
-          </div>
-          <div class="breakdown-item">
-            <div class="breakdown-label">Money Factor</div>
-            <div class="breakdown-value">0.00189</div>
-            <div class="breakdown-context">Equivalent to 4.54% APR</div>
-            <span class="breakdown-flag flag-watch">Marked Up</span>
-          </div>
-          <div class="breakdown-item">
-            <div class="breakdown-label">Drive-Off</div>
-            <div class="breakdown-value">$1,850</div>
-            <div class="breakdown-context">First month + fees + tax</div>
-            <span class="breakdown-flag flag-good">Normal</span>
-          </div>
-          <div class="breakdown-item">
-            <div class="breakdown-label">Dealer Add-Ons</div>
-            <div class="breakdown-value">$895</div>
-            <div class="breakdown-context">Wheel protection, tint</div>
-            <span class="breakdown-flag flag-high">Avoidable</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SECTION 2: MONEY FACTOR -->
-    <div class="section-card">
-      <div class="section-card-header">
-        <div class="section-card-title"><span class="icon">💰</span> Money Factor Analysis</div>
-        <span class="section-status status-fair">Marked Up</span>
-      </div>
-      <div class="section-card-body">
-        <div class="mf-comparison">
-          <div class="mf-card">
-            <div class="mf-label">Buy Rate (Base)</div>
-            <div class="mf-value">0.00159</div>
-            <div class="mf-apr">≈ 3.82% APR</div>
-          </div>
-          <div class="mf-card highlight">
-            <div class="mf-label">Your Rate</div>
-            <div class="mf-value">0.00189</div>
-            <div class="mf-apr">≈ 4.54% APR</div>
-          </div>
-          <div class="mf-card">
-            <div class="mf-label">Markup</div>
-            <div class="mf-value" style="color: var(--rose);">+0.00030</div>
-            <div class="mf-apr" style="color: var(--rose);">+$9/mo · $312 over term</div>
-          </div>
-        </div>
-        <div class="mf-verdict">
-          <strong>Your dealer marked up the money factor by 0.00030 above the Honda Financial buy rate.</strong> This is legal and common — dealers earn this as profit. However, the buy rate is negotiable. Had you negotiated back to 0.00159, your payment would have been approximately $403/mo — saving $312 over the 36-month term.
-        </div>
-      </div>
-    </div>
-
-    <!-- SECTION 4: DEALER SIGNALS -->
-    <!-- IN YOUR NEIGHBORHOOD -->
-    <div class="section-card">
-      <div class="section-card-header">
-        <div class="section-card-title"><span class="icon">📍</span> In Your Neighborhood — Bergen County</div>
-        <span class="section-status status-good">4 Nearby Deals Found</span>
-      </div>
-      <div class="section-card-body">
-
-        <!-- ═══ STATE 1: ZIP DATA EXISTS (default shown in sample) ═══ -->
-        <div id="nhState1">
-          <p style="font-size:0.83rem;color:var(--ink-3);line-height:1.65;margin-bottom:20px;">
-            Verified lease deals for the same vehicle submitted by drivers within your county in the last 60 days. These are real transactions — not estimates.
-          </p>
-
-          <div style="overflow-x:auto;">
-            <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">
-              <thead>
-                <tr style="border-bottom:2px solid var(--border-2);">
-                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Vehicle</th>
-                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Payment</th>
-                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Term</th>
-                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Drive-Off</th>
-                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Submitted</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr style="border-bottom:1px solid var(--border);">
-                  <td style="padding:12px;color:var(--ink-2);">2024 CR-V EX-L AWD</td>
-                  <td style="padding:12px;"><strong style="color:var(--sage);">$408/mo</strong></td>
-                  <td style="padding:12px;color:var(--ink-3);">36 mo · 10k</td>
-                  <td style="padding:12px;color:var(--ink-3);">$1,800</td>
-                  <td style="padding:12px;font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-4);">11 days ago</td>
-                </tr>
-                <tr style="border-bottom:1px solid var(--border);">
-                  <td style="padding:12px;color:var(--ink-2);">2024 CR-V EX-L AWD</td>
-                  <td style="padding:12px;"><strong style="color:var(--sage);">$421/mo</strong></td>
-                  <td style="padding:12px;color:var(--ink-3);">36 mo · 10k</td>
-                  <td style="padding:12px;color:var(--ink-3);">$2,100</td>
-                  <td style="padding:12px;font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-4);">18 days ago</td>
-                </tr>
-                <tr style="border-bottom:1px solid var(--border);">
-                  <td style="padding:12px;color:var(--ink-2);">2024 CR-V EX-L FWD</td>
-                  <td style="padding:12px;"><strong style="color:var(--copper);">$398/mo</strong></td>
-                  <td style="padding:12px;color:var(--ink-3);">36 mo · 12k</td>
-                  <td style="padding:12px;color:var(--ink-3);">$2,500</td>
-                  <td style="padding:12px;font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-4);">24 days ago</td>
-                </tr>
-                <tr>
-                  <td style="padding:12px;color:var(--ink-2);">2024 CR-V EX-L AWD</td>
-                  <td style="padding:12px;"><strong style="color:var(--rose);">$449/mo</strong></td>
-                  <td style="padding:12px;color:var(--ink-3);">39 mo · 10k</td>
-                  <td style="padding:12px;color:var(--ink-3);">$1,500</td>
-                  <td style="padding:12px;font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-4);">31 days ago</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div style="margin-top:18px;padding:12px 16px;background:var(--canvas-2);border-radius:3px;border:1px solid var(--border);font-size:0.76rem;color:var(--ink-4);line-height:1.6;">
-            Payments shown are effective monthly cost normalised to the same drive-off for comparability. FWD vs AWD affects residual and payment — your quote is AWD.
-          </div>
-
-          <!-- NEARBY DEALERS -->
-          <div style="margin-top:28px;padding-top:24px;border-top:1px solid var(--border);">
-            <div style="font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--copper);margin-bottom:16px;">Honda Dealers Within 10 Miles — Bergen County</div>
-            <p style="font-size:0.78rem;color:var(--ink-4);line-height:1.6;margin-bottom:18px;">Average lease payment for a 2024 CR-V EX-L AWD · 36mo · 10k · based on verified submissions at each location.</p>
-            <div style="display:flex;flex-direction:column;gap:0;">
-              <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border);">
-                <div style="font-size:0.85rem;font-weight:500;color:var(--ink);">DCH Paramus Honda</div>
-                <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:400;color:var(--ink);line-height:1;">$428<span style="font-size:0.7rem;color:var(--ink-4);font-family:'DM Sans',sans-serif;">/mo avg</span></div>
-              </div>
-              <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border);">
-                <div style="font-size:0.85rem;font-weight:500;color:var(--ink);">Wayne Honda</div>
-                <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:400;color:var(--ink);line-height:1;">$441<span style="font-size:0.7rem;color:var(--ink-4);font-family:'DM Sans',sans-serif;">/mo avg</span></div>
-              </div>
-              <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 0;">
-                <div style="font-size:0.85rem;font-weight:500;color:var(--ink);">Meadowlands Honda</div>
-                <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:400;color:var(--ink);line-height:1;">$452<span style="font-size:0.7rem;color:var(--ink-4);font-family:'DM Sans',sans-serif;">/mo avg</span></div>
-              </div>
-            </div>
-            <div style="margin-top:14px;font-size:0.72rem;font-style:italic;color:var(--ink-4);line-height:1.55;">
-              Dealer averages are based on verified submissions only. Fewer submissions means less certainty — treat single-deal figures as directional, not definitive.
-            </div>
-          </div>
-        </div>
-
-        <!-- ═══ STATE 2: COUNTY DATA ONLY — no zip-level deals ═══ -->
-        <div id="nhState2" style="display:none;">
-          <div style="padding:14px 16px;background:#faf3ea;border:1px solid rgba(168,105,46,0.2);border-radius:6px;margin-bottom:20px;">
-            <div style="font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--copper);margin-bottom:6px;">No zip-level data for your area yet</div>
-            <p style="font-size:0.8rem;color:var(--ink-3);line-height:1.6;margin:0;">
-              We don't have verified deals from your zip code yet — so we're showing Bergen County benchmarks instead. County-level data is still useful, but local zip comparisons are more precise.
-            </p>
-            <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(168,105,46,0.15);font-size:0.75rem;color:var(--ink-3);">
-              Have a signed lease? <a href="intake-upload.html" style="color:var(--copper);text-decoration:none;border-bottom:1px solid rgba(168,105,46,0.3);">Upload it and be the first from your zip</a> — future neighbors will see your deal and you'll unlock your full report free.
-            </div>
-          </div>
-
-          <p style="font-size:0.83rem;color:var(--ink-3);line-height:1.65;margin-bottom:20px;">
-            Verified deals for the same vehicle across Bergen County in the last 90 days.
-          </p>
-          <div style="overflow-x:auto;">
-            <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">
-              <thead>
-                <tr style="border-bottom:2px solid var(--border-2);">
-                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Vehicle</th>
-                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Payment</th>
-                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Term</th>
-                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Drive-Off</th>
-                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Submitted</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr style="border-bottom:1px solid var(--border);">
-                  <td style="padding:12px;color:var(--ink-2);">2024 CR-V EX-L AWD</td>
-                  <td style="padding:12px;"><strong style="color:var(--sage);">$408/mo</strong></td>
-                  <td style="padding:12px;color:var(--ink-3);">36 mo · 10k</td>
-                  <td style="padding:12px;color:var(--ink-3);">$1,800</td>
-                  <td style="padding:12px;font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-4);">Bergen Co. · 11 days ago</td>
-                </tr>
-                <tr style="border-bottom:1px solid var(--border);">
-                  <td style="padding:12px;color:var(--ink-2);">2024 CR-V EX-L AWD</td>
-                  <td style="padding:12px;"><strong style="color:var(--copper);">$421/mo</strong></td>
-                  <td style="padding:12px;color:var(--ink-3);">36 mo · 10k</td>
-                  <td style="padding:12px;color:var(--ink-3);">$2,100</td>
-                  <td style="padding:12px;font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-4);">Bergen Co. · 28 days ago</td>
-                </tr>
-                <tr>
-                  <td style="padding:12px;color:var(--ink-2);">2024 CR-V EX-L AWD</td>
-                  <td style="padding:12px;"><strong style="color:var(--rose);">$449/mo</strong></td>
-                  <td style="padding:12px;color:var(--ink-3);">39 mo · 10k</td>
-                  <td style="padding:12px;color:var(--ink-3);">$1,500</td>
-                  <td style="padding:12px;font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--ink-4);">Bergen Co. · 45 days ago</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- ═══ STATE 3: NO LOCAL DATA — show neighboring counties ═══ -->
-        <div id="nhState3" style="display:none;">
-          <div style="padding:14px 16px;background:var(--canvas-2);border:1px solid var(--border);border-radius:6px;margin-bottom:24px;">
-            <div style="font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-4);margin-bottom:6px;">We're still building data for your county</div>
-            <p style="font-size:0.8rem;color:var(--ink-3);line-height:1.6;margin:0;">
-              We don't have enough verified deals in your county yet to show local benchmarks. The grade in this report uses the NJ statewide average — it's directional, but not as precise as county-level data would be.
-            </p>
-            <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:0.75rem;color:var(--ink-3);">
-              Be among the first to contribute from your county. <a href="intake-upload.html" style="color:var(--copper);text-decoration:none;border-bottom:1px solid rgba(168,105,46,0.3);">Upload your lease and unlock your full report free →</a>
-            </div>
-          </div>
-
-          <div style="font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-4);margin-bottom:16px;">Neighboring Counties — For Reference Only</div>
-          <p style="font-size:0.8rem;color:var(--ink-3);line-height:1.6;margin-bottom:18px;">
-            These deals are from adjacent counties. Markets differ — use these as a directional reference, not a direct comparison.
-          </p>
-
-          <div style="overflow-x:auto;">
-            <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">
-              <thead>
-                <tr style="border-bottom:2px solid var(--border-2);">
-                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Vehicle</th>
-                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">County</th>
-                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Payment</th>
-                  <th style="text-align:left;padding:8px 12px;font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4);font-weight:400;">Term</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr style="border-bottom:1px solid var(--border);">
-                  <td style="padding:12px;color:var(--ink-2);">2024 CR-V EX-L AWD</td>
-                  <td style="padding:12px;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--ink-4);">Morris</td>
-                  <td style="padding:12px;"><strong style="color:var(--sage);">$428/mo</strong></td>
-                  <td style="padding:12px;color:var(--ink-3);">36 mo · 10k</td>
-                </tr>
-                <tr style="border-bottom:1px solid var(--border);">
-                  <td style="padding:12px;color:var(--ink-2);">2024 CR-V EX-L AWD</td>
-                  <td style="padding:12px;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--ink-4);">Somerset</td>
-                  <td style="padding:12px;"><strong style="color:var(--copper);">$435/mo</strong></td>
-                  <td style="padding:12px;color:var(--ink-3);">36 mo · 10k</td>
-                </tr>
-                <tr>
-                  <td style="padding:12px;color:var(--ink-2);">2024 CR-V EX-L AWD</td>
-                  <td style="padding:12px;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--ink-4);">Middlesex</td>
-                  <td style="padding:12px;"><strong style="color:var(--copper);">$432/mo</strong></td>
-                  <td style="padding:12px;color:var(--ink-3);">36 mo · 10k</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div style="margin-top:14px;padding:10px 14px;background:var(--canvas-2);border-radius:4px;border:1px solid var(--border);font-size:0.72rem;font-style:italic;color:var(--ink-4);line-height:1.55;">
-            These deals are from neighboring counties, not your local market. Treat them as a broad reference only. Dealer incentives, local demand, and tax structures vary by county.
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-
-    <!-- SECTION 4: COMPARABLE DEALS -->
-    <div class="section-card">
-      <div class="section-card-header">
-        <div class="section-card-title"><span class="icon">📊</span> Comparable NJ Deals — 2024 CR-V EX-L</div>
-        <span class="section-status status-good">8 Verified Comps</span>
-      </div>
-      <div class="section-card-body">
-        <table class="comps-table">
-          <thead>
-            <tr>
-              <th>Deal</th>
-              <th>County</th>
-              <th>Payment</th>
-              <th>Drive-Off</th>
-              <th>MF</th>
-              <th>Grade</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Verified Deal</td>
-              <td>Morris</td>
-              <td><strong>$389/mo</strong></td>
-              <td>$1,200</td>
-              <td>0.00159</td>
-              <td><span class="deal-badge" style="background:var(--sage-pale);color:var(--sage)">A</span></td>
-            </tr>
-            <tr>
-              <td>Verified Deal</td>
-              <td>Bergen</td>
-              <td><strong>$398/mo</strong></td>
-              <td>$2,100</td>
-              <td>0.00162</td>
-              <td><span class="deal-badge" style="background:var(--sage-pale);color:var(--sage)">A−</span></td>
-            </tr>
-            <tr>
-              <td>Verified Deal</td>
-              <td>Middlesex</td>
-              <td><strong>$405/mo</strong></td>
-              <td>$1,500</td>
-              <td>0.00171</td>
-              <td><span class="deal-badge" style="background:var(--sage-pale);color:var(--sage)">B+</span></td>
-            </tr>
-            <tr class="your-deal">
-              <td>Your Deal</td>
-              <td>Bergen</td>
-              <td><strong>$412/mo</strong></td>
-              <td>$1,850</td>
-              <td>0.00189</td>
-              <td><span class="deal-badge" style="background:var(--sage-pale);color:var(--sage)">B+</span></td>
-            </tr>
-            <tr>
-              <td>Verified Deal</td>
-              <td>Essex</td>
-              <td><strong>$428/mo</strong></td>
-              <td>$1,950</td>
-              <td>0.00195</td>
-              <td><span class="deal-badge" style="background:var(--copper-pale);color:var(--copper)">C+</span></td>
-            </tr>
-            <tr>
-              <td>Verified Deal</td>
-              <td>Hudson</td>
-              <td><strong>$441/mo</strong></td>
-              <td>$2,400</td>
-              <td>0.00201</td>
-              <td><span class="deal-badge" style="background:var(--copper-pale);color:var(--copper)">C</span></td>
-            </tr>
-            <tr>
-              <td>Verified Deal</td>
-              <td>Union</td>
-              <td><strong>$458/mo</strong></td>
-              <td>$2,200</td>
-              <td>0.00215</td>
-              <td><span class="deal-badge" style="background:var(--rose-pale);color:var(--rose)">D+</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-
-    <div class="section-card">
-      <div class="section-card-header">
-        <div class="section-card-title"><span class="icon">🏪</span> Dealer Pricing Signals</div>
-        <span class="section-status status-fair">2 Flags</span>
-      </div>
-      <div class="section-card-body">
-        <div class="signals-grid">
-          <div class="signal-item">
-            <div class="signal-dot dot-good"></div>
-            <div>
-              <div class="signal-title">Residual at Program Rate</div>
-              <div class="signal-desc">The residual value of 57% matches Honda Financial's published program rate for March 2026. No manipulation detected.</div>
-            </div>
-          </div>
-          <div class="signal-item">
-            <div class="signal-dot dot-watch"></div>
-            <div>
-              <div class="signal-title">Money Factor Marked Up</div>
-              <div class="signal-desc">Dealer marked up the MF by 0.00030 above buy rate. Common practice — but fully negotiable at signing.</div>
-            </div>
-          </div>
-          <div class="signal-item">
-            <div class="signal-dot dot-bad"></div>
-            <div>
-              <div class="signal-title">Add-Ons Added to Cap Cost</div>
-              <div class="signal-desc">$895 in dealer add-ons were rolled into the cap cost, increasing your monthly payment by ~$8/mo over the term.</div>
-            </div>
-          </div>
-          <div class="signal-item">
-            <div class="signal-dot dot-good"></div>
-            <div>
-              <div class="signal-title">Drive-Off Within Normal Range</div>
-              <div class="signal-desc">Your $1,850 drive-off is within the normal range for Bergen County Honda dealers. No unusual upfront fees detected.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SECTION 5: MARKET TRENDS -->
-    <div class="section-card">
-      <div class="section-card-header">
-        <div class="section-card-title"><span class="icon">📈</span> Bergen County Market Trends — CR-V</div>
-        <span class="section-status status-good">Improving</span>
-      </div>
-      <div class="section-card-body">
-        <div class="trend-bars">
-          <div class="trend-row">
-            <div class="trend-month">Nov 2025</div>
-            <div class="trend-bar-track"><div class="trend-bar-fill" style="width:88%"></div></div>
-            <div class="trend-value">$448/mo</div>
-          </div>
-          <div class="trend-row">
-            <div class="trend-month">Dec 2025</div>
-            <div class="trend-bar-track"><div class="trend-bar-fill" style="width:83%"></div></div>
-            <div class="trend-value">$441/mo</div>
-          </div>
-          <div class="trend-row">
-            <div class="trend-month">Jan 2026</div>
-            <div class="trend-bar-track"><div class="trend-bar-fill" style="width:80%"></div></div>
-            <div class="trend-value">$436/mo</div>
-          </div>
-          <div class="trend-row">
-            <div class="trend-month">Feb 2026</div>
-            <div class="trend-bar-track"><div class="trend-bar-fill" style="width:76%"></div></div>
-            <div class="trend-value">$431/mo</div>
-          </div>
-          <div class="trend-row">
-            <div class="trend-month">Mar 2026</div>
-            <div class="trend-bar-track"><div class="trend-bar-fill current" style="width:72%"></div></div>
-            <div class="trend-value">$426/mo</div>
-          </div>
-        </div>
-        <div class="trend-insight">
-          <strong>Bergen County CR-V lease payments have dropped 4.9% over the past 4 months.</strong> If you're still in negotiation, the market is moving in your favor. Deals signed in February were averaging $431/mo — March is trending lower.
-        </div>
-      </div>
-    </div>
-
-    <!-- SECTION 6: AT THE DEALER — NEGOTIATION TIPS -->
-    <div class="section-card">
-      <div class="section-card-header">
-        <div class="section-card-title"><span class="icon">🤝</span> If You're at the Dealer Right Now</div>
-        <span class="section-status status-fair">Act on This</span>
-      </div>
-      <div class="section-card-body">
-        <div style="background:var(--copper-pale); border-left:3px solid var(--copper); padding:14px 18px; border-radius:0 3px 3px 0; margin-bottom:24px; font-size:0.85rem; color:var(--ink-light); line-height:1.6;">
-          <strong>Based on your deal analysis, here are the 3 things you can still negotiate before signing.</strong> These are specific to your CR-V deal in Bergen County.
-        </div>
-        <div style="display:flex; flex-direction:column; gap:14px;">
-          <div style="background:var(--canvas); border-radius:3px; padding:18px 20px; display:flex; gap:16px; align-items:flex-start;">
-            <div style="background:var(--rose-pale); color:var(--rose); font-family:'DM Mono',monospace; font-size:0.7rem; font-weight:500; padding:4px 10px; border-radius:2px; flex-shrink:0; margin-top:2px;">HIGH IMPACT</div>
-            <div>
-              <div style="font-size:0.88rem; font-weight:500; margin-bottom:4px;">Ask them to match the buy rate money factor</div>
-              <div style="font-size:0.78rem; color:var(--ink-muted); line-height:1.6;">Say: <em>"I know the Honda Financial buy rate is 0.00159. I'd like to lease at that rate."</em> The dealer may say no — but asking saves you $312 if they agree. This is the single highest-impact move.</div>
-            </div>
-          </div>
-          <div style="background:var(--canvas); border-radius:3px; padding:18px 20px; display:flex; gap:16px; align-items:flex-start;">
-            <div style="background:var(--rose-pale); color:var(--rose); font-family:'DM Mono',monospace; font-size:0.7rem; font-weight:500; padding:4px 10px; border-radius:2px; flex-shrink:0; margin-top:2px;">HIGH IMPACT</div>
-            <div>
-              <div style="font-size:0.88rem; font-weight:500; margin-bottom:4px;">Remove the $895 dealer add-ons</div>
-              <div style="font-size:0.78rem; color:var(--ink-muted); line-height:1.6;">Say: <em>"I'd like to remove the wheel protection and tint from the deal."</em> These are almost always optional. Removing them reduces your cap cost and your monthly payment by ~$8/mo.</div>
-            </div>
-          </div>
-          <div style="background:var(--canvas); border-radius:3px; padding:18px 20px; display:flex; gap:16px; align-items:flex-start;">
-            <div style="background:var(--copper-pale); color:var(--copper); font-family:'DM Mono',monospace; font-size:0.7rem; font-weight:500; padding:4px 10px; border-radius:2px; flex-shrink:0; margin-top:2px;">MEDIUM</div>
-            <div>
-              <div style="font-size:0.88rem; font-weight:500; margin-bottom:4px;">Negotiate the cap cost down by $500–750</div>
-              <div style="font-size:0.78rem; color:var(--ink-muted); line-height:1.6;">The best Bergen County CR-V deal we've seen this month had a cap cost of $35,700 vs your $36,450. A $750 reduction saves you roughly $7/mo — $252 over the term. Offer $35,900 and see what happens.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SECTION 7: DEALER CHECKLIST -->
-    <div class="section-card">
-      <div class="section-card-header">
-        <div class="section-card-title"><span class="icon">✅</span> Pre-Signing Checklist</div>
-        <span class="section-status status-good">Print or Screenshot This</span>
-      </div>
-      <div class="section-card-body">
-        <div style="font-size:0.82rem; color:var(--ink-muted); margin-bottom:20px; line-height:1.6;">Go through every item before you sign. Dealers move fast — this checklist slows things down in your favor.</div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-          <div style="background:var(--canvas); border-radius:3px; padding:14px 16px; display:flex; gap:12px; align-items:flex-start;">
-            <span style="color:var(--sage); font-size:1rem; flex-shrink:0;">☐</span>
-            <div>
-              <div style="font-size:0.82rem; font-weight:500; margin-bottom:2px;">Confirm the money factor</div>
-              <div style="font-size:0.72rem; color:var(--ink-muted);">Ask: "What is the money factor on this deal?" Write it down.</div>
-            </div>
-          </div>
-          <div style="background:var(--canvas); border-radius:3px; padding:14px 16px; display:flex; gap:12px; align-items:flex-start;">
-            <span style="color:var(--sage); font-size:1rem; flex-shrink:0;">☐</span>
-            <div>
-              <div style="font-size:0.82rem; font-weight:500; margin-bottom:2px;">Confirm the residual percentage</div>
-              <div style="font-size:0.72rem; color:var(--ink-muted);">Should match the manufacturer's published rate. Compare to Edmunds.</div>
-            </div>
-          </div>
-          <div style="background:var(--canvas); border-radius:3px; padding:14px 16px; display:flex; gap:12px; align-items:flex-start;">
-            <span style="color:var(--sage); font-size:1rem; flex-shrink:0;">☐</span>
-            <div>
-              <div style="font-size:0.82rem; font-weight:500; margin-bottom:2px;">Review every line of the cap cost</div>
-              <div style="font-size:0.72rem; color:var(--ink-muted);">Ask for an itemized cap cost sheet. Look for dealer add-ons buried in the number.</div>
-            </div>
-          </div>
-          <div style="background:var(--canvas); border-radius:3px; padding:14px 16px; display:flex; gap:12px; align-items:flex-start;">
-            <span style="color:var(--sage); font-size:1rem; flex-shrink:0;">☐</span>
-            <div>
-              <div style="font-size:0.82rem; font-weight:500; margin-bottom:2px;">Decline all add-ons you didn't ask for</div>
-              <div style="font-size:0.72rem; color:var(--ink-muted);">Wheel protection, paint sealant, tint, GAP insurance (usually already included). Say no to all.</div>
-            </div>
-          </div>
-          <div style="background:var(--canvas); border-radius:3px; padding:14px 16px; display:flex; gap:12px; align-items:flex-start;">
-            <span style="color:var(--sage); font-size:1rem; flex-shrink:0;">☐</span>
-            <div>
-              <div style="font-size:0.82rem; font-weight:500; margin-bottom:2px;">Verify drive-off is first month + DMV fees only</div>
-              <div style="font-size:0.72rem; color:var(--ink-muted);">Question any "doc fees" over $500 or bank acquisition fees over $895 on Honda.</div>
-            </div>
-          </div>
-          <div style="background:var(--canvas); border-radius:3px; padding:14px 16px; display:flex; gap:12px; align-items:flex-start;">
-            <span style="color:var(--sage); font-size:1rem; flex-shrink:0;">☐</span>
-            <div>
-              <div style="font-size:0.82rem; font-weight:500; margin-bottom:2px;">Check the mileage allowance</div>
-              <div style="font-size:0.72rem; color:var(--ink-muted);">10k/yr is standard. If you drive more, negotiate 12k upfront — it's cheaper than overage charges.</div>
-            </div>
-          </div>
-          <div style="background:var(--canvas); border-radius:3px; padding:14px 16px; display:flex; gap:12px; align-items:flex-start;">
-            <span style="color:var(--sage); font-size:1rem; flex-shrink:0;">☐</span>
-            <div>
-              <div style="font-size:0.82rem; font-weight:500; margin-bottom:2px;">Do the math yourself: (Cap − Residual) ÷ Term + (Cap + Residual) × MF</div>
-              <div style="font-size:0.72rem; color:var(--ink-muted);">If your calculated payment is more than $5 off the dealer's number, ask them to explain the difference.</div>
-            </div>
-          </div>
-          <div style="background:var(--canvas); border-radius:3px; padding:14px 16px; display:flex; gap:12px; align-items:flex-start;">
-            <span style="color:var(--sage); font-size:1rem; flex-shrink:0;">☐</span>
-            <div>
-              <div style="font-size:0.82rem; font-weight:500; margin-bottom:2px;">Never tell them your target monthly payment</div>
-              <div style="font-size:0.72rem; color:var(--ink-muted);">Dealers optimize to hit your number — not to give you the best deal. Focus on cap cost and MF instead.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SECTION 8: ZIP CODE ANALYSIS -->
-    <div class="section-card">
-      <div class="section-card-header">
-        <div class="section-card-title"><span class="icon">📍</span> Recent Deals Near You — Bergen County, NJ</div>
-        <span class="section-status status-good">Last 60 Days</span>
-      </div>
-      <div class="section-card-body">
-        <div style="font-size:0.82rem; color:var(--ink-muted); margin-bottom:20px; line-height:1.6;">Verified deals submitted by LeaseCheckr members in and around Bergen County. All data anonymized. Vehicle, payment, and grade shown.</div>
-
-        <!-- ZIP MAP LEGEND -->
-        <div style="display:flex; gap:20px; margin-bottom:20px; flex-wrap:wrap;">
-          <div style="display:flex; align-items:center; gap:6px; font-size:0.72rem; color:var(--ink-muted);"><span style="width:10px;height:10px;border-radius:50%;background:var(--sage);display:inline-block;"></span> Great Deal (A/A−)</div>
-          <div style="display:flex; align-items:center; gap:6px; font-size:0.72rem; color:var(--ink-muted);"><span style="width:10px;height:10px;border-radius:50%;background:var(--copper);display:inline-block;"></span> Fair Deal (B/B+)</div>
-          <div style="display:flex; align-items:center; gap:6px; font-size:0.72rem; color:var(--ink-muted);"><span style="width:10px;height:10px;border-radius:50%;background:var(--rose);display:inline-block;"></span> Overpaying (C or below)</div>
-        </div>
-
-        <!-- DEALS BY ZIP -->
-        <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:24px;">
-          <div style="display:grid; grid-template-columns:70px 1fr auto auto auto; gap:12px; align-items:center; padding:12px 16px; background:var(--canvas); border-radius:3px; font-size:0.8rem;">
-            <span style="font-family:'DM Mono',monospace; font-size:0.68rem; color:var(--ink-muted);">07601</span>
-            <span style="color:var(--ink-light);">2024 Honda CR-V EX-L · Hackensack</span>
-            <span style="font-weight:500;">$389/mo</span>
-            <span style="font-size:0.7rem; color:var(--ink-muted);">36mo / 10k</span>
-            <span style="background:var(--sage-pale); color:var(--sage); font-family:'DM Mono',monospace; font-size:0.6rem; padding:3px 8px; border-radius:2px;">A</span>
-          </div>
-          <div style="display:grid; grid-template-columns:70px 1fr auto auto auto; gap:12px; align-items:center; padding:12px 16px; background:var(--canvas); border-radius:3px; font-size:0.8rem;">
-            <span style="font-family:'DM Mono',monospace; font-size:0.68rem; color:var(--ink-muted);">07452</span>
-            <span style="color:var(--ink-light);">2024 Toyota RAV4 XLE · Glen Rock</span>
-            <span style="font-weight:500;">$401/mo</span>
-            <span style="font-size:0.7rem; color:var(--ink-muted);">36mo / 12k</span>
-            <span style="background:var(--sage-pale); color:var(--sage); font-family:'DM Mono',monospace; font-size:0.6rem; padding:3px 8px; border-radius:2px;">A−</span>
-          </div>
-          <div style="display:grid; grid-template-columns:70px 1fr auto auto auto; gap:12px; align-items:center; padding:12px 16px; background:rgba(92,122,101,0.06); border:1px solid rgba(92,122,101,0.15); border-radius:3px; font-size:0.8rem; font-weight:500;">
-            <span style="font-family:'DM Mono',monospace; font-size:0.68rem; color:var(--copper);">07450</span>
-            <span style="color:var(--ink);">2024 Honda CR-V EX-L · Ridgewood ← You</span>
-            <span style="font-weight:600;">$412/mo</span>
-            <span style="font-size:0.7rem; color:var(--ink-muted);">36mo / 10k</span>
-            <span style="background:var(--sage-pale); color:var(--sage); font-family:'DM Mono',monospace; font-size:0.6rem; padding:3px 8px; border-radius:2px;">B+</span>
-          </div>
-          <div style="display:grid; grid-template-columns:70px 1fr auto auto auto; gap:12px; align-items:center; padding:12px 16px; background:var(--canvas); border-radius:3px; font-size:0.8rem;">
-            <span style="font-family:'DM Mono',monospace; font-size:0.68rem; color:var(--ink-muted);">07410</span>
-            <span style="color:var(--ink-light);">2024 Honda CR-V Sport · Fair Lawn</span>
-            <span style="font-weight:500;">$421/mo</span>
-            <span style="font-size:0.7rem; color:var(--ink-muted);">36mo / 10k</span>
-            <span style="background:var(--copper-pale); color:var(--copper); font-family:'DM Mono',monospace; font-size:0.6rem; padding:3px 8px; border-radius:2px;">B</span>
-          </div>
-          <div style="display:grid; grid-template-columns:70px 1fr auto auto auto; gap:12px; align-items:center; padding:12px 16px; background:var(--canvas); border-radius:3px; font-size:0.8rem;">
-            <span style="font-family:'DM Mono',monospace; font-size:0.68rem; color:var(--ink-muted);">07024</span>
-            <span style="color:var(--ink-light);">2024 Nissan Rogue SV · Fort Lee</span>
-            <span style="font-weight:500;">$438/mo</span>
-            <span style="font-size:0.7rem; color:var(--ink-muted);">36mo / 10k</span>
-            <span style="background:var(--copper-pale); color:var(--copper); font-family:'DM Mono',monospace; font-size:0.6rem; padding:3px 8px; border-radius:2px;">C+</span>
-          </div>
-          <div style="display:grid; grid-template-columns:70px 1fr auto auto auto; gap:12px; align-items:center; padding:12px 16px; background:var(--canvas); border-radius:3px; font-size:0.8rem;">
-            <span style="font-family:'DM Mono',monospace; font-size:0.68rem; color:var(--ink-muted);">07631</span>
-            <span style="color:var(--ink-light);">2024 Honda CR-V EX · Englewood</span>
-            <span style="font-weight:500;">$449/mo</span>
-            <span style="font-size:0.7rem; color:var(--ink-muted);">36mo / 10k</span>
-            <span style="background:var(--rose-pale); color:var(--rose); font-family:'DM Mono',monospace; font-size:0.6rem; padding:3px 8px; border-radius:2px;">D+</span>
-          </div>
-        </div>
-
-        <!-- COUNTY STATS -->
-        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px; padding-top:20px; border-top:1px solid var(--border);">
-          <div style="text-align:center;">
-            <div style="font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:400; color:var(--ink);">$438</div>
-            <div style="font-family:'DM Mono',monospace; font-size:0.58rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-muted); margin-top:4px;">County Avg/mo</div>
-          </div>
-          <div style="text-align:center;">
-            <div style="font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:400; color:var(--sage);">$389</div>
-            <div style="font-family:'DM Mono',monospace; font-size:0.58rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-muted); margin-top:4px;">Best Deal Seen</div>
-          </div>
-          <div style="text-align:center;">
-            <div style="font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:400; color:var(--ink);">47</div>
-            <div style="font-family:'DM Mono',monospace; font-size:0.58rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-muted); margin-top:4px;">Deals This Month</div>
-          </div>
-          <div style="text-align:center;">
-            <div style="font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:400; color:var(--copper);">↓ 4.9%</div>
-            <div style="font-family:'DM Mono',monospace; font-size:0.58rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-muted); margin-top:4px;">vs Last Month</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SECTION 9: QUESTIONS TO ASK YOUR DEALER -->
-    <div class="section-card">
-      <div class="section-card-header">
-        <div class="section-card-title"><span class="icon">💬</span> Questions to Ask Before You Sign</div>
-        <span class="section-status status-good">Screenshot These</span>
-      </div>
-      <div class="section-card-body">
-        <div style="font-size:0.82rem; color:var(--ink-muted); margin-bottom:20px; line-height:1.6;">These are the exact questions that separate informed NJ lease shoppers from everyone else. A good dealer will answer all of them without hesitation. A bad one will deflect.</div>
-        <div style="display:flex; flex-direction:column; gap:10px;">
-          <div style="background:var(--canvas); border-radius:3px; padding:14px 18px; border-left:2px solid var(--copper);">
-            <div style="font-size:0.85rem; font-weight:500; color:var(--ink); margin-bottom:4px;">"What is the money factor on this lease?"</div>
-            <div style="font-size:0.75rem; color:var(--ink-muted); line-height:1.55;">If they say they don't know, or give you an APR instead, that's a red flag. You want the raw money factor. Multiply by 2,400 to convert to APR yourself.</div>
-          </div>
-          <div style="background:var(--canvas); border-radius:3px; padding:14px 18px; border-left:2px solid var(--copper);">
-            <div style="font-size:0.85rem; font-weight:500; color:var(--ink); margin-bottom:4px;">"What is the residual value and where does it come from?"</div>
-            <div style="font-size:0.75rem; color:var(--ink-muted); line-height:1.55;">It should match Honda Financial's published program. Dealers cannot change the residual — if it's different, ask why.</div>
-          </div>
-          <div style="background:var(--canvas); border-radius:3px; padding:14px 18px; border-left:2px solid var(--copper);">
-            <div style="font-size:0.85rem; font-weight:500; color:var(--ink); margin-bottom:4px;">"Can I see the full cap cost breakdown?"</div>
-            <div style="font-size:0.75rem; color:var(--ink-muted); line-height:1.55;">You want every line item: MSRP, dealer discount, rebates, trade-in, add-ons, acquisition fee, and any other adjustments. If they won't show you, walk out.</div>
-          </div>
-          <div style="background:var(--canvas); border-radius:3px; padding:14px 18px; border-left:2px solid var(--copper);">
-            <div style="font-size:0.85rem; font-weight:500; color:var(--ink); margin-bottom:4px;">"Is the acquisition fee capitalized or due at signing?"</div>
-            <div style="font-size:0.75rem; color:var(--ink-muted); line-height:1.55;">Honda's standard acquisition fee is $895. If it's capitalized, you're paying interest on it. Ask to pay it at signing instead.</div>
-          </div>
-          <div style="background:var(--canvas); border-radius:3px; padding:14px 18px; border-left:2px solid var(--copper);">
-            <div style="font-size:0.85rem; font-weight:500; color:var(--ink); margin-bottom:4px;">"What happens if I go over mileage?"</div>
-            <div style="font-size:0.75rem; color:var(--ink-muted); line-height:1.55;">Standard overage is $0.15–$0.25/mile on Honda. If you drive 12k/yr but signed for 10k, that's 7,200 miles over 3 years — up to $1,800 at signing return.</div>
-          </div>
-          <div style="background:var(--canvas); border-radius:3px; padding:14px 18px; border-left:2px solid var(--copper);">
-            <div style="font-size:0.85rem; font-weight:500; color:var(--ink); margin-bottom:4px;">"Is GAP insurance included or am I being charged for it?"</div>
-            <div style="font-size:0.75rem; color:var(--ink-muted); line-height:1.55;">Honda Financial leases include GAP coverage automatically. If a dealer is charging you for additional GAP, that's a pure add-on — decline it.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SUMMARY -->
-    <div class="summary-card">
-      <h2>What this means for <em>your next move.</em></h2>
-      <div class="summary-points">
-        <div class="summary-point">
-          <span class="summary-point-num">01</span>
-          <span class="summary-point-text"><strong>Your deal is fair, not great.</strong> You're paying $26/mo below the Bergen County average, which puts you in the top 38% of verified CR-V deals in your county. That's decent — but not the best possible outcome.</span>
-        </div>
-        <div class="summary-point">
-          <span class="summary-point-num">02</span>
-          <span class="summary-point-text"><strong>The money factor cost you $312.</strong> The single biggest opportunity was the MF markup. The buy rate was 0.00159 — you paid 0.00189. That 0.00030 markup is completely standard dealer behavior, but it was negotiable.</span>
-        </div>
-        <div class="summary-point">
-          <span class="summary-point-num">03</span>
-          <span class="summary-point-text"><strong>The add-ons added up.</strong> $895 in dealer add-ons rolled into your cap cost added roughly $8/mo — $288 over the term. These are almost always removable at signing if you push back.</span>
-        </div>
-        <div class="summary-point">
-          <span class="summary-point-num">04</span>
-          <span class="summary-point-text"><strong>At your next lease, come in prepared.</strong> Know the buy rate before you walk in. Decline add-ons at signing. These two moves alone could get you to an A-grade deal next time.</span>
-        </div>
-      </div>
-      <div class="summary-cta-row">
-        <a href="intake-upload.html" class="cta-primary">Check My Real Deal →</a>
-        <a href="pricing.html" class="cta-secondary">Get the full report for $19.99 — no subscription</a>
-      </div>
-    </div>
-
-  </div><!-- end report-wrapper -->
-
-  <!-- FLOATING WATERMARK -->
-  <div class="watermark" id="watermark">
-    <div class="watermark-label">Sample Report</div>
-    <div class="watermark-text">This is fictional data. Your real report uses verified NJ market comps. One-time payment, no subscription.</div>
-    <a href="pricing.html" class="watermark-cta">Get My Real Report — $19.99 →</a>
-    <div class="watermark-dismiss" onclick="document.getElementById('watermark').style.display='none'">Dismiss</div>
+  <div class="mg">
+    <div class="m"><div class="ml">MSRP</div><div class="mv">$38,400</div></div>
+    <div class="m"><div class="ml">Selling Price</div><div class="mv">$37,200</div><div class="ms">3.1% off MSRP</div></div>
+    <div class="m"><div class="ml">Residual</div><div class="mv">57%</div><div class="ms">$21,888 — standard for term</div></div>
+    <div class="m"><div class="ml">Cap Reduction</div><div class="mv">$1,200</div><div class="ms">From your $2,500 DAS</div></div>
   </div>
 
-  <footer>
-    <span class="footer-logo">Lease<span>Checkr</span></span>
-    <div class="footer-links">
-      <a href="index.html">Home</a>
-      <a href="pricing.html">Pricing</a>
-      <a href="founder.html">Founding Member</a>
-      <a href="privacy.html">Privacy</a>
-      <a href="terms.html">Terms</a>
-    </div>
-  </footer>
+  <div class="ins"><div class="ins-i">🏪</div><div class="ins-t"><strong>As more NJ drivers contribute deals, dealer rankings become more precise.</strong> We're building toward county-level dealer comparisons — showing which dealers consistently offer better pricing, lower MF markups, and fewer add-ons.</div></div>
+</div>
+
+<!-- ═══════════ PART 2 ═══════════ -->
+<div class="part">
+  <div class="part-num">Part Two</div>
+  <div class="part-name">Negotiation <em>Playbook</em></div>
+  <div class="part-sub">What to do, what to say, and what to check.</div>
+</div>
+
+<!-- 06 RED FLAG -->
+<div class="dk">
+  <div class="sn">06</div>
+  <h2 class="sh" style="font-family:var(--sans);font-weight:700;font-size:1.3rem">🚩 The One Thing to Fix</h2>
+  <p class="ss">Your money factor markup is where the dealer profits — and it's the easiest thing to negotiate.</p>
+  <div class="nvs">
+    <div class="nb you"><div class="nb-l">You're paying</div><div class="nb-v">0.00189</div><div class="nb-n">4.54% APR</div></div>
+    <div class="narr">→</div>
+    <div class="nb tgt"><div class="nb-l">Target</div><div class="nb-v">0.00125</div><div class="nb-n">3.00% APR — buy rate</div></div>
+  </div>
+  <div class="wrn"><div class="wrn-l">Hidden Cost</div><div class="wrn-t">That markup costs you $1,224 over your lease.</div><div class="wrn-d">0.00064 added to the base MF. $34 extra per payment. Most shoppers never catch it.</div></div>
+  <div class="sav"><div class="sav-l">Potential Savings</div><div class="sav-v">$600 – $1,224</div><div class="sav-d">Negotiating to the buy rate saves $34/mo. Even halfway saves $17/mo — $612 over the lease.</div></div>
+</div>
+
+<!-- 07 SCRIPTS -->
+<div class="dk" style="margin-top:14px">
+  <div class="sn">07</div>
+  <h2 class="sh" style="font-family:var(--sans);font-weight:700;font-size:1.3rem">💬 Exactly What to Say</h2>
+  <p class="ss">Use these word-for-word at the dealership.</p>
+  <div class="scr"><div class="scr-c">Opening — Get the number</div><div class="scr-q">"Before we finalize, can you show me the money factor? I'd like to see it written on the deal sheet."</div><div class="scr-w"><strong>Why:</strong> Signals you understand lease structure. Dealers give better terms to informed buyers.</div></div>
+  <div class="scr"><div class="scr-c">Counter — Push for buy rate</div><div class="scr-q">"I know Honda Financial's base rate is around .00125 for this term. Is there any way to get closer to that?"</div><div class="scr-w"><strong>Why:</strong> Shows you know the buy rate without being aggressive. Gives them room to negotiate.</div></div>
+  <div class="scr"><div class="scr-c">Closer — Use competition</div><div class="scr-q">"I have a similar offer from another Honda dealer. If you can match .00150, I'd prefer to work with you."</div><div class="scr-w"><strong>Why:</strong> Competition motivates movement. Dealers don't want to lose a deal they're close to closing.</div></div>
+  <div class="scr"><div class="scr-c">F&I — Decline add-ons</div><div class="scr-q">"I appreciate the offer on the protection packages, but I'd like to finalize without any additional products."</div><div class="scr-w"><strong>Why:</strong> F&I offices make significant profit on add-ons. Declining upfront prevents pressure.</div></div>
+</div>
+
+<!-- 08 POWER MOVES -->
+<div class="dk" style="margin-top:14px">
+  <div class="sn">08</div>
+  <h2 class="sh" style="font-family:var(--sans);font-weight:700;font-size:1.3rem">⚡ Your 4 Power Moves</h2>
+  <p class="ss">Ranked by dollar impact. Do #1 no matter what.</p>
+  <div class="pm"><div class="pm-n">1</div><div><div class="pm-t">Negotiate the money factor</div><div class="pm-d">Ask for 0.00125 (buy rate). Settle for anything below 0.00160.</div><div class="pm-i">SAVES $600 – $1,224</div></div></div>
+  <div class="pm"><div class="pm-n">2</div><div><div class="pm-t">Get one competing quote</div><div class="pm-d">Email Honda of Hackensack or Garden State Honda. One number gives you leverage.</div><div class="pm-i">SAVES $300 – $800</div></div></div>
+  <div class="pm"><div class="pm-n">3</div><div><div class="pm-t">Ask about hidden incentives</div><div class="pm-d">"Are there Honda Financial lease incentives or loyalty bonuses I qualify for?"</div><div class="pm-i">SAVES $500 – $1,500</div></div></div>
+  <div class="pm"><div class="pm-n">4</div><div><div class="pm-t">Refuse all F&I add-ons</div><div class="pm-d">Nitrogen fill, paint protection, VIN etching, fabric guard — decline everything.</div><div class="pm-i">SAVES $500 – $2,000</div></div></div>
+</div>
+
+<!-- 09 CHECKLIST -->
+<div class="sec">
+  <div class="sn">09</div>
+  <h2 class="sh">Before you <em>sign</em></h2>
+  <p class="ss">Pull this up on your phone at the dealership.</p>
+  <div class="cl">
+    <div class="ci"><div class="cb"></div><div class="ct"><strong>Money factor confirmed in writing</strong> — on the deal sheet, not verbal</div></div>
+    <div class="ci"><div class="cb"></div><div class="ct"><strong>Residual matches term + mileage</strong> — 57% for 36mo/10k</div></div>
+    <div class="ci"><div class="cb"></div><div class="ct"><strong>Selling price matches agreed number</strong> — watch for last-minute F&I changes</div></div>
+    <div class="ci"><div class="cb"></div><div class="ct"><strong>No surprise add-ons in cap cost</strong> — scan for accessories you didn't request</div></div>
+    <div class="ci"><div class="cb"></div><div class="ct"><strong>Acquisition fee is standard</strong> — Honda = $595, shouldn't be marked up</div></div>
+    <div class="ci"><div class="cb"></div><div class="ct"><strong>Due at signing breakdown is clear</strong> — first month + fees + tax, nothing hidden</div></div>
+    <div class="ci"><div class="cb"></div><div class="ct"><strong>MVSC-1 form matches verbal agreement</strong> — NJ law requires this disclosure</div></div>
+    <div class="ci"><div class="cb"></div><div class="ct"><strong>Mileage penalty rate documented</strong> — know the per-mile charge over 10,000</div></div>
+    <div class="ci"><div class="cb"></div><div class="ct"><strong>End-of-lease purchase option stated</strong> — residual + any purchase option fee</div></div>
+    <div class="ci"><div class="cb"></div><div class="ct"><strong>All F&I products declined</strong> — or consciously kept</div></div>
+  </div>
+</div>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<div class="rf">
+  <div class="rf-b">Lease<span>Checkr</span></div>
+  <div class="rf-n">Generated for your specific deal using verified NJ lease benchmark data. Save it, print it, bring it to the dealership.</div>
+  <div class="rf-d">LeaseCheckr provides informational analysis based on crowdsourced data. This is not financial, legal, or professional advice. Always verify terms with your dealer and lender before signing.</div>
+</div>
+
+</div>
+
+<!-- WATERMARK (sample only — removed in real reports) -->
+<div class="wm" id="wm">
+  <div class="wm-badge">Sample</div>
+  <div class="wm-text">This is fictional data. Your real report uses verified NJ comps.</div>
+  <a href="pricing.html" class="wm-cta">Get My Real Report →</a>
+  <div class="wm-x" onclick="document.getElementById('wm').style.display='none'">✕</div>
+</div>
 
 </body>
 </html>
