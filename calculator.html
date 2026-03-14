@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lease Calculator — LeaseCheckr | Estimate Your Fair NJ Lease Payment</title>
+  <meta name="description" content="Free NJ lease calculator. Enter MSRP, sale price, residual, money factor, and term to instantly estimate your monthly payment and total lease cost.">
+  <meta name="keywords" content="lease calculator, NJ lease payment, car lease calculator, money factor, residual value, lease payment estimator, New Jersey auto lease">
+  <link rel="canonical" href="https://leasecheckr.vercel.app/calculator.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="Lease Calculator — LeaseCheckr">
+  <meta property="og:description" content="Free lease payment calculator. Know your numbers before you negotiate.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://leasecheckr.vercel.app/calculator.html">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --canvas:        #f8f5f0;
+      --canvas-2:      #f2ede6;
+      --canvas-dark:   #1a1512;
+      --ink:           #1c1917;
+      --ink-2:         #3d3830;
+      --ink-3:         #6b6259;
+      --ink-4:         #a89f94;
+      --ink-5:         #cdc5bc;
+      --copper:        #a8692e;
+      --copper-lt:     #c4864a;
+      --copper-pale:   #f0e4d4;
+      --copper-bg:     #faf3ea;
+      --copper-dark:   #7a4d20;
+      --sage:          #5c7a65;
+      --sage-pale:     #e8f0ea;
+      --rose:          #a85a4a;
+      --rose-pale:     #f5e8e5;
+      --cream:         #fdfaf6;
+      --section-dark:  #16120e;
+      --section-mid:   #211a14;
+      --border:        rgba(28,25,23,0.10);
+      --border-2:      rgba(28,25,23,0.18);
+      --border-light:  rgba(253,250,246,0.10);
+      --ease:          cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--canvas);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ── GRAIN ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 999; opacity: 0.35;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 48px;
+      background: rgba(248,245,240,0.92);
+      backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 500; letter-spacing: 0.02em; color: var(--ink); text-decoration: none; }
+    .nav-logo span { color: var(--copper); }
+    .nav-right { display: flex; align-items: center; gap: 28px; }
+    .nav-link { font-size: 0.73rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); text-decoration: none; transition: color 0.2s; }
+    .nav-link:hover { color: var(--ink); }
+    .nav-founder { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.06em; color: var(--copper); text-decoration: none; border-bottom: 1px solid rgba(168,105,46,0.3); padding-bottom: 1px; transition: border-color 0.2s; }
+    .nav-founder:hover { border-color: var(--copper); }
+
+    /* ── PAGE HERO ── */
+    .page-hero {
+      padding: 140px 48px 60px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .page-hero::before {
+      content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 800px; height: 500px;
+      background: radial-gradient(ellipse, rgba(168,105,46,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--copper); margin-bottom: 18px;
+      display: inline-flex; align-items: center; gap: 10px;
+      animation: fadeUp 0.5s var(--ease) both;
+    }
+    .hero-eyebrow::before, .hero-eyebrow::after { content: ''; width: 22px; height: 1px; background: var(--copper); }
+    .page-hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.2rem, 4vw, 3.4rem);
+      font-weight: 500; line-height: 1.1;
+      letter-spacing: -0.015em;
+      margin-bottom: 16px;
+      animation: fadeUp 0.6s var(--ease) 0.08s both;
+    }
+    .page-hero h1 em { font-style: italic; color: var(--copper); }
+    .page-hero p {
+      font-size: 0.95rem; color: var(--ink-3);
+      max-width: 520px; margin: 0 auto; line-height: 1.65;
+      animation: fadeUp 0.6s var(--ease) 0.16s both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── CALCULATOR LAYOUT ── */
+    .calc-wrap {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 48px 80px;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 40px;
+      align-items: start;
+    }
+
+    /* ── INPUT PANEL ── */
+    .calc-inputs {
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 40px;
+      animation: fadeUp 0.65s var(--ease) 0.22s both;
+    }
+    .calc-section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--copper);
+      margin-bottom: 18px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .calc-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+    .calc-row.full { grid-template-columns: 1fr; }
+    .calc-row.triple { grid-template-columns: 1fr 1fr 1fr; }
+
+    .field {
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .field label {
+      font-size: 0.72rem; font-weight: 500;
+      letter-spacing: 0.04em; color: var(--ink-3);
+    }
+    .field label .hint {
+      font-weight: 400; color: var(--ink-4); font-size: 0.66rem;
+    }
+    .field input, .field select {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.92rem; font-weight: 400;
+      color: var(--ink);
+      background: var(--canvas);
+      border: 1px solid var(--border-2);
+      border-radius: 8px;
+      padding: 11px 14px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .field input:focus, .field select:focus {
+      border-color: var(--copper);
+      box-shadow: 0 0 0 3px rgba(168,105,46,0.08);
+    }
+    .field input::placeholder { color: var(--ink-5); }
+
+    .input-with-prefix {
+      position: relative;
+    }
+    .input-with-prefix .prefix {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      font-size: 0.92rem; color: var(--ink-4); pointer-events: none;
+    }
+    .input-with-prefix input { padding-left: 28px; }
+
+    .input-with-suffix {
+      position: relative;
+    }
+    .input-with-suffix .suffix {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      font-size: 0.75rem; color: var(--ink-4); pointer-events: none;
+    }
+    .input-with-suffix input { padding-right: 48px; }
+
+    .spacer { height: 10px; }
+
+    .calc-btn {
+      width: 100%;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem; font-weight: 500;
+      letter-spacing: 0.06em;
+      color: var(--cream);
+      background: var(--ink);
+      border: none; border-radius: 8px;
+      padding: 14px 24px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 8px;
+    }
+    .calc-btn:hover { background: var(--ink-2); }
+    .calc-btn:active { transform: scale(0.985); }
+
+    .reset-link {
+      display: block; text-align: center;
+      margin-top: 12px;
+      font-size: 0.72rem; color: var(--ink-4);
+      text-decoration: underline;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .reset-link:hover { color: var(--ink-3); }
+
+    /* ── RESULT PANEL ── */
+    .calc-result {
+      position: sticky; top: 80px;
+      animation: fadeUp 0.65s var(--ease) 0.3s both;
+    }
+    .result-card {
+      background: var(--section-dark);
+      border-radius: 14px;
+      padding: 36px 32px;
+      color: var(--cream);
+      position: relative;
+      overflow: hidden;
+    }
+    .result-card::before {
+      content: ''; position: absolute; top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(168,105,46,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .result-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.56rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--copper-lt);
+      margin-bottom: 6px;
+    }
+    .result-payment {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3.2rem; font-weight: 500;
+      line-height: 1;
+      margin-bottom: 4px;
+      transition: all 0.3s var(--ease);
+    }
+    .result-payment-note {
+      font-size: 0.72rem; color: rgba(253,250,246,0.5);
+      margin-bottom: 28px;
+    }
+
+    .result-divider {
+      height: 1px;
+      background: rgba(253,250,246,0.08);
+      margin: 0 -32px 24px;
+    }
+
+    .result-breakdown { display: flex; flex-direction: column; gap: 14px; }
+    .rb-row {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .rb-label { font-size: 0.76rem; color: rgba(253,250,246,0.55); }
+    .rb-value { font-family: 'DM Mono', monospace; font-size: 0.82rem; color: var(--cream); }
+    .rb-value.highlight { color: var(--copper-lt); }
+
+    .result-divider-sm {
+      height: 1px;
+      background: rgba(253,250,246,0.05);
+      margin: 6px 0;
+    }
+
+    .result-total-section {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(253,250,246,0.1);
+    }
+    .rt-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: 8px;
+    }
+    .rt-label { font-size: 0.74rem; color: rgba(253,250,246,0.5); }
+    .rt-value { font-family: 'DM Mono', monospace; font-size: 0.88rem; color: var(--cream); font-weight: 500; }
+
+    /* ── CTA CARD ── */
+    .result-cta-card {
+      margin-top: 16px;
+      background: var(--copper-bg);
+      border: 1px solid var(--copper-pale);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+    }
+    .rcc-text {
+      font-size: 0.82rem; color: var(--ink-2);
+      line-height: 1.55;
+      margin-bottom: 14px;
+    }
+    .rcc-text strong { color: var(--copper-dark); }
+    .rcc-btn {
+      display: inline-block;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem; font-weight: 500;
+      letter-spacing: 0.04em;
+      color: var(--cream);
+      background: var(--copper);
+      border-radius: 8px;
+      padding: 11px 28px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .rcc-btn:hover { background: var(--copper-dark); }
+
+    /* ── HELPER TOOLTIP ── */
+    .help-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 15px; height: 15px;
+      border-radius: 50%;
+      background: var(--canvas-2);
+      border: 1px solid var(--border-2);
+      font-size: 0.55rem; font-weight: 600;
+      color: var(--ink-4);
+      cursor: help;
+      position: relative;
+      margin-left: 5px;
+      vertical-align: middle;
+    }
+    .help-icon .tip {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+      width: 240px;
+      background: var(--section-dark);
+      color: var(--cream);
+      font-size: 0.7rem; font-weight: 400;
+      line-height: 1.5;
+      padding: 12px 14px;
+      border-radius: 8px;
+      z-index: 50;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+    .help-icon .tip::after {
+      content: ''; position: absolute;
+      top: 100%; left: 50%; transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: var(--section-dark);
+    }
+    .help-icon:hover .tip { display: block; }
+
+    /* ── HOW IT WORKS ── */
+    .how-section {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 60px 48px 100px;
+    }
+    .how-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--copper); margin-bottom: 14px;
+    }
+    .how-headline {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+      font-weight: 500; line-height: 1.15;
+      margin-bottom: 36px;
+    }
+    .how-headline em { font-style: italic; color: var(--copper); }
+
+    .formula-card {
+      background: var(--section-dark);
+      border-radius: 14px;
+      padding: 36px 40px;
+      color: var(--cream);
+      margin-bottom: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .formula-card::after {
+      content: ''; position: absolute; bottom: -40px; right: -40px;
+      width: 160px; height: 160px;
+      background: radial-gradient(circle, rgba(168,105,46,0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .formula-title {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--copper-lt);
+      margin-bottom: 18px;
+    }
+    .formula-line {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem; font-weight: 400;
+      line-height: 1.6;
+      color: rgba(253,250,246,0.85);
+    }
+    .formula-line .hl { color: var(--copper-lt); font-weight: 500; }
+
+    .terms-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .term-card {
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 22px 20px;
+    }
+    .tc-term {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem; font-weight: 500;
+      color: var(--copper);
+      margin-bottom: 6px;
+    }
+    .tc-name {
+      font-size: 0.85rem; font-weight: 500;
+      color: var(--ink); margin-bottom: 6px;
+    }
+    .tc-desc {
+      font-size: 0.76rem; color: var(--ink-3);
+      line-height: 1.55;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 40px 48px;
+      border-top: 1px solid var(--border);
+    }
+    .footer-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem; font-weight: 500;
+      color: var(--ink-4);
+    }
+    .footer-logo span { color: var(--copper); }
+    .footer-links {
+      margin-top: 14px;
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 24px;
+    }
+    .footer-links a {
+      font-size: 0.7rem; color: var(--ink-4); text-decoration: none;
+      letter-spacing: 0.04em; transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--ink-2); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 860px) {
+      nav { padding: 0 20px; }
+      .nav-right { gap: 16px; }
+      .page-hero { padding: 120px 24px 40px; }
+      .calc-wrap {
+        grid-template-columns: 1fr;
+        padding: 0 20px 60px;
+      }
+      .calc-result { position: static; }
+      .calc-inputs { padding: 28px 22px; }
+      .calc-row { grid-template-columns: 1fr; }
+      .calc-row.triple { grid-template-columns: 1fr 1fr; }
+      .how-section { padding: 40px 20px 60px; }
+      .formula-card { padding: 28px 22px; }
+      .formula-line { font-size: 1.2rem; }
+    }
+
+    @media (max-width: 600px) {
+      .nav-link:not(.nav-link-primary) { display: none; }
+      .calc-row.triple { grid-template-columns: 1fr; }
+      .result-card { padding: 28px 22px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="index.html">Lease<span>Checkr</span></a>
+  <div class="nav-right">
+    <a class="nav-link" href="blog.html">Learn</a>
+    <a class="nav-link" href="calculator.html">Calculator</a>
+    <a class="nav-link" href="pricing.html">Pricing</a>
+    <a class="nav-link" href="sample-report.html">Sample Report</a>
+    <a class="nav-founder" href="founder.html">Founding Member →</a>
+  </div>
+</nav>
+
+
+<!-- HERO -->
+<section class="page-hero">
+  <div class="hero-eyebrow">Lease Calculator</div>
+  <h1>Know your numbers<br>before you <em>negotiate.</em></h1>
+  <p>Enter the deal terms to see what your monthly payment should be — and what you'll actually pay over the full lease. No guessing, no dealer math.</p>
+</section>
+
+
+<!-- CALCULATOR -->
+<div class="calc-wrap">
+
+  <!-- INPUTS -->
+  <div class="calc-inputs">
+
+    <div class="calc-section-label">Vehicle &amp; Price</div>
+
+    <div class="calc-row">
+      <div class="field">
+        <label>MSRP <span class="help-icon">?<span class="tip">The Manufacturer's Suggested Retail Price — the sticker price on the window. This is the starting point for your lease calculation.</span></span></label>
+        <div class="input-with-prefix">
+          <span class="prefix">$</span>
+          <input type="number" id="msrp" placeholder="42,000" value="42000">
+        </div>
+      </div>
+      <div class="field">
+        <label>Negotiated Sale Price <span class="help-icon">?<span class="tip">The price you've negotiated with the dealer — also called the "cap cost" before any reductions. Always negotiate this down from MSRP.</span></span></label>
+        <div class="input-with-prefix">
+          <span class="prefix">$</span>
+          <input type="number" id="salePrice" placeholder="39,500" value="39500">
+        </div>
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+    <div class="calc-section-label">Lease Terms</div>
+
+    <div class="calc-row triple">
+      <div class="field">
+        <label>Residual % <span class="help-icon">?<span class="tip">The vehicle's predicted value at lease end, as a % of MSRP. Set by the manufacturer's leasing arm — not the dealer. Higher residual = lower payment.</span></span></label>
+        <div class="input-with-suffix">
+          <input type="number" id="residual" placeholder="57" value="57" step="0.5">
+          <span class="suffix">%</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Money Factor <span class="help-icon">?<span class="tip">The lease financing rate. Multiply by 2,400 to get the approximate APR. Example: 0.00125 MF ≈ 3.0% APR. Ask your dealer for this number.</span></span></label>
+        <input type="text" id="moneyFactor" placeholder="0.00125" value="0.00125">
+      </div>
+      <div class="field">
+        <label>Term</label>
+        <select id="term">
+          <option value="24">24 months</option>
+          <option value="36" selected>36 months</option>
+          <option value="39">39 months</option>
+          <option value="42">42 months</option>
+          <option value="48">48 months</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+    <div class="calc-section-label">Due at Signing</div>
+
+    <div class="calc-row">
+      <div class="field">
+        <label>Down Payment <span class="hint">(Cap cost reduction)</span></label>
+        <div class="input-with-prefix">
+          <span class="prefix">$</span>
+          <input type="number" id="downPayment" placeholder="0" value="0">
+        </div>
+      </div>
+      <div class="field">
+        <label>Rebates / Incentives</label>
+        <div class="input-with-prefix">
+          <span class="prefix">$</span>
+          <input type="number" id="rebates" placeholder="0" value="0">
+        </div>
+      </div>
+    </div>
+
+    <div class="calc-row">
+      <div class="field">
+        <label>Dealer / Acquisition Fees <span class="help-icon">?<span class="tip">Fees charged by the dealer or manufacturer's leasing company. This includes the acquisition fee (usually $595–$995) and any dealer doc fees. These get rolled into the lease.</span></span></label>
+        <div class="input-with-prefix">
+          <span class="prefix">$</span>
+          <input type="number" id="fees" placeholder="895" value="895">
+        </div>
+      </div>
+      <div class="field">
+        <label>NJ Sales Tax Rate <span class="help-icon">?<span class="tip">New Jersey charges 6.625% sales tax on the monthly lease payment — not the full vehicle price. This is applied to each monthly payment.</span></span></label>
+        <div class="input-with-suffix">
+          <input type="number" id="taxRate" placeholder="6.625" value="6.625" step="0.001">
+          <span class="suffix">%</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="calc-btn" onclick="calculate()">Calculate My Payment</button>
+    <div class="reset-link" onclick="resetCalc()">Reset to defaults</div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="calc-result">
+    <div class="result-card" id="resultCard">
+
+      <div class="result-label">Estimated Monthly Payment</div>
+      <div class="result-payment" id="rPayment">$—</div>
+      <div class="result-payment-note"><span id="rPaymentNote">including NJ tax</span></div>
+
+      <div class="result-divider"></div>
+
+      <div class="result-breakdown">
+        <div class="rb-row">
+          <span class="rb-label">Depreciation charge</span>
+          <span class="rb-value" id="rDepreciation">—</span>
+        </div>
+        <div class="rb-row">
+          <span class="rb-label">Finance charge (rent)</span>
+          <span class="rb-value" id="rFinance">—</span>
+        </div>
+        <div class="rb-row">
+          <span class="rb-label">Pre-tax payment</span>
+          <span class="rb-value highlight" id="rPreTax">—</span>
+        </div>
+        <div class="rb-row">
+          <span class="rb-label">NJ sales tax / mo</span>
+          <span class="rb-value" id="rTax">—</span>
+        </div>
+        <div class="result-divider-sm"></div>
+        <div class="rb-row">
+          <span class="rb-label">Effective APR</span>
+          <span class="rb-value" id="rAPR">—</span>
+        </div>
+        <div class="rb-row">
+          <span class="rb-label">Discount off MSRP</span>
+          <span class="rb-value" id="rDiscount">—</span>
+        </div>
+      </div>
+
+      <div class="result-total-section">
+        <div class="rt-row">
+          <span class="rt-label">Total due at signing</span>
+          <span class="rt-value" id="rDAS">—</span>
+        </div>
+        <div class="rt-row">
+          <span class="rt-label">Total lease cost</span>
+          <span class="rt-value" id="rTotal">—</span>
+        </div>
+        <div class="rt-row">
+          <span class="rt-label">Cost per month (effective)</span>
+          <span class="rt-value" id="rEffective" style="color:var(--copper-lt);">—</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="result-cta-card">
+      <div class="rcc-text">This calculator shows the <strong>math</strong>. LeaseCheckr shows you how your deal compares to <strong>real signed leases in your county.</strong></div>
+      <a class="rcc-btn" href="index.html">Check Your Lease Free →</a>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- HOW LEASE MATH WORKS -->
+<section class="how-section">
+  <div class="how-label">How Lease Math Works</div>
+  <h2 class="how-headline">Every lease payment is two charges:<br><em>depreciation + financing.</em></h2>
+
+  <div class="formula-card">
+    <div class="formula-title">The Lease Payment Formula</div>
+    <div class="formula-line">
+      <span class="hl">Depreciation</span> = (Adjusted Cap Cost − Residual Value) ÷ Term
+    </div>
+    <div class="formula-line">
+      <span class="hl">Finance Charge</span> = (Adjusted Cap Cost + Residual Value) × Money Factor
+    </div>
+    <div class="formula-line" style="margin-top:12px;">
+      <span class="hl">Monthly Payment</span> = Depreciation + Finance Charge + Tax
+    </div>
+  </div>
+
+  <div class="terms-grid">
+    <div class="term-card">
+      <div class="tc-term">MSRP</div>
+      <div class="tc-name">Sticker Price</div>
+      <div class="tc-desc">The manufacturer's suggested retail price. Your lease residual is based on this number — even if you negotiate the sale price down.</div>
+    </div>
+    <div class="term-card">
+      <div class="tc-term">Cap Cost</div>
+      <div class="tc-name">Capitalized Cost</div>
+      <div class="tc-desc">The negotiated sale price plus any rolled-in fees, minus your down payment and rebates. This is the number your lease is actually built on.</div>
+    </div>
+    <div class="term-card">
+      <div class="tc-term">Residual</div>
+      <div class="tc-name">Residual Value</div>
+      <div class="tc-desc">The vehicle's predicted value at lease end, expressed as a % of MSRP. Set by the manufacturer's leasing company — not the dealer. Higher = lower payment.</div>
+    </div>
+    <div class="term-card">
+      <div class="tc-term">MF</div>
+      <div class="tc-name">Money Factor</div>
+      <div class="tc-desc">The lease interest rate in decimal form. Multiply by 2,400 to get the approximate APR. Dealers receive a "buy rate" and can mark it up — always ask.</div>
+    </div>
+    <div class="term-card">
+      <div class="tc-term">Depreciation</div>
+      <div class="tc-name">The Biggest Piece</div>
+      <div class="tc-desc">The difference between what the car is worth now vs. at lease end, spread over the term. This is usually 60–70% of your monthly payment.</div>
+    </div>
+    <div class="term-card">
+      <div class="tc-term">NJ Tax</div>
+      <div class="tc-name">6.625% Monthly</div>
+      <div class="tc-desc">New Jersey taxes each monthly lease payment at 6.625%. Unlike some states, you don't pay tax on the full vehicle price — only on the payments.</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-logo">Lease<span>Checkr</span></span>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="blog.html">Learn</a>
+    <a href="calculator.html">Calculator</a>
+    <a href="pricing.html">Pricing</a>
+    <a href="founder.html">Founding Member</a>
+    <a href="sample-report.html">Sample Report</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms</a>
+  </div>
+</footer>
+
+
+<script>
+  function getVal(id) { return parseFloat(document.getElementById(id).value) || 0; }
+
+  function calculate() {
+    const msrp = getVal('msrp');
+    const sale = getVal('salePrice');
+    const residualPct = getVal('residual');
+    const mf = parseFloat(document.getElementById('moneyFactor').value) || 0;
+    const term = getVal('term');
+    const down = getVal('downPayment');
+    const rebates = getVal('rebates');
+    const fees = getVal('fees');
+    const taxRate = getVal('taxRate');
+
+    // Core lease math
+    const residualValue = msrp * (residualPct / 100);
+    const adjCapCost = sale + fees - down - rebates;
+    const depreciation = (adjCapCost - residualValue) / term;
+    const financeCharge = (adjCapCost + residualValue) * mf;
+    const preTax = depreciation + financeCharge;
+    const taxPerMonth = preTax * (taxRate / 100);
+    const monthlyPayment = preTax + taxPerMonth;
+
+    // Totals
+    const apr = mf * 2400;
+    const discountPct = ((msrp - sale) / msrp) * 100;
+    const dueAtSigning = down + monthlyPayment; // first month + down
+    const totalCost = (monthlyPayment * term) + down;
+    const effectiveMonthly = totalCost / term;
+
+    // Update UI
+    document.getElementById('rPayment').textContent = '$' + monthlyPayment.toFixed(0);
+    document.getElementById('rPaymentNote').textContent = term + ' months · including NJ tax';
+    document.getElementById('rDepreciation').textContent = '$' + depreciation.toFixed(2);
+    document.getElementById('rFinance').textContent = '$' + financeCharge.toFixed(2);
+    document.getElementById('rPreTax').textContent = '$' + preTax.toFixed(2);
+    document.getElementById('rTax').textContent = '$' + taxPerMonth.toFixed(2);
+    document.getElementById('rAPR').textContent = apr.toFixed(1) + '%';
+    document.getElementById('rDiscount').textContent = discountPct.toFixed(1) + '% off MSRP';
+    document.getElementById('rDAS').textContent = '$' + dueAtSigning.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    document.getElementById('rTotal').textContent = '$' + totalCost.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    document.getElementById('rEffective').textContent = '$' + effectiveMonthly.toFixed(0) + '/mo';
+
+    // Animate the payment number
+    const payEl = document.getElementById('rPayment');
+    payEl.style.transform = 'scale(1.06)';
+    payEl.style.color = '#c4864a';
+    setTimeout(() => {
+      payEl.style.transform = 'scale(1)';
+      payEl.style.color = '';
+    }, 300);
+  }
+
+  function resetCalc() {
+    document.getElementById('msrp').value = 42000;
+    document.getElementById('salePrice').value = 39500;
+    document.getElementById('residual').value = 57;
+    document.getElementById('moneyFactor').value = '0.00125';
+    document.getElementById('term').value = 36;
+    document.getElementById('downPayment').value = 0;
+    document.getElementById('rebates').value = 0;
+    document.getElementById('fees').value = 895;
+    document.getElementById('taxRate').value = 6.625;
+    calculate();
+  }
+
+  // Auto-calculate on load
+  calculate();
+
+  // Live calculation on any input change
+  document.querySelectorAll('.calc-inputs input, .calc-inputs select').forEach(el => {
+    el.addEventListener('input', calculate);
+    el.addEventListener('change', calculate);
+  });
+</script>
+
+</body>
+</html>
