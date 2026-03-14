@@ -34,6 +34,12 @@
     .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
     .nav-links a { font-size: 0.8rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); text-decoration: none; transition: color 0.2s; }
     .nav-links a:hover { color: var(--ink); }
+    .nav-right { display: flex; align-items: center; gap: 28px; }
+    .nav-link { font-size: 0.73rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); text-decoration: none; transition: color 0.2s; }
+    .nav-link:visited { color: var(--ink-muted); }
+    .nav-link:hover { color: var(--ink); }
+    .nav-founder { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.06em; color: var(--copper); text-decoration: none; border-bottom: 1px solid rgba(168,105,46,0.3); padding-bottom: 1px; transition: border-color 0.2s; }
+    .nav-founder:hover { border-color: var(--copper); }
     .nav-cta { background: var(--ink) !important; color: var(--canvas) !important; padding: 8px 20px; border-radius: 2px; font-size: 0.82rem !important; }
 
     .hero { padding: 140px 48px 80px; text-align: center; max-width: 720px; margin: 0 auto; }
@@ -159,6 +165,7 @@
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231c1917'/><text x='5' y='22' font-family='Georgia,serif' font-size='18' font-weight='500' fill='%23a8692e'>LC</text></svg>">
 </head>
 <body>
 
@@ -403,10 +410,10 @@
 </footer>
 
   <script>
-    const SUPABASE_URL='YOUR_SUPABASE_URL';
-    const SUPABASE_KEY='YOUR_SUPABASE_ANON_KEY';
+    const SUPABASE_URL='https://xqjsvlhdpdfvzixlmdxk.supabase.co';
+    const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxanN2bGhkcGRmdnppeGxtZHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzg2ODcsImV4cCI6MjA4ODg1NDY4N30.MT0tEDMLaBDLtZkX9xEVEkaUfPdIA9QsJrWjGDpeWsE';
     let sb=null;
-    try{if(SUPABASE_URL!=='YOUR_SUPABASE_URL'&&window.supabase){sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}}catch(e){}
+    try{if(window.supabase){sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}}catch(e){}
 
     (async function(){
       let claimed=153;

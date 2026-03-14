@@ -92,6 +92,7 @@ footer a{color:var(--ink-4);text-decoration:none}
 footer a:hover{color:var(--ink)}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231c1917'/><text x='5' y='22' font-family='Georgia,serif' font-size='18' font-weight='500' fill='%23a8692e'>LC</text></svg>">
 </head>
 <body>
 
@@ -249,10 +250,10 @@ footer a:hover{color:var(--ink)}
 
 <script>
 // ── SUPABASE
-const SUPABASE_URL='YOUR_SUPABASE_URL';
-const SUPABASE_KEY='YOUR_SUPABASE_ANON_KEY';
+const SUPABASE_URL='https://xqjsvlhdpdfvzixlmdxk.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxanN2bGhkcGRmdnppeGxtZHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzg2ODcsImV4cCI6MjA4ODg1NDY4N30.MT0tEDMLaBDLtZkX9xEVEkaUfPdIA9QsJrWjGDpeWsE';
 let sb=null;
-try{if(SUPABASE_URL!=='YOUR_SUPABASE_URL'&&window.supabase){sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}}catch(e){console.error(e)}
+try{if(window.supabase){sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}}catch(e){console.error(e)}
 
 // ── STRIPE PAYMENT LINK
 const STRIPE_MANUAL_LINK='https://buy.stripe.com/test_28EcN571r98kfma7AAdby01';
@@ -301,33 +302,47 @@ async function handleSubmit(){
   btn.disabled=true;
   btn.textContent='Saving…';
 
+  const zipVal=document.getElementById('zip').value;
+  // ZIP to county
+  const p=zipVal?zipVal.substring(0,3):'';
+  const countyMap={'074':'Bergen','075':'Bergen','070':'Essex','071':'Essex','073':'Hudson','079':'Morris','088':'Middlesex','089':'Middlesex','076':'Passaic','072':'Union','078':'Somerset','087':'Monmouth','077':'Ocean'};
+  const county=countyMap[p]||null;
+
+  const termVal=parseInt(document.getElementById('term').value)||36;
+  const payVal=parseFloat(document.getElementById('payment').value)||null;
+  const dasVal=parseFloat(document.getElementById('signing').value)||null;
+  const effMonthly=payVal&&termVal?Math.round((payVal*termVal+(dasVal||0))/termVal*100)/100:null;
+
   const data={
     email:document.getElementById('email').value,
+    make:document.getElementById('make').value,
+    model:document.getElementById('model').value,
+    trim:document.getElementById('trim').value,
+    monthly_payment:payVal,
+    due_at_signing:dasVal,
+    term:termVal,
+    annual_mileage:parseInt(document.getElementById('mileage').value)||null,
+    zip:zipVal,
+    county:county,
+    dealer_name:document.getElementById('dealer').value,
+    signed_month_year:document.getElementById('signed').value,
+    partial_vin:document.getElementById('vin').value||null,
+    money_factor:document.getElementById('mf').value?parseFloat(document.getElementById('mf').value):null,
+    residual_pct:document.getElementById('residual').value?parseFloat(document.getElementById('residual').value):null,
+    effective_monthly:effMonthly,
     submission_type:'manual_signed',
     deal_status:'signed_manual',
     trust_tier:'medium',
     verification_status:'na',
     report_entitlement:'discounted_manual',
-    attestation_confirmed:true,
-    make:document.getElementById('make').value,
-    model:document.getElementById('model').value,
-    trim:document.getElementById('trim').value,
-    monthly_payment:parseFloat(document.getElementById('payment').value)||null,
-    due_at_signing:parseFloat(document.getElementById('signing').value)||null,
-    lease_term:parseInt(document.getElementById('term').value)||null,
-    annual_mileage:parseInt(document.getElementById('mileage').value)||null,
-    zip_code:document.getElementById('zip').value,
-    dealer_name:document.getElementById('dealer').value,
-    signed_month_year:document.getElementById('signed').value,
-    vin_partial:document.getElementById('vin').value||null,
-    money_factor:document.getElementById('mf').value?parseFloat(document.getElementById('mf').value):null,
-    residual_value:document.getElementById('residual').value?parseFloat(document.getElementById('residual').value):null
+    founder_eligible:false
   };
 
   // Save to Supabase
   if(sb){
-    const{error}=await sb.from('submissions').insert(data);
+    const{error}=await sb.from('lease_submissions').insert([data]);
     if(error)console.error('Submit error:',error);
+    else console.log('Manual deal saved to Supabase');
   }
 
   // Save email to sessionStorage for post-payment reference

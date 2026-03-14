@@ -856,6 +856,72 @@
     .reveal-delay-2 { transition-delay: 0.2s; }
     .reveal-delay-3 { transition-delay: 0.3s; }
 
+    /* ── DESKTOP TYPOGRAPHY READABILITY ── */
+    @media (min-width: 961px) {
+      /* Body / supporting paragraphs: 0.875rem → 1rem (16-17px) */
+      .subhead { font-size: 1.05rem; }
+      .support-para { font-size: 0.95rem; }
+      .founder-text { font-size: 0.86rem; }
+      .locked-text { font-size: 0.84rem; }
+      .grade-interp { font-size: 0.88rem; }
+
+      /* Form elements */
+      .field-label { font-size: 0.65rem; }
+      .pill-label { font-size: 0.65rem; }
+      .field input, .field select { font-size: 0.95rem; }
+      .field input::placeholder { font-size: 0.9rem; }
+      .pill { font-size: 0.84rem; }
+
+      /* Helper / descriptor text */
+      .mf-helper { font-size: 0.8rem; }
+      .expand-label { font-size: 0.64rem; }
+      .email-gate-sub { font-size: 0.84rem; }
+      .email-gate-note { font-size: 0.72rem; }
+
+      /* Trust / microcopy */
+      .trust-line { font-size: 0.62rem; }
+      .proof-label { font-size: 0.62rem; }
+      .founder-count { font-size: 0.64rem; }
+      .confidence-line { font-size: 0.64rem; }
+      .pay-box-label { font-size: 0.6rem; }
+      .pay-box-delta { font-size: 0.78rem; }
+
+      /* CTA text */
+      .cta-btn { font-size: 0.95rem; }
+      .cta-primary-label { font-size: 0.9rem; }
+      .cta-primary-price { font-size: 0.72rem; }
+      .cta-secondary { font-size: 0.88rem; }
+      .cta-tertiary { font-size: 0.8rem; }
+
+      /* Below-fold sections */
+      .mislead-left p { font-size: 1.05rem; }
+      .mp-desc { font-size: 0.88rem; }
+      .nc-desc { font-size: 0.86rem; }
+      .nc-tip { font-size: 0.78rem; }
+      .how-step-desc { font-size: 0.88rem; }
+      .how-right-intro { font-size: 0.95rem; }
+      .need-item { font-size: 0.9rem; }
+      .ask-q-why { font-size: 0.84rem; }
+      .ask-intro { font-size: 0.95rem; }
+      .cc-item { font-size: 0.88rem; }
+      .cc-price { font-size: 0.76rem; }
+      .benchmark-left p { font-size: 0.95rem; }
+      .s-subhead-light { font-size: 1rem; }
+
+      /* Eyebrows - slight bump */
+      .eyebrow { font-size: 0.67rem; }
+      .s-eyebrow { font-size: 0.65rem; }
+      .form-eyebrow { font-size: 0.65rem; }
+
+      /* Section headlines stay the same - no change */
+
+      /* Learn cards */
+      .learn-card-desc { font-size: 0.86rem; }
+
+      /* Footer */
+      .footer-links a { font-size: 0.78rem; }
+    }
+
     /* ── MOBILE ── */
     @media (max-width: 960px) {
       nav { padding: 0 24px; }
@@ -879,6 +945,7 @@
       .field-row { grid-template-columns: 1fr; }
     }
   </style>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231c1917'/><text x='5' y='22' font-family='Georgia,serif' font-size='18' font-weight='500' fill='%23a8692e'>LC</text></svg>">
 </head>
 <body>
 
@@ -918,7 +985,7 @@
 
     <div class="proof-row">
       <div class="proof-item">
-        <span class="proof-value" id="dealsCount">847</span>
+        <span class="proof-value" id="dealsCount">98</span>
         <span class="proof-label">Deals checked</span>
       </div>
       <div class="proof-item">
@@ -926,7 +993,7 @@
         <span class="proof-label">NJ counties</span>
       </div>
       <div class="proof-item">
-        <span class="proof-value" id="foundersCount">153</span>
+        <span class="proof-value" id="foundersCount">1</span>
         <span class="proof-label">Founding members</span>
       </div>
     </div>
@@ -938,7 +1005,7 @@
           Submitting your first verified lease document? You qualify as a Founding Member — one of the first 1,000 NJ drivers helping build the benchmark.
           <br><a href="founder.html">See Founding Member benefits →</a>
         </div>
-        <div class="founder-count" id="spotsLeft">847 spots remaining</div>
+        <div class="founder-count" id="spotsLeft">999 spots remaining</div>
       </div>
     </div>
   </div>
@@ -1152,7 +1219,7 @@
           </a>
           <a href="sample-report.html" target="_blank" class="cta-secondary">View Sample Report →</a>
           <div class="cta-tertiary">
-            Or <a href="founder.html">contribute your lease and join <span id="tFounderCount">153</span> Founding Members</a> — full report free, Premium access permanent.
+            Or <a href="founder.html">contribute your lease and join <span id="tFounderCount">1</span> Founding Members</a> — full report free, Premium access permanent.
           </div>
         </div>
       </div>
@@ -2071,7 +2138,7 @@
   // FOUNDER COUNTER (live from Supabase)
   // ═══════════════════════════════════
   const TOTAL = 1000;
-  let founderCount = 153; // fallback
+  let founderCount = 1; // honest fallback — Supabase will update
 
   async function updateFounderCount() {
     if (!supabaseClient) return;
@@ -2088,6 +2155,23 @@
     if (tfc) tfc.textContent = founderCount;
   }
   updateFounderCount();
+
+  // ═══════════════════════════════════
+  // DEALS COUNTER (live from Supabase)
+  // ═══════════════════════════════════
+  async function updateDealsCount() {
+    const el = document.getElementById('dealsCount');
+    if (!supabaseClient || !el) return;
+    try {
+      const { count, error } = await supabaseClient
+        .from('lease_submissions')
+        .select('*', { count: 'exact', head: true });
+      if (!error && count > 0) {
+        el.textContent = count;
+      }
+    } catch (e) { console.warn('Deals count fetch failed'); }
+  }
+  updateDealsCount();
 
   // ═══════════════════════════════════
   // COUNTY BAR CHART ANIMATION

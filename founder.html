@@ -306,6 +306,7 @@
     .sold-out .spots-text{color:var(--ink-3)}
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231c1917'/><text x='5' y='22' font-family='Georgia,serif' font-size='18' font-weight='500' fill='%23a8692e'>LC</text></svg>">
 </head>
 <body>
 
@@ -445,10 +446,10 @@
 
 <script>
   // ── SUPABASE
-  const SUPABASE_URL='YOUR_SUPABASE_URL';
-  const SUPABASE_KEY='YOUR_SUPABASE_ANON_KEY';
+  const SUPABASE_URL='https://xqjsvlhdpdfvzixlmdxk.supabase.co';
+  const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxanN2bGhkcGRmdnppeGxtZHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzg2ODcsImV4cCI6MjA4ODg1NDY4N30.MT0tEDMLaBDLtZkX9xEVEkaUfPdIA9QsJrWjGDpeWsE';
   let sb=null;
-  try{if(SUPABASE_URL!=='YOUR_SUPABASE_URL'&&window.supabase){sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}}catch(e){console.error(e)}
+  try{if(window.supabase){sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}}catch(e){console.error(e)}
 
   const TOTAL=1000;
 
