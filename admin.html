@@ -421,140 +421,20 @@ async function sendReport(id) {
   const r = allData.find(d => d.id === id);
   if (!r || !r.email) { showToast('No email for this submission', 'error'); return; }
 
-  const vehicle = [r.make, r.model, r.trim].filter(Boolean).join(' ') || 'Your Vehicle';
-  const grade = r.grade || 'B';
-  const payment = r.monthly_payment || 0;
-  const county = r.county || 'NJ';
-  const mf = r.money_factor;
-  const residual = r.residual_pct;
-  const msrp = r.msrp;
-  const sp = r.selling_price;
-  const term = r.term || 36;
-  const das = r.due_at_signing || 0;
-  const effMonthly = Math.round((payment * term + das) / term);
+  showToast('Sending report to ' + r.email + '...', 'success');
 
-  // Grade styling
-  const gc = { 'A': '#4a8f5a', 'B+': '#5c7a65', 'B': '#5c7a65', 'C+': '#a8692e', 'C': '#a8692e', 'D': '#a85a4a' };
-  const gradeColor = gc[grade] || '#5c7a65';
-
-  // Build MF analysis section
-  let mfSection = '';
-  if (mf) {
-    const apr = (mf * 2400).toFixed(2);
-    mfSection = `
-      <tr><td style="padding:0 32px 16px;">
-        <div style="background:#1a1512;border-radius:4px;padding:20px 24px;">
-          <div style="font-family:monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#c4864a;margin-bottom:10px;">Money Factor Analysis</div>
-          <table width="100%" cellpadding="0" cellspacing="0"><tr>
-            <td width="48%"><div style="font-size:12px;color:#a89f94;">Your MF</div><div style="font-size:22px;color:#e8e4dc;font-family:monospace;">${mf}</div><div style="font-size:11px;color:#6b6259;">≈ ${apr}% APR</div></td>
-            <td width="48%"><div style="font-size:12px;color:#a89f94;">Effective Monthly</div><div style="font-size:22px;color:#e8e4dc;font-family:monospace;">$${effMonthly}</div><div style="font-size:11px;color:#6b6259;">Payment + DAS amortized</div></td>
-          </tr></table>
-        </div>
-      </td></tr>`;
-  }
-
-  // Build residual/discount section
-  let detailSection = '';
-  if (residual || (msrp && sp)) {
-    const disc = msrp && sp ? ((1 - sp / msrp) * 100).toFixed(1) : null;
-    detailSection = `
-      <tr><td style="padding:0 32px 16px;">
-        <table width="100%" cellpadding="0" cellspacing="0"><tr>
-          ${residual ? `<td style="background:#f8f5f0;border:1px solid rgba(28,25,23,0.10);border-radius:3px;padding:12px 16px;"><div style="font-family:monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#a89f94;margin-bottom:4px;">Residual</div><div style="font-size:20px;color:#1c1917;">${residual}%</div></td><td width="8px"></td>` : ''}
-          ${disc ? `<td style="background:#f8f5f0;border:1px solid rgba(28,25,23,0.10);border-radius:3px;padding:12px 16px;"><div style="font-family:monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#a89f94;margin-bottom:4px;">Discount off MSRP</div><div style="font-size:20px;color:#1c1917;">${disc}%</div></td>` : ''}
-        </tr></table>
-      </td></tr>`;
-  }
-
-  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background:#f8f5f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8f5f0;"><tr><td align="center" style="padding:40px 20px 0;">
-    <table width="600" cellpadding="0" cellspacing="0"><tr><td style="font-family:Georgia,'Times New Roman',serif;font-size:22px;color:#1c1917;">Lease<span style="color:#a8692e;">Checkr</span></td></tr></table>
-  </td></tr></table>
-
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8f5f0;"><tr><td align="center" style="padding:16px 20px 8px;">
-    <table width="600" cellpadding="0" cellspacing="0"><tr><td style="font-family:monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#c4864a;">Full Deal Report</td></tr></table>
-  </td></tr></table>
-
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8f5f0;"><tr><td align="center" style="padding:8px 20px 40px;">
-    <table width="600" cellpadding="0" cellspacing="0" style="background:#fdfaf6;border:1px solid rgba(28,25,23,0.10);border-radius:4px;">
-
-      <tr><td style="padding:28px 32px 0;">
-        <div style="font-family:monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#a89f94;">${vehicle}</div>
-        <div style="font-size:12px;color:#a89f94;margin-top:4px;">${term}mo · ${county} County, NJ</div>
-      </td></tr>
-
-      <tr><td style="padding:20px 32px;">
-        <table cellpadding="0" cellspacing="0"><tr>
-          <td style="vertical-align:top;padding-right:18px;"><div style="font-family:Georgia,serif;font-size:72px;font-weight:300;line-height:0.85;color:${gradeColor};">${grade}</div></td>
-          <td style="vertical-align:middle;"><div style="font-size:14px;color:#6b6259;line-height:1.55;max-width:280px;">Your full deal analysis based on verified NJ lease benchmark data.</div></td>
-        </tr></table>
-      </td></tr>
-
-      <tr><td style="padding:0 32px;"><div style="height:1px;background:rgba(28,25,23,0.10);"></div></td></tr>
-
-      <tr><td style="padding:20px 32px;">
-        <table width="100%" cellpadding="0" cellspacing="0"><tr>
-          <td width="30%" style="background:#f8f5f0;border:1px solid rgba(28,25,23,0.10);border-radius:3px;padding:12px 16px;">
-            <div style="font-family:monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#a89f94;margin-bottom:4px;">Payment</div>
-            <div style="font-size:22px;color:#1c1917;">$${payment}</div>
-          </td>
-          <td width="5%"></td>
-          <td width="30%" style="background:#f8f5f0;border:1px solid rgba(28,25,23,0.10);border-radius:3px;padding:12px 16px;">
-            <div style="font-family:monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#a89f94;margin-bottom:4px;">Due at Signing</div>
-            <div style="font-size:22px;color:#1c1917;">$${das.toLocaleString()}</div>
-          </td>
-          <td width="5%"></td>
-          <td width="30%" style="background:#f8f5f0;border:1px solid rgba(28,25,23,0.10);border-radius:3px;padding:12px 16px;">
-            <div style="font-family:monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#a89f94;margin-bottom:4px;">Total Cost</div>
-            <div style="font-size:22px;color:#1c1917;">$${(payment * term + das).toLocaleString()}</div>
-          </td>
-        </tr></table>
-      </td></tr>
-
-      ${mfSection}
-      ${detailSection}
-
-      <tr><td style="padding:16px 32px 28px;">
-        <div style="font-size:13px;color:#6b6259;line-height:1.7;">
-          This report was generated from the LeaseCheckr NJ benchmark — verified signed lease deals from NJ drivers. For questions or to contribute more data, visit <a href="https://leasecheckr.vercel.app" style="color:#a8692e;text-decoration:none;">leasecheckr.vercel.app</a>.
-        </div>
-      </td></tr>
-
-    </table>
-  </td></tr></table>
-
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8f5f0;"><tr><td align="center" style="padding:0 20px 40px;">
-    <table width="600"><tr><td style="text-align:center;font-size:11px;color:#a89f94;line-height:1.6;">
-      <a href="https://leasecheckr.vercel.app" style="color:#a8692e;text-decoration:none;">LeaseCheckr</a> · NJ Lease Intelligence<br>
-      <a href="https://leasecheckr.vercel.app/privacy.html" style="color:#a89f94;text-decoration:none;">Privacy</a> · <a href="https://leasecheckr.vercel.app/terms.html" style="color:#a89f94;text-decoration:none;">Terms</a>
-    </td></tr></table>
-  </td></tr></table>
-</body></html>`;
-
-  // Send via Resend
   try {
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESEND_KEY },
-      body: JSON.stringify({
-        from: 'LeaseCheckr <onboarding@resend.dev>',
-        to: [r.email],
-        subject: 'Your Full Lease Report: ' + grade + ' — ' + vehicle,
-        html: html
-      })
-    });
-
-    const result = await res.json();
-    if (res.ok) {
-      // Update report_entitlement in DB
-      await sb.from('lease_submissions').update({ report_entitlement: 'sent' }).eq('id', id);
+    const { data, error } = await sb.rpc('send_full_report', { submission_id: id });
+    if (error) {
+      showToast('Send failed: ' + error.message, 'error');
+    } else if (data && data.startsWith('success')) {
       showToast('Full report sent to ' + r.email, 'success');
+      loadData();
     } else {
-      showToast('Email failed: ' + JSON.stringify(result), 'error');
+      showToast('Send issue: ' + (data || 'unknown'), 'error');
     }
   } catch (err) {
-    showToast('Email error: ' + err.message, 'error');
+    showToast('Send error: ' + err.message, 'error');
   }
 }
 
