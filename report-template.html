@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Your Lease Report — LeaseCheckr</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#faf7f2;--bg2:#f3efe7;--bg3:#eae5db;--cream:#fefcf8;
+  --dark:#0b0907;--dark2:#13110e;--dark3:#1c1915;--dark4:#282420;--dark5:#3a3530;
+  --ink:#1a1613;--ink2:#38332c;--ink3:#635c52;--ink4:#9e968a;--ink5:#c8c1b6;
+  --copper:#b3722f;--copper-lt:#d49040;--copper-bg:#f6ecdf;--copper-dim:rgba(179,114,47,0.1);
+  --sage:#3d7a4e;--sage-bg:#e4f0e7;--sage-dim:rgba(61,122,78,0.08);
+  --rose:#c24838;--rose-bg:#fae6e3;--rose-dim:rgba(194,72,56,0.08);
+  --amber:#c08e22;--amber-bg:#f8f0dc;
+  --green:#3bb85e;--green-dim:rgba(59,184,94,0.1);
+  --white:#fff;
+  --on-dark:#f2ede5;--on-dark2:#c4bdb2;--on-dark3:#8a847a;--on-dark4:#5a544c;
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono','Menlo',monospace;
+}
+html{font-size:17px}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.65}
+.r{max-width:700px;margin:0 auto;padding:0 28px}
+
+.cover{min-height:95vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:48px 28px;position:relative}
+.cover::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--copper),var(--copper-lt),var(--sage))}
+.cv-brand{font-family:var(--mono);font-size:0.58rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--copper);margin-bottom:48px}
+.cv-vehicle{font-family:var(--serif);font-size:3.2rem;font-weight:300;line-height:1.06;margin-bottom:6px}
+.cv-vehicle em{font-style:italic;color:var(--copper)}
+.cv-trim{font-family:var(--serif);font-size:1.2rem;font-weight:300;color:var(--ink3);margin-bottom:24px;font-style:italic}
+.cv-meta{font-size:0.78rem;color:var(--ink4);line-height:2}
+.cv-grade-ring{width:140px;height:140px;border-radius:50%;border:2.5px solid;display:flex;align-items:center;justify-content:center;margin:48px auto 10px;position:relative}
+.cv-grade-ring::after{content:'';position:absolute;inset:-8px;border-radius:50%;border:1px solid;opacity:0.15}
+.cv-grade-ring.ga{border-color:var(--sage)}.cv-grade-ring.ga::after{border-color:var(--sage)}
+.cv-grade-ring.gb{border-color:var(--copper)}.cv-grade-ring.gb::after{border-color:var(--copper)}
+.cv-grade-ring.gc{border-color:var(--amber)}.cv-grade-ring.gc::after{border-color:var(--amber)}
+.cv-grade-ring.gd{border-color:var(--rose)}.cv-grade-ring.gd::after{border-color:var(--rose)}
+.cv-letter{font-family:var(--serif);font-size:5rem;font-weight:300;line-height:1}
+.ga .cv-letter{color:var(--sage)}.gb .cv-letter{color:var(--copper)}.gc .cv-letter{color:var(--amber)}.gd .cv-letter{color:var(--rose)}
+.cv-verdict{font-family:var(--mono);font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;margin-top:14px}
+.cv-date{font-family:var(--mono);font-size:0.52rem;letter-spacing:0.15em;color:var(--ink5);text-transform:uppercase;margin-top:48px}
+
+.part{padding:56px 0 36px;text-align:center;border-top:1px solid var(--bg3);position:relative}
+.part::before{content:'';position:absolute;top:-1px;left:50%;transform:translateX(-50%);width:40px;height:3px;background:var(--copper)}
+.part-num{font-family:var(--mono);font-size:0.5rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--copper);margin-bottom:8px}
+.part-name{font-family:var(--serif);font-size:1.8rem;font-weight:400}
+.part-name em{font-style:italic;color:var(--copper)}
+.part-sub{font-size:0.8rem;color:var(--ink4);margin-top:6px}
+
+.sec{padding:44px 0;border-top:1px solid var(--bg3)}
+.sec:first-of-type{border-top:none}
+.sn{font-family:var(--mono);font-size:0.48rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--copper);margin-bottom:5px}
+.sh{font-family:var(--serif);font-size:1.6rem;font-weight:400;line-height:1.15;margin-bottom:6px}
+.sh em{font-style:italic;color:var(--copper)}
+.ss{font-size:0.82rem;color:var(--ink3);margin-bottom:24px;line-height:1.7;max-width:540px}
+.nar{font-size:0.88rem;color:var(--ink2);line-height:1.9;margin-bottom:18px}
+.nar strong{color:var(--ink);font-weight:600}
+.nar em{color:var(--copper);font-style:normal;font-weight:500}
+
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
+.m{background:var(--white);border:1px solid rgba(0,0,0,0.05);border-radius:10px;padding:16px 18px}
+.ml{font-family:var(--mono);font-size:0.48rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink4);margin-bottom:4px}
+.mv{font-family:var(--serif);font-size:1.65rem;font-weight:400;color:var(--ink)}
+.ms{font-size:0.68rem;color:var(--ink4);margin-top:3px}
+.m.hi{border-left:3px solid var(--copper);background:var(--copper-bg)}
+.m.ok{border-left:3px solid var(--sage);background:var(--sage-bg)}
+.m.bad{border-left:3px solid var(--rose);background:var(--rose-bg)}
+.mf{grid-column:1/-1}
+
+.scores{margin:22px 0}
+.sr{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.sc{width:120px;font-family:var(--mono);font-size:0.52rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3);flex-shrink:0}
+.st{flex:1;height:5px;background:var(--bg3);border-radius:5px;overflow:hidden}
+.sf{height:100%;border-radius:5px}
+.sf.a{background:var(--sage)}.sf.b{background:var(--sage);opacity:0.65}.sf.c{background:var(--copper)}.sf.d{background:var(--rose)}
+.sg{width:24px;font-family:var(--mono);font-size:0.58rem;font-weight:500;text-align:center}
+
+.ins{display:flex;gap:12px;padding:16px 18px;background:var(--white);border:1px solid rgba(0,0,0,0.05);border-radius:10px;margin:16px 0;border-left:3px solid var(--copper)}
+.ins-i{font-size:1rem;flex-shrink:0;margin-top:1px}
+.ins-t{font-size:0.8rem;color:var(--ink2);line-height:1.7}
+.ins-t strong{color:var(--ink)}
+
+.cbar{padding:16px 18px;background:var(--white);border:1px solid rgba(0,0,0,0.05);border-radius:10px;margin:18px 0}
+.cbar-l{font-family:var(--mono);font-size:0.48rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink4);margin-bottom:12px}
+.cbar-track{height:6px;background:var(--bg3);border-radius:6px;position:relative;margin-bottom:14px}
+.cbar-fill{height:100%;border-radius:6px;position:absolute;left:0;top:0}
+.cbar-you{background:var(--copper);z-index:2}
+.cbar-avg{background:var(--sage);opacity:0.3;z-index:1}
+.cbar-marks{display:flex;justify-content:space-between}
+.cm{text-align:center}
+.cm-v{font-family:var(--serif);font-size:0.95rem;font-weight:500}
+.cm-l{font-family:var(--mono);font-size:0.44rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink4)}
+.cm.you .cm-v{color:var(--copper)}.cm.avg .cm-v{color:var(--sage)}
+
+.dtbl{width:100%;border-collapse:collapse;margin:18px 0;font-size:0.76rem}
+.dtbl th{font-family:var(--mono);font-size:0.46rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink4);text-align:left;padding:9px 12px;border-bottom:2px solid var(--bg3);font-weight:500}
+.dtbl td{padding:10px 12px;border-bottom:1px solid var(--bg2);color:var(--ink2)}
+.dtbl .you{background:var(--copper-bg);font-weight:500;color:var(--ink)}
+.dtbl .you td:first-child::before{content:'→ ';color:var(--copper)}
+
+.dlr{background:var(--white);border:1px solid rgba(0,0,0,0.05);border-radius:10px;padding:20px;margin:18px 0}
+.dlr-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--bg2)}
+.dlr-name{font-size:0.92rem;font-weight:600;color:var(--ink)}
+.dlr-badge{font-family:var(--mono);font-size:0.46rem;letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;border-radius:4px}
+.dlr-badge.avg{background:var(--amber-bg);color:var(--amber)}
+.dlr-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.dlr-stat-l{font-family:var(--mono);font-size:0.44rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink4);margin-bottom:2px}
+.dlr-stat-v{font-family:var(--serif);font-size:1.15rem;font-weight:400;color:var(--ink)}
+.dlr-obs{font-size:0.78rem;color:var(--ink3);line-height:1.65;padding-top:12px;border-top:1px solid var(--bg2)}
+
+.dk{background:var(--dark);color:var(--on-dark);padding:44px 32px;margin:28px -28px;border-radius:14px;position:relative;overflow:hidden}
+.dk::before{content:'';position:absolute;top:0;right:0;width:300px;height:300px;background:radial-gradient(circle,rgba(179,114,47,0.06) 0%,transparent 70%);pointer-events:none}
+.dk .sn{color:var(--copper-lt)}.dk .sh{color:var(--on-dark)}.dk .ss{color:var(--on-dark3)}
+
+.nvs{display:grid;grid-template-columns:1fr auto 1fr;gap:0;margin:18px 0;align-items:center}
+.nb{background:var(--dark2);border-radius:10px;padding:16px;text-align:center;border:1px solid var(--dark4)}
+.nb.you{border-color:var(--copper-dim)}.nb.tgt{border-color:var(--green-dim)}
+.nb-l{font-family:var(--mono);font-size:0.44rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--on-dark3);margin-bottom:4px}
+.nb-v{font-size:1.4rem;font-weight:600}
+.nb.you .nb-v{color:var(--copper-lt)}.nb.tgt .nb-v{color:var(--green)}
+.nb-n{font-size:0.56rem;color:var(--on-dark4);margin-top:3px}
+.narr{font-size:1.2rem;color:var(--on-dark4);padding:0 12px}
+
+.sav{background:var(--green-dim);border:1px solid rgba(59,184,94,0.18);border-radius:12px;padding:22px;margin:16px 0;position:relative;overflow:hidden}
+.sav::after{content:'$';position:absolute;right:14px;top:-6px;font-size:4.5rem;font-weight:800;opacity:0.05;color:var(--green)}
+.sav-l{font-family:var(--mono);font-size:0.48rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--green);margin-bottom:5px}
+.sav-v{font-size:1.8rem;font-weight:700;color:var(--green);margin-bottom:3px}
+.sav-d{font-size:0.78rem;color:var(--on-dark2);line-height:1.6}
+
+.wrn{background:var(--rose-dim);border:1px solid rgba(194,72,56,0.18);border-radius:12px;padding:22px;margin:16px 0}
+.wrn-l{font-family:var(--mono);font-size:0.48rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--rose);margin-bottom:5px}
+.wrn-t{font-size:1.05rem;font-weight:600;color:var(--on-dark);margin-bottom:4px}
+.wrn-d{font-size:0.78rem;color:var(--on-dark2);line-height:1.7}
+
+.scr{background:var(--dark3);border-radius:12px;padding:20px;margin:10px 0;border:1px solid var(--dark4)}
+.scr-c{font-family:var(--mono);font-size:0.46rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--copper-lt);margin-bottom:8px}
+.scr-q{font-family:var(--serif);font-size:1rem;font-weight:300;font-style:italic;line-height:1.7;color:rgba(242,237,229,0.85);padding-left:14px;border-left:2px solid var(--copper-lt);margin-bottom:8px}
+.scr-w{font-size:0.68rem;color:var(--on-dark3);line-height:1.5}
+.scr-w strong{color:var(--on-dark2)}
+
+.pm{display:flex;gap:12px;padding:16px 18px;margin:9px 0;background:var(--dark2);border-radius:10px;border:1px solid var(--dark4)}
+.pm-n{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:0.6rem;font-weight:600;flex-shrink:0;background:var(--copper-dim);color:var(--copper-lt)}
+.pm-t{font-size:0.84rem;font-weight:600;color:var(--on-dark);margin-bottom:2px}
+.pm-d{font-size:0.72rem;color:var(--on-dark3);line-height:1.6}
+.pm-i{font-family:var(--mono);font-size:0.5rem;letter-spacing:0.06em;color:var(--green);margin-top:5px;display:inline-block;padding:2px 7px;background:var(--green-dim);border-radius:3px}
+
+.cl{margin:18px 0}
+.ci{display:flex;align-items:flex-start;gap:11px;padding:10px 0;border-bottom:1px solid var(--bg2)}
+.ci:last-child{border-bottom:none}
+.cb{width:18px;height:18px;border:1.5px solid var(--ink5);border-radius:3px;flex-shrink:0;margin-top:2px}
+.ct{font-size:0.8rem;color:var(--ink2);line-height:1.5}
+.ct strong{color:var(--ink);font-weight:600}
+
+.rf{padding:44px 0;text-align:center;border-top:1px solid var(--bg3);margin-top:44px}
+.rf-b{font-family:var(--serif);font-size:1.15rem;color:var(--ink);margin-bottom:5px}
+.rf-b span{color:var(--copper)}
+.rf-n{font-size:0.7rem;color:var(--ink4);line-height:1.6;max-width:420px;margin:0 auto}
+.rf-d{font-size:0.56rem;color:var(--ink5);margin-top:18px;line-height:1.6;max-width:500px;margin-left:auto;margin-right:auto}
+
+@media print{
+  .dk{break-inside:avoid;border-radius:0;margin:20px 0}
+  @page{margin:0.5in}
+  .cover{min-height:auto;padding:40px 0}
+}
+</style>
+</head>
+<body>
+<div class="r" id="report">
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cv-brand">LeaseCheckr · Full Deal Report</div>
+  <h1 class="cv-vehicle" id="cvVehicle">Loading...</h1>
+  <div class="cv-trim" id="cvTrim"></div>
+  <div class="cv-meta" id="cvMeta"></div>
+  <div class="cv-grade-ring gb" id="cvRing"><div class="cv-letter" id="cvLetter">—</div></div>
+  <div class="cv-verdict" id="cvVerdict"></div>
+  <div class="cv-date" id="cvDate"></div>
+</div>
+
+<!-- PART 1 -->
+<div class="part"><div class="part-num">Part One</div><div class="part-name">Deal <em>Analysis</em></div><div class="part-sub">Every number explained and benchmarked.</div></div>
+
+<!-- 01 GLANCE -->
+<div class="sec">
+  <div class="sn">01</div>
+  <h2 class="sh">Your deal at <em>a glance</em></h2>
+  <p class="ss">How your lease compares to real signed deals on the same vehicle in your area.</p>
+  <div class="mg">
+    <div class="m hi"><div class="ml">Your Payment</div><div class="mv" id="rPay"></div><div class="ms" id="rDas"></div></div>
+    <div class="m ok"><div class="ml" id="rAvgLabel">County Average</div><div class="mv" id="rAvg"></div><div class="ms" id="rAvgNote"></div></div>
+    <div class="m"><div class="ml">Effective Monthly</div><div class="mv" id="rEff"></div><div class="ms">Payment + signing amortized</div></div>
+    <div class="m"><div class="ml">Total Lease Cost</div><div class="mv" id="rTotal"></div><div class="ms" id="rTotalNote"></div></div>
+  </div>
+  <div class="nar" id="rNarrative"></div>
+  <div class="cbar">
+    <div class="cbar-l">Your payment vs. local range</div>
+    <div class="cbar-track"><div class="cbar-fill cbar-avg" id="cbarAvg" style="width:75%"></div><div class="cbar-fill cbar-you" id="cbarYou" style="width:65%"></div></div>
+    <div class="cbar-marks">
+      <div class="cm"><div class="cm-v" id="cbarLow" style="color:var(--ink5)"></div><div class="cm-l">Best</div></div>
+      <div class="cm you"><div class="cm-v" id="cbarYouV"></div><div class="cm-l">You</div></div>
+      <div class="cm avg"><div class="cm-v" id="cbarAvgV"></div><div class="cm-l">Avg</div></div>
+      <div class="cm"><div class="cm-v" id="cbarHigh" style="color:var(--ink5)"></div><div class="cm-l">High</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 02 SCORES -->
+<div class="sec">
+  <div class="sn">02</div>
+  <h2 class="sh">Score <em>breakdown</em></h2>
+  <p class="ss">Key dimensions that affect your total cost.</p>
+  <div class="scores" id="rScores"></div>
+  <div class="ins" id="rInsight"><div class="ins-i">💡</div><div class="ins-t" id="rInsightText"></div></div>
+</div>
+
+<!-- 03 MF DEEP DIVE -->
+<div class="sec" id="secMF">
+  <div class="sn">03</div>
+  <h2 class="sh">The money factor: <em>your hidden cost</em></h2>
+  <p class="ss">The single biggest lever dealers use to increase profit.</p>
+  <div class="mg">
+    <div class="m bad"><div class="ml">Your Money Factor</div><div class="mv" id="rMF"></div><div class="ms" id="rMFapr"></div></div>
+    <div class="m ok"><div class="ml">Buy Rate (Base)</div><div class="mv" id="rBuyRate"></div><div class="ms" id="rBuyApr"></div></div>
+  </div>
+  <div class="m hi mf" style="margin:10px 0 18px"><div class="ml">Dealer Markup</div><div class="mv" id="rMarkup"></div><div class="ms" id="rMarkupNote"></div></div>
+  <div class="nar" id="rMFnar"></div>
+</div>
+
+<!-- 04 DEAL TERMS -->
+<div class="sec" id="secTerms">
+  <div class="sn">04</div>
+  <h2 class="sh">Deal terms <em>breakdown</em></h2>
+  <p class="ss">The numbers behind your lease.</p>
+  <div class="mg">
+    <div class="m"><div class="ml">MSRP</div><div class="mv" id="rMsrp"></div></div>
+    <div class="m"><div class="ml">Selling Price</div><div class="mv" id="rSP"></div><div class="ms" id="rDisc"></div></div>
+    <div class="m"><div class="ml">Residual</div><div class="mv" id="rRes"></div><div class="ms" id="rResNote"></div></div>
+    <div class="m"><div class="ml">Due at Signing</div><div class="mv" id="rDasBox"></div></div>
+  </div>
+</div>
+
+<!-- 05 COMPARABLE DEALS (populated by Supabase query) -->
+<div class="sec" id="secComps">
+  <div class="sn">05</div>
+  <h2 class="sh">What others paid <em>nearby</em></h2>
+  <p class="ss" id="compsSubtitle">Recent verified deals in your area. Your deal is highlighted.</p>
+  <table class="dtbl" id="compsTable">
+    <thead><tr><th>Vehicle</th><th>Payment</th><th>Due at Sign</th><th>MF</th><th>County</th></tr></thead>
+    <tbody id="compsBody"><tr><td colspan="5" style="color:var(--ink4);text-align:center;padding:20px;">Loading comparable deals...</td></tr></tbody>
+  </table>
+  <div class="dtbl-note" id="compsNote"></div>
+  <div class="ins" id="compsInsight" style="display:none;"><div class="ins-i">📊</div><div class="ins-t" id="compsInsightText"></div></div>
+</div>
+
+<!-- 06 DEALER SIGNALS (populated by Supabase query) -->
+<div class="sec" id="secDealer" style="display:none;">
+  <div class="sn">06</div>
+  <h2 class="sh">Dealer pricing <em>signals</em></h2>
+  <p class="ss" id="dealerSubtitle"></p>
+  <div class="dlr" id="dealerCard"></div>
+  <div class="ins"><div class="ins-i">🏪</div><div class="ins-t"><strong>As more NJ drivers contribute deals, dealer rankings become more precise.</strong> We're building toward county-level dealer comparisons — showing which dealers consistently offer better pricing and lower MF markups.</div></div>
+</div>
+
+<!-- PART 2 -->
+<div class="part"><div class="part-num">Part Two</div><div class="part-name">Negotiation <em>Playbook</em></div><div class="part-sub">What to do, what to say, and what to check.</div></div>
+
+<!-- 07 ONE THING TO FIX -->
+<div class="dk" id="secFix">
+  <div class="sn">07</div>
+  <h2 class="sh" style="font-family:var(--sans);font-weight:700;font-size:1.3rem">🚩 The One Thing to Fix</h2>
+  <p class="ss">Your money factor markup is where the dealer profits — and it's the easiest thing to negotiate.</p>
+  <div class="nvs">
+    <div class="nb you"><div class="nb-l">You're paying</div><div class="nb-v" id="fixYou"></div><div class="nb-n" id="fixYouApr"></div></div>
+    <div class="narr">→</div>
+    <div class="nb tgt"><div class="nb-l">Target</div><div class="nb-v" id="fixTgt"></div><div class="nb-n" id="fixTgtApr"></div></div>
+  </div>
+  <div class="wrn"><div class="wrn-l">Hidden Cost</div><div class="wrn-t" id="fixCost"></div><div class="wrn-d" id="fixCostNote"></div></div>
+  <div class="sav"><div class="sav-l">Potential Savings</div><div class="sav-v" id="fixSavings"></div><div class="sav-d" id="fixSavingsNote"></div></div>
+</div>
+
+<!-- 08 SCRIPTS -->
+<div class="dk" style="margin-top:14px">
+  <div class="sn">08</div>
+  <h2 class="sh" style="font-family:var(--sans);font-weight:700;font-size:1.3rem">💬 Exactly What to Say</h2>
+  <p class="ss">Use these word-for-word at the dealership.</p>
+  <div class="scr"><div class="scr-c">Opening — Get the number</div><div class="scr-q">"Before we finalize, can you show me the money factor? I'd like to see it written on the deal sheet."</div><div class="scr-w"><strong>Why:</strong> Signals you understand lease structure. Dealers give better terms to informed buyers.</div></div>
+  <div class="scr"><div class="scr-c">Counter — Push for buy rate</div><div class="scr-q" id="scrCounter"></div><div class="scr-w"><strong>Why:</strong> Shows you know the buy rate without being aggressive.</div></div>
+  <div class="scr"><div class="scr-c">Closer — Use competition</div><div class="scr-q">"I have a similar offer from another dealer. If you can match .00150, I'd prefer to work with you."</div><div class="scr-w"><strong>Why:</strong> Competition motivates movement.</div></div>
+  <div class="scr"><div class="scr-c">F&I — Decline add-ons</div><div class="scr-q">"I appreciate the offer on the protection packages, but I'd like to finalize without any additional products."</div><div class="scr-w"><strong>Why:</strong> F&I offices make significant profit on add-ons.</div></div>
+</div>
+
+<!-- 09 POWER MOVES -->
+<div class="dk" style="margin-top:14px">
+  <div class="sn">09</div>
+  <h2 class="sh" style="font-family:var(--sans);font-weight:700;font-size:1.3rem">⚡ Your 4 Power Moves</h2>
+  <p class="ss">Ranked by dollar impact. Do #1 no matter what.</p>
+  <div class="pm"><div class="pm-n">1</div><div><div class="pm-t">Negotiate the money factor</div><div class="pm-d" id="pm1d"></div><div class="pm-i" id="pm1s"></div></div></div>
+  <div class="pm"><div class="pm-n">2</div><div><div class="pm-t">Get one competing quote</div><div class="pm-d" id="pm2d"></div><div class="pm-i">SAVES $300 – $800</div></div></div>
+  <div class="pm"><div class="pm-n">3</div><div><div class="pm-t">Ask about hidden incentives</div><div class="pm-d">"Are there lease incentives or loyalty bonuses I qualify for?"</div><div class="pm-i">SAVES $500 – $1,500</div></div></div>
+  <div class="pm"><div class="pm-n">4</div><div><div class="pm-t">Refuse all F&I add-ons</div><div class="pm-d">Nitrogen fill, paint protection, VIN etching — decline everything.</div><div class="pm-i">SAVES $500 – $2,000</div></div></div>
+</div>
+
+<!-- 10 CHECKLIST -->
+<div class="sec">
+  <div class="sn">10</div>
+  <h2 class="sh">Before you <em>sign</em></h2>
+  <p class="ss">Pull this up on your phone at the dealership.</p>
+  <div class="cl" id="rChecklist"></div>
+</div>
+
+<!-- FOOTER -->
+<div class="rf">
+  <div class="rf-b">Lease<span>Checkr</span></div>
+  <div class="rf-n">Generated for your specific deal using verified NJ lease benchmark data. Save it, print it, bring it to the dealership.</div>
+  <div class="rf-d">LeaseCheckr provides informational analysis based on crowdsourced data. This is not financial, legal, or professional advice. Always verify terms with your dealer and lender before signing.</div>
+</div>
+
+</div>
+
+<script>
+// Read deal data from URL params
+const p = new URLSearchParams(window.location.search);
+const g = k => p.get(k) || '';
+const gn = k => parseFloat(p.get(k)) || 0;
+
+const make = g('make');
+const model = g('model');
+const trim = g('trim');
+const year = g('year') || '2025';
+const payment = gn('pay');
+const das = gn('das');
+const term = gn('term') || 36;
+const mileage = gn('mi') || 10000;
+const county = g('county') || 'NJ';
+const dealer = g('dealer');
+const signed = g('signed');
+const msrp = gn('msrp');
+const sp = gn('sp');
+const residual = gn('res');
+const mf = parseFloat(p.get('mf')) || 0;
+const grade = g('grade') || 'B';
+const avgPay = gn('avg') || Math.round(payment * 1.06);
+
+const vehicle = [make, model].filter(Boolean).join(' ') || 'Your Vehicle';
+const vehicleFull = [year, make, model].filter(Boolean).join(' ');
+const eff = Math.round((payment * term + das) / term);
+const totalCost = payment * term + das;
+const diff = payment - avgPay;
+
+// Buy rate estimate (typical for major manufacturers)
+const buyRate = mf > 0 ? Math.max(mf - 0.0006, 0.00050) : 0.00125;
+const mfApr = (mf * 2400).toFixed(2);
+const buyApr = (buyRate * 2400).toFixed(2);
+const markup = mf > 0 ? (mf - buyRate) : 0;
+const mfCostMo = msrp > 0 && mf > 0 ? Math.round(markup * (msrp + msrp * (residual || 55) / 100)) : Math.round(markup * 60000);
+const mfCostTotal = mfCostMo * term;
+const discPct = msrp > 0 && sp > 0 ? ((1 - sp / msrp) * 100).toFixed(1) : null;
+
+// Grade ring class
+const gradeRing = grade.startsWith('A') ? 'ga' : (grade.startsWith('B') ? 'gb' : (grade.startsWith('C') ? 'gc' : 'gd'));
+const gradeColor = grade.startsWith('A') ? 'var(--sage)' : (grade.startsWith('B') ? 'var(--copper)' : (grade.startsWith('C') ? 'var(--amber)' : 'var(--rose)'));
+
+// Verdict text
+const verdicts = {'A':'Excellent Deal','A-':'Excellent Deal','B+':'Good Deal — One Fix Makes It Great','B':'Fair Deal','B-':'Fair Deal','C+':'Slightly Above Average','C':'Overpaying','D':'Significantly Overpaying'};
+const verdict = verdicts[grade] || 'Deal Analyzed';
+
+// Populate COVER
+document.getElementById('cvVehicle').innerHTML = vehicleFull + (trim ? '<br><em>' + trim + '</em>' : '');
+document.getElementById('cvTrim').textContent = term + ' months · ' + (mileage/1000).toFixed(0) + ',000 mi/yr · ' + county + ' County, NJ';
+document.getElementById('cvMeta').textContent = (dealer ? dealer + ' · ' : '') + (signed ? 'Signed ' + signed : '');
+document.getElementById('cvLetter').textContent = grade;
+document.getElementById('cvRing').className = 'cv-grade-ring ' + gradeRing;
+document.getElementById('cvVerdict').textContent = verdict;
+document.getElementById('cvVerdict').style.color = gradeColor;
+document.getElementById('cvDate').textContent = 'Generated ' + new Date().toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
+
+// Populate 01 GLANCE
+document.getElementById('rPay').innerHTML = '$' + payment.toLocaleString() + '<span style="font-size:0.8rem;color:var(--ink4)">/mo</span>';
+document.getElementById('rDas').textContent = '$' + das.toLocaleString() + ' due at signing';
+document.getElementById('rAvgLabel').textContent = county + ' Co. Average';
+document.getElementById('rAvg').innerHTML = '$' + avgPay.toLocaleString() + '<span style="font-size:0.8rem;color:var(--ink4)">/mo</span>';
+document.getElementById('rAvgNote').textContent = 'Based on verified NJ deals';
+document.getElementById('rEff').textContent = '$' + eff.toLocaleString();
+document.getElementById('rTotal').textContent = '$' + totalCost.toLocaleString();
+document.getElementById('rTotalNote').textContent = 'Over ' + term + ' months';
+
+const diffText = diff < 0 ? ('$' + Math.abs(diff) + ' below') : ('$' + diff + ' above');
+const savedText = diff < 0 ? ('$' + Math.abs(diff * term).toLocaleString() + ' saved') : ('$' + (diff * term).toLocaleString() + ' extra');
+document.getElementById('rNarrative').innerHTML = 'Your monthly payment of <em>$' + payment + '</em> is <strong>' + diffText + ' the ' + county + ' County average</strong> for this vehicle. Over ' + term + ' months, that\'s roughly <strong>' + savedText + '</strong> compared to the typical deal.' + (mf > 0 && markup > 0.0002 ? ' However, your money factor suggests there\'s about $' + mfCostTotal.toLocaleString() + ' in negotiable financing markup.' : '');
+
+// Comparison bar
+const range = avgPay * 0.3;
+const low = Math.round(avgPay - range * 0.6);
+const high = Math.round(avgPay + range * 0.4);
+const youPct = Math.min(95, Math.max(5, ((payment - low) / (high - low)) * 100));
+const avgPct = Math.min(95, Math.max(5, ((avgPay - low) / (high - low)) * 100));
+document.getElementById('cbarYou').style.width = youPct + '%';
+document.getElementById('cbarAvg').style.width = avgPct + '%';
+document.getElementById('cbarLow').textContent = '$' + low;
+document.getElementById('cbarYouV').textContent = '$' + payment;
+document.getElementById('cbarAvgV').textContent = '$' + avgPay;
+document.getElementById('cbarHigh').textContent = '$' + high;
+
+// Populate 02 SCORES
+const scoreItems = [];
+if (payment > 0) { const pGrade = diff <= -avgPay*0.1 ? 'A-' : diff <= 0 ? 'B+' : diff <= avgPay*0.05 ? 'B' : 'C+'; const pPct = Math.max(20, Math.min(95, 80 - (diff/avgPay*100))); const pCls = pGrade.startsWith('A') ? 'a' : pGrade.startsWith('B') ? 'b' : 'c'; scoreItems.push({name:'Monthly Payment',grade:pGrade,pct:pPct,cls:pCls}); }
+if (das >= 0) { const dGrade = das <= 1000 ? 'A' : das <= 2500 ? 'B' : 'C+'; const dPct = Math.max(20, Math.min(90, 90 - das/50)); const dCls = dGrade.startsWith('A') ? 'a' : dGrade.startsWith('B') ? 'b' : 'c'; scoreItems.push({name:'Due at Signing',grade:dGrade,pct:dPct,cls:dCls}); }
+if (mf > 0) { const mGrade = markup <= 0.0001 ? 'A' : markup <= 0.0003 ? 'B' : markup <= 0.0006 ? 'C+' : 'C'; const mPct = Math.max(20, Math.min(90, 85 - markup*100000)); const mCls = mGrade.startsWith('A') ? 'a' : mGrade.startsWith('B') ? 'b' : 'c'; scoreItems.push({name:'Money Factor',grade:mGrade,pct:mPct,cls:mCls}); }
+if (residual > 0) { const rGrade = residual >= 60 ? 'A-' : residual >= 52 ? 'B+' : 'B'; const rPct = Math.min(90, residual * 1.3); const rCls = rGrade.startsWith('A') ? 'a' : 'b'; scoreItems.push({name:'Residual Value',grade:rGrade,pct:rPct,cls:rCls}); }
+if (discPct) { const sGrade = parseFloat(discPct) >= 5 ? 'A-' : parseFloat(discPct) >= 2 ? 'B' : 'C+'; const sPct = Math.min(90, parseFloat(discPct) * 15); const sCls = sGrade.startsWith('A') ? 'a' : sGrade.startsWith('B') ? 'b' : 'c'; scoreItems.push({name:'Selling Price',grade:sGrade,pct:sPct,cls:sCls}); }
+
+document.getElementById('rScores').innerHTML = scoreItems.map(s => 
+  '<div class="sr"><div class="sc">' + s.name + '</div><div class="st"><div class="sf ' + s.cls + '" style="width:' + s.pct + '%"></div></div><div class="sg" style="color:' + (s.cls==='a'?'var(--sage)':s.cls==='b'?'var(--sage)':'var(--copper)') + '">' + s.grade + '</div></div>'
+).join('');
+
+// Insight
+const worstScore = scoreItems.reduce((w, s) => (!w || 'ABCD'.indexOf(s.grade[0]) > 'ABCD'.indexOf(w.grade[0]) ? s : w), null);
+document.getElementById('rInsightText').innerHTML = worstScore ? '<strong>Your biggest opportunity is ' + worstScore.name.toLowerCase() + '.</strong> The full analysis above shows where the gap is and how to close it.' : 'Your deal scores well across all dimensions.';
+
+// Populate 03 MF
+if (mf > 0) {
+  document.getElementById('rMF').textContent = mf.toString();
+  document.getElementById('rMFapr').textContent = '≈ ' + mfApr + '% APR';
+  document.getElementById('rBuyRate').textContent = buyRate.toFixed(5);
+  document.getElementById('rBuyApr').textContent = '≈ ' + buyApr + '% APR';
+  document.getElementById('rMarkup').innerHTML = '+' + markup.toFixed(5) + ' <span style="font-size:0.82rem;color:var(--copper)">→ $' + mfCostTotal.toLocaleString() + ' over your lease</span>';
+  document.getElementById('rMarkupNote').textContent = 'Dealer profit on financing — $' + mfCostMo + '/month added to every payment';
+  document.getElementById('rMFnar').innerHTML = 'The manufacturer sets a base money factor of <strong>' + buyRate.toFixed(5) + '</strong>. Your dealer marked it up to <strong>' + mf + '</strong>. That ' + markup.toFixed(5) + ' difference adds <strong>$' + mfCostMo + ' to every monthly payment</strong>. Over ' + term + ' months, it costs <strong>$' + mfCostTotal.toLocaleString() + '</strong>.';
+} else {
+  document.getElementById('secMF').style.display = 'none';
+}
+
+// Populate 04 TERMS
+if (msrp > 0) document.getElementById('rMsrp').textContent = '$' + msrp.toLocaleString();
+else document.getElementById('rMsrp').textContent = '—';
+if (sp > 0) { document.getElementById('rSP').textContent = '$' + sp.toLocaleString(); document.getElementById('rDisc').textContent = discPct + '% off MSRP'; }
+else { document.getElementById('rSP').textContent = '—'; }
+if (residual > 0) { document.getElementById('rRes').textContent = residual + '%'; document.getElementById('rResNote').textContent = '$' + Math.round(msrp * residual / 100).toLocaleString() + ' — end-of-lease value'; }
+else { document.getElementById('rRes').textContent = '—'; }
+document.getElementById('rDasBox').textContent = '$' + das.toLocaleString();
+if (!msrp && !sp && !residual) document.getElementById('secTerms').style.display = 'none';
+
+// Populate 05 FIX
+if (mf > 0) {
+  document.getElementById('fixYou').textContent = mf.toString();
+  document.getElementById('fixYouApr').textContent = mfApr + '% APR';
+  document.getElementById('fixTgt').textContent = buyRate.toFixed(5);
+  document.getElementById('fixTgtApr').textContent = buyApr + '% APR — buy rate';
+  document.getElementById('fixCost').textContent = 'That markup costs you $' + mfCostTotal.toLocaleString() + ' over your lease.';
+  document.getElementById('fixCostNote').textContent = markup.toFixed(5) + ' added to the base MF. $' + mfCostMo + ' extra per payment. Most shoppers never catch it.';
+  document.getElementById('fixSavings').textContent = '$' + Math.round(mfCostTotal * 0.5).toLocaleString() + ' – $' + mfCostTotal.toLocaleString();
+  document.getElementById('fixSavingsNote').textContent = 'Negotiating to the buy rate saves $' + mfCostMo + '/mo. Even halfway saves $' + Math.round(mfCostMo/2) + '/mo — $' + Math.round(mfCostMo/2 * term).toLocaleString() + ' over the lease.';
+  document.getElementById('scrCounter').textContent = '"I know the base rate is around ' + buyRate.toFixed(5) + ' for this term. Is there any way to get closer to that?"';
+  document.getElementById('pm1d').textContent = 'Ask for ' + buyRate.toFixed(5) + ' (buy rate). Settle for anything below 0.00160.';
+  document.getElementById('pm1s').textContent = 'SAVES $' + Math.round(mfCostTotal*0.5).toLocaleString() + ' – $' + mfCostTotal.toLocaleString();
+} else {
+  document.getElementById('secFix').style.display = 'none';
+  document.getElementById('scrCounter').textContent = '"What money factor are you using? I\'d like to compare it to the manufacturer\'s base rate."';
+  document.getElementById('pm1d').textContent = 'Ask for the buy rate money factor. Most dealers mark it up — negotiating it down is the single biggest savings.';
+  document.getElementById('pm1s').textContent = 'SAVES $500 – $1,500';
+}
+document.getElementById('pm2d').textContent = dealer ? ('Email a competing ' + make + ' dealer. One number gives you leverage at ' + dealer + '.') : 'Email another dealer. One competing number gives you leverage.';
+
+// Populate 08 CHECKLIST
+const checks = [
+  'Money factor confirmed in writing — on the deal sheet, not verbal',
+  'Residual matches term + mileage' + (residual ? ' — ' + residual + '% for ' + term + 'mo/' + (mileage/1000) + 'k' : ''),
+  'Selling price matches agreed number — watch for last-minute F&I changes',
+  'No surprise add-ons in cap cost — scan for accessories you didn\'t request',
+  'Acquisition fee is standard ($595–$995)',
+  'Due at signing breakdown is clear — first month + fees + tax, nothing hidden',
+  'MVSC-1 form matches verbal agreement — NJ law requires this disclosure',
+  'Mileage penalty rate documented — know the per-mile charge over ' + (mileage/1000) + ',000',
+  'End-of-lease purchase option stated — residual + any purchase option fee',
+  'All F&I products declined — or consciously kept',
+];
+document.getElementById('rChecklist').innerHTML = checks.map(c => '<div class="ci"><div class="cb"></div><div class="ct"><strong>' + c.split(' — ')[0] + '</strong>' + (c.includes(' — ') ? ' — ' + c.split(' — ')[1] : '') + '</div></div>').join('');
+
+// ═══════════════════════════════════
+// LOAD COMPARABLE DEALS FROM SUPABASE
+// ═══════════════════════════════════
+const SB_URL = 'https://xqjsvlhdpdfvzixlmdxk.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxanN2bGhkcGRmdnppeGxtZHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzg2ODcsImV4cCI6MjA4ODg1NDY4N30.MT0tEDMLaBDLtZkX9xEVEkaUfPdIA9QsJrWjGDpeWsE';
+
+async function loadComps() {
+  try {
+    const sb = window.supabase.createClient(SB_URL, SB_KEY);
+
+    // Tier 1: same make + model in any NJ county
+    let { data: comps, error } = await sb.from('dealer_comps')
+      .select('*')
+      .eq('make', make)
+      .eq('model', model)
+      .eq('is_active', true)
+      .order('deal_date', { ascending: false })
+      .limit(8);
+
+    // Tier 2: if < 3 results, broaden to same make
+    if (!comps || comps.length < 3) {
+      const { data: broader } = await sb.from('dealer_comps')
+        .select('*')
+        .eq('make', make)
+        .eq('is_active', true)
+        .order('deal_date', { ascending: false })
+        .limit(8);
+      if (broader && broader.length > (comps || []).length) comps = broader;
+    }
+
+    // Tier 3: if still < 3, get county deals
+    if (!comps || comps.length < 3) {
+      const { data: countyDeals } = await sb.from('dealer_comps')
+        .select('*')
+        .eq('county', county)
+        .eq('is_active', true)
+        .order('deal_date', { ascending: false })
+        .limit(8);
+      if (countyDeals && countyDeals.length > (comps || []).length) comps = countyDeals;
+    }
+
+    if (!comps || comps.length === 0) {
+      document.getElementById('compsBody').innerHTML = '<tr><td colspan="5" style="color:var(--ink4);text-align:center;padding:20px;">No comparable deals available yet for this vehicle in NJ.</td></tr>';
+      document.getElementById('compsNote').textContent = 'As more NJ drivers contribute deals, comparables become more precise.';
+      return;
+    }
+
+    // Update subtitle
+    const sameModel = comps.filter(c => c.model === model);
+    if (sameModel.length >= 3) {
+      document.getElementById('compsSubtitle').textContent = 'Recent verified ' + make + ' ' + model + ' deals in NJ. Your deal is highlighted.';
+    } else {
+      document.getElementById('compsSubtitle').textContent = 'Recent verified ' + make + ' deals in NJ and nearby counties.';
+    }
+
+    // Build the user's row first
+    let rows = '<tr class="you"><td>' + (trim || model) + '</td><td>$' + payment + '/mo</td><td>$' + das.toLocaleString() + '</td><td>' + (mf > 0 ? mf.toString().substring(0,7) : '—') + '</td><td>' + county + '</td></tr>';
+
+    // Add comp rows
+    comps.forEach(c => {
+      // Skip if it's the same as user's deal
+      if (c.monthly_payment === payment && c.county === county && c.trim === trim) return;
+      rows += '<tr><td>' + (c.trim || c.model) + '</td><td>$' + c.monthly_payment + '/mo</td><td>$' + (c.due_at_signing || 0).toLocaleString() + '</td><td>' + (c.money_factor ? c.money_factor.toString().substring(0,7) : '—') + '</td><td>' + c.county + '</td></tr>';
+    });
+
+    document.getElementById('compsBody').innerHTML = rows;
+    document.getElementById('compsNote').textContent = comps.length + ' verified NJ deals · Showing comparable vehicles in your area';
+
+    // Comp insight
+    const avgCompPay = Math.round(comps.reduce((s,c) => s + (c.monthly_payment || 0), 0) / comps.length);
+    const compMFs = comps.filter(c => c.money_factor).map(c => c.money_factor);
+    const avgCompMF = compMFs.length ? (compMFs.reduce((s,v) => s+v, 0) / compMFs.length) : null;
+
+    let insightText = '';
+    if (payment < avgCompPay) {
+      insightText = 'Your payment ranks in the <strong>lower third</strong> of comparable deals — that\'s good.';
+    } else {
+      insightText = 'Your payment is <strong>above the comparable average</strong> of $' + avgCompPay + '/mo.';
+    }
+    if (avgCompMF && mf > 0 && mf > avgCompMF + 0.0002) {
+      insightText += ' Notice deals with lower money factors — they often have better total cost even with slightly higher payments.';
+    }
+    if (insightText) {
+      document.getElementById('compsInsight').style.display = 'flex';
+      document.getElementById('compsInsightText').innerHTML = insightText;
+    }
+
+    // DEALER SIGNALS
+    if (dealer) {
+      const dealerComps = comps.filter(c => c.dealer_name && c.dealer_name.toLowerCase().includes(dealer.split(' ')[0].toLowerCase()));
+      
+      // Also get all deals from same county for context
+      const countyComps = comps.filter(c => c.county === county);
+      const avgCountyDisc = countyComps.filter(c => c.msrp && c.selling_price).map(c => (1 - c.selling_price/c.msrp)*100);
+      const avgDisc = avgCountyDisc.length ? (avgCountyDisc.reduce((s,v) => s+v, 0) / avgCountyDisc.length).toFixed(1) : null;
+
+      document.getElementById('secDealer').style.display = 'block';
+      document.getElementById('dealerSubtitle').textContent = 'How ' + dealer + ' compares to other NJ ' + make + ' dealers.';
+
+      const userDisc = msrp > 0 && sp > 0 ? ((1 - sp/msrp)*100).toFixed(1) : null;
+      const dealerBadgeClass = mf > 0 && markup > 0.0004 ? 'high' : (userDisc && avgDisc && parseFloat(userDisc) >= parseFloat(avgDisc)) ? 'good' : 'avg';
+      const dealerBadgeText = dealerBadgeClass === 'high' ? 'High MF Markup' : dealerBadgeClass === 'good' ? 'Good Pricing' : 'Average Pricing';
+
+      document.getElementById('dealerCard').innerHTML = ''
+        + '<div class="dlr-head"><div class="dlr-name">' + dealer + '</div><div class="dlr-badge ' + dealerBadgeClass + '">' + dealerBadgeText + '</div></div>'
+        + '<div class="dlr-stats">'
+        + '<div><div class="dlr-stat-l">Discount off MSRP</div><div class="dlr-stat-v">' + (userDisc ? userDisc + '%' : '—') + '</div></div>'
+        + '<div><div class="dlr-stat-l">MF Markup</div><div class="dlr-stat-v">' + (mf > 0 ? '+' + markup.toFixed(5) : '—') + '</div></div>'
+        + '<div><div class="dlr-stat-l">County Avg Discount</div><div class="dlr-stat-v">' + (avgDisc ? avgDisc + '%' : '—') + '</div></div>'
+        + '</div>'
+        + '<div class="dlr-obs">' + (mf > 0 && markup > 0.0004
+          ? 'This dealer appears to mark up the money factor above the base rate. Their margin comes primarily from financing. Shoppers who specifically negotiate the MF tend to get better total deals here.'
+          : 'Based on available data, this dealer offers competitive terms. Always verify the money factor and compare with at least one other dealer.'
+        ) + '</div>';
+    }
+
+  } catch (e) {
+    console.error('Comps load error:', e);
+    document.getElementById('compsBody').innerHTML = '<tr><td colspan="5" style="color:var(--ink4);text-align:center;padding:20px;">Unable to load comparables.</td></tr>';
+  }
+}
+
+// Load Supabase SDK and fetch comps
+const sbScript = document.createElement('script');
+sbScript.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+sbScript.onload = loadComps;
+document.head.appendChild(sbScript);
+</script>
+</body>
+</html>
