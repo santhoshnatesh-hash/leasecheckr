@@ -261,10 +261,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);-webkit-font-
 <!-- 06 DEALER SIGNALS (populated by Supabase query) -->
 <div class="sec" id="secDealer" style="display:none;">
   <div class="sn">06</div>
-  <h2 class="sh">Dealer pricing <em>signals</em></h2>
-  <p class="ss" id="dealerSubtitle"></p>
+  <h2 class="sh">Dealer pricing <em>landscape</em></h2>
+  <p class="ss" id="dealerSubtitle">What dealers in your area are currently advertising.</p>
   <div class="dlr" id="dealerCard"></div>
-  <div class="ins"><div class="ins-i">🏪</div><div class="ins-t"><strong>As more NJ drivers contribute deals, dealer rankings become more precise.</strong> We're building toward county-level dealer comparisons — showing which dealers consistently offer better pricing and lower MF markups.</div></div>
+  <div class="ins"><div class="ins-i">🏪</div><div class="ins-t"><strong>Dealer advertised rates are starting points, not final prices.</strong> Verified signed deals from real NJ drivers (shown above) represent what people actually paid after negotiation. The gap between advertised and signed is where your savings live.</div></div>
 </div>
 
 <!-- PART 2 -->
@@ -483,131 +483,238 @@ const checks = [
 document.getElementById('rChecklist').innerHTML = checks.map(c => '<div class="ci"><div class="cb"></div><div class="ct"><strong>' + c.split(' — ')[0] + '</strong>' + (c.includes(' — ') ? ' — ' + c.split(' — ')[1] : '') + '</div></div>').join('');
 
 // ═══════════════════════════════════
-// LOAD COMPARABLE DEALS FROM SUPABASE
+// LOAD DATA FROM SUPABASE
+// Section 05: Verified deals from lease_submissions
+// Section 06: Dealer advertised from dealer_comps (by county)
+// Grade: A+ through F anchored to both tables
 // ═══════════════════════════════════
 const SB_URL = 'https://xqjsvlhdpdfvzixlmdxk.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxanN2bGhkcGRmdnppeGxtZHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzg2ODcsImV4cCI6MjA4ODg1NDY4N30.MT0tEDMLaBDLtZkX9xEVEkaUfPdIA9QsJrWjGDpeWsE';
 
-async function loadComps() {
+async function loadReportData() {
   try {
     const sb = window.supabase.createClient(SB_URL, SB_KEY);
 
-    // Tier 1: same make + model in any NJ county
-    let { data: comps, error } = await sb.from('dealer_comps')
-      .select('*')
+    // ════════════════════════════════
+    // SECTION 05: Verified signed deals from lease_submissions
+    // ════════════════════════════════
+
+    // Tier 1: same make + model + term
+    let { data: verifiedDeals } = await sb.from('lease_submissions')
+      .select('make,model,trim,monthly_payment,due_at_signing,money_factor,residual_pct,county,dealer_name,term')
       .eq('make', make)
       .eq('model', model)
-      .eq('is_active', true)
-      .order('deal_date', { ascending: false })
+      .in('deal_status', ['signed_verified', 'signed_manual'])
+      .gt('monthly_payment', 0)
+      .order('created_at', { ascending: false })
       .limit(8);
 
-    // Tier 2: if < 3 results, broaden to same make
-    if (!comps || comps.length < 3) {
-      const { data: broader } = await sb.from('dealer_comps')
-        .select('*')
+    // Tier 2: same make, any model
+    if (!verifiedDeals || verifiedDeals.length < 3) {
+      const { data: broader } = await sb.from('lease_submissions')
+        .select('make,model,trim,monthly_payment,due_at_signing,money_factor,residual_pct,county,dealer_name,term')
         .eq('make', make)
-        .eq('is_active', true)
-        .order('deal_date', { ascending: false })
+        .in('deal_status', ['signed_verified', 'signed_manual'])
+        .gt('monthly_payment', 0)
+        .order('created_at', { ascending: false })
         .limit(8);
-      if (broader && broader.length > (comps || []).length) comps = broader;
+      if (broader && broader.length > (verifiedDeals || []).length) verifiedDeals = broader;
     }
 
-    // Tier 3: if still < 3, get county deals
-    if (!comps || comps.length < 3) {
-      const { data: countyDeals } = await sb.from('dealer_comps')
-        .select('*')
+    // Tier 3: same county, any vehicle
+    if (!verifiedDeals || verifiedDeals.length < 3) {
+      const { data: countyDeals } = await sb.from('lease_submissions')
+        .select('make,model,trim,monthly_payment,due_at_signing,money_factor,residual_pct,county,dealer_name,term')
         .eq('county', county)
-        .eq('is_active', true)
-        .order('deal_date', { ascending: false })
+        .in('deal_status', ['signed_verified', 'signed_manual'])
+        .gt('monthly_payment', 0)
+        .order('created_at', { ascending: false })
         .limit(8);
-      if (countyDeals && countyDeals.length > (comps || []).length) comps = countyDeals;
+      if (countyDeals && countyDeals.length > (verifiedDeals || []).length) verifiedDeals = countyDeals;
     }
 
-    if (!comps || comps.length === 0) {
-      document.getElementById('compsBody').innerHTML = '<tr><td colspan="5" style="color:var(--ink4);text-align:center;padding:20px;">No comparable deals available yet for this vehicle in NJ.</td></tr>';
-      document.getElementById('compsNote').textContent = 'As more NJ drivers contribute deals, comparables become more precise.';
-      return;
-    }
+    // Populate Section 05 table
+    if (verifiedDeals && verifiedDeals.length > 0) {
+      const sameModel = verifiedDeals.filter(c => c.model === model);
+      document.getElementById('compsSubtitle').textContent = sameModel.length >= 3
+        ? 'Recent verified ' + make + ' ' + model + ' deals signed by NJ drivers. Your deal is highlighted.'
+        : 'Recent verified ' + make + ' deals signed by NJ drivers.';
 
-    // Update subtitle
-    const sameModel = comps.filter(c => c.model === model);
-    if (sameModel.length >= 3) {
-      document.getElementById('compsSubtitle').textContent = 'Recent verified ' + make + ' ' + model + ' deals in NJ. Your deal is highlighted.';
-    } else {
-      document.getElementById('compsSubtitle').textContent = 'Recent verified ' + make + ' deals in NJ and nearby counties.';
-    }
+      // User's row first
+      let rows = '<tr class="you"><td>' + (trim || model) + '</td><td>$' + payment + '/mo</td><td>$' + das.toLocaleString() + '</td><td>' + (mf > 0 ? mf.toString().substring(0,7) : '—') + '</td><td>' + county + '</td></tr>';
 
-    // Build the user's row first
-    let rows = '<tr class="you"><td>' + (trim || model) + '</td><td>$' + payment + '/mo</td><td>$' + das.toLocaleString() + '</td><td>' + (mf > 0 ? mf.toString().substring(0,7) : '—') + '</td><td>' + county + '</td></tr>';
+      verifiedDeals.forEach(c => {
+        if (c.monthly_payment === payment && c.county === county && c.trim === trim) return;
+        rows += '<tr><td>' + (c.trim || c.model) + '</td><td>$' + c.monthly_payment + '/mo</td><td>$' + (c.due_at_signing || 0).toLocaleString() + '</td><td>' + (c.money_factor ? c.money_factor.toString().substring(0,7) : '—') + '</td><td>' + c.county + '</td></tr>';
+      });
 
-    // Add comp rows
-    comps.forEach(c => {
-      // Skip if it's the same as user's deal
-      if (c.monthly_payment === payment && c.county === county && c.trim === trim) return;
-      rows += '<tr><td>' + (c.trim || c.model) + '</td><td>$' + c.monthly_payment + '/mo</td><td>$' + (c.due_at_signing || 0).toLocaleString() + '</td><td>' + (c.money_factor ? c.money_factor.toString().substring(0,7) : '—') + '</td><td>' + c.county + '</td></tr>';
-    });
+      document.getElementById('compsBody').innerHTML = rows;
+      document.getElementById('compsNote').textContent = verifiedDeals.length + ' verified signed NJ deals · Real data from NJ drivers';
 
-    document.getElementById('compsBody').innerHTML = rows;
-    document.getElementById('compsNote').textContent = comps.length + ' verified NJ deals · Showing comparable vehicles in your area';
+      // Insight
+      const avgVerifiedPay = Math.round(verifiedDeals.reduce((s,c) => s + c.monthly_payment, 0) / verifiedDeals.length);
+      const lowestVerified = Math.min(...verifiedDeals.map(c => c.monthly_payment));
+      const highestVerified = Math.max(...verifiedDeals.map(c => c.monthly_payment));
 
-    // Comp insight
-    const avgCompPay = Math.round(comps.reduce((s,c) => s + (c.monthly_payment || 0), 0) / comps.length);
-    const compMFs = comps.filter(c => c.money_factor).map(c => c.money_factor);
-    const avgCompMF = compMFs.length ? (compMFs.reduce((s,v) => s+v, 0) / compMFs.length) : null;
-
-    let insightText = '';
-    if (payment < avgCompPay) {
-      insightText = 'Your payment ranks in the <strong>lower third</strong> of comparable deals — that\'s good.';
-    } else {
-      insightText = 'Your payment is <strong>above the comparable average</strong> of $' + avgCompPay + '/mo.';
-    }
-    if (avgCompMF && mf > 0 && mf > avgCompMF + 0.0002) {
-      insightText += ' Notice deals with lower money factors — they often have better total cost even with slightly higher payments.';
-    }
-    if (insightText) {
+      let insightText = '';
+      if (payment <= lowestVerified) {
+        insightText = 'Your payment is <strong>the lowest among all comparable verified deals</strong> — outstanding.';
+      } else if (payment < avgVerifiedPay) {
+        insightText = 'Your payment is <strong>below the verified average</strong> of $' + avgVerifiedPay + '/mo — that\'s solid.';
+      } else {
+        insightText = 'Your payment is <strong>above the verified average</strong> of $' + avgVerifiedPay + '/mo. There may be room to negotiate.';
+      }
       document.getElementById('compsInsight').style.display = 'flex';
       document.getElementById('compsInsightText').innerHTML = insightText;
+
+      // ════════════════════════════════
+      // RECOMPUTE GRADE using real verified data
+      // ════════════════════════════════
+      // Also need dealer advertised rates for E/F grades
+      let dealerAvgRate = null;
+
+      // Fetch dealer comps for grade calculation
+      const { data: dealerDeals } = await sb.from('dealer_comps')
+        .select('monthly_payment')
+        .eq('make', make)
+        .eq('model', model)
+        .eq('is_active', true);
+
+      if (dealerDeals && dealerDeals.length > 0) {
+        dealerAvgRate = Math.round(dealerDeals.reduce((s,c) => s + c.monthly_payment, 0) / dealerDeals.length);
+      }
+
+      // Grade calculation
+      let computedGrade = 'B';
+      let gradeLabel = 'Fair Deal';
+      if (payment < lowestVerified) {
+        computedGrade = 'A+'; gradeLabel = 'Excellent Deal';
+      } else if (payment <= avgVerifiedPay) {
+        computedGrade = 'A'; gradeLabel = 'Strong Deal';
+      } else if (payment <= avgVerifiedPay * 1.02) {
+        computedGrade = 'B'; gradeLabel = 'Fair Deal';
+      } else if (payment <= avgVerifiedPay * 1.05) {
+        computedGrade = 'C'; gradeLabel = 'Above Average';
+      } else if (payment <= highestVerified && payment <= avgVerifiedPay * 1.10) {
+        computedGrade = 'D'; gradeLabel = 'Overpaying';
+      } else if (dealerAvgRate && payment <= dealerAvgRate) {
+        computedGrade = 'E'; gradeLabel = 'At Dealer Advertised Rate';
+      } else if (dealerAvgRate && payment > dealerAvgRate) {
+        computedGrade = 'F'; gradeLabel = 'Above Dealer Advertised Rate';
+      } else {
+        computedGrade = 'D'; gradeLabel = 'Significantly Overpaying';
+      }
+
+      // If URL passed a grade, only override if we have good data
+      if (verifiedDeals.length >= 3) {
+        // Update displayed grade
+        const newGradeColor = computedGrade.startsWith('A') ? 'var(--sage)' : (computedGrade === 'B' ? 'var(--copper)' : (computedGrade === 'C' ? 'var(--amber)' : 'var(--rose)'));
+        const newRingClass = computedGrade.startsWith('A') ? 'ga' : (computedGrade === 'B' ? 'gb' : (computedGrade === 'C' ? 'gc' : 'gd'));
+        document.getElementById('cvLetter').textContent = computedGrade;
+        document.getElementById('cvRing').className = 'cv-grade-ring ' + newRingClass;
+        document.getElementById('cvVerdict').textContent = gradeLabel;
+        document.getElementById('cvVerdict').style.color = newGradeColor;
+
+        // Update avg display with real number
+        if (avgVerifiedPay > 0 && avgPay === 0) {
+          document.getElementById('rAvg').innerHTML = '$' + avgVerifiedPay + '<span style="font-size:0.8rem;color:var(--ink4)">/mo</span>';
+        }
+      }
+
+    } else {
+      document.getElementById('compsBody').innerHTML = '<tr><td colspan="5" style="color:var(--ink4);text-align:center;padding:20px;">No comparable verified deals available yet.</td></tr>';
+      document.getElementById('compsNote').textContent = 'As more NJ drivers contribute deals, comparables become more precise.';
     }
 
-    // DEALER SIGNALS
-    if (dealer) {
-      const dealerComps = comps.filter(c => c.dealer_name && c.dealer_name.toLowerCase().includes(dealer.split(' ')[0].toLowerCase()));
-      
-      // Also get all deals from same county for context
-      const countyComps = comps.filter(c => c.county === county);
-      const avgCountyDisc = countyComps.filter(c => c.msrp && c.selling_price).map(c => (1 - c.selling_price/c.msrp)*100);
-      const avgDisc = avgCountyDisc.length ? (avgCountyDisc.reduce((s,v) => s+v, 0) / avgCountyDisc.length).toFixed(1) : null;
+    // ════════════════════════════════
+    // SECTION 06: Dealer advertised deals from dealer_comps (by county)
+    // Always show if we have county data — not dependent on user entering dealer name
+    // ════════════════════════════════
 
+    // Get dealer comps for user's county
+    let { data: countyDealerComps } = await sb.from('dealer_comps')
+      .select('*')
+      .eq('county', county)
+      .eq('is_active', true)
+      .order('monthly_payment', { ascending: true })
+      .limit(10);
+
+    // If not enough in county, broaden to neighboring counties
+    if (!countyDealerComps || countyDealerComps.length < 3) {
+      const { data: allDealerComps } = await sb.from('dealer_comps')
+        .select('*')
+        .eq('is_active', true)
+        .order('monthly_payment', { ascending: true })
+        .limit(15);
+      if (allDealerComps && allDealerComps.length > (countyDealerComps || []).length) {
+        countyDealerComps = allDealerComps;
+      }
+    }
+
+    if (countyDealerComps && countyDealerComps.length > 0) {
       document.getElementById('secDealer').style.display = 'block';
-      document.getElementById('dealerSubtitle').textContent = 'How ' + dealer + ' compares to other NJ ' + make + ' dealers.';
+      document.getElementById('dealerSubtitle').textContent = 'What dealers in ' + county + ' County and nearby are currently advertising for comparable vehicles.';
 
-      const userDisc = msrp > 0 && sp > 0 ? ((1 - sp/msrp)*100).toFixed(1) : null;
-      const dealerBadgeClass = mf > 0 && markup > 0.0004 ? 'high' : (userDisc && avgDisc && parseFloat(userDisc) >= parseFloat(avgDisc)) ? 'good' : 'avg';
-      const dealerBadgeText = dealerBadgeClass === 'high' ? 'High MF Markup' : dealerBadgeClass === 'good' ? 'Good Pricing' : 'Average Pricing';
+      // Group by make for summary
+      const dealersByMake = {};
+      countyDealerComps.forEach(c => {
+        const key = c.make + ' ' + c.model;
+        if (!dealersByMake[key]) dealersByMake[key] = [];
+        dealersByMake[key].push(c);
+      });
 
-      document.getElementById('dealerCard').innerHTML = ''
-        + '<div class="dlr-head"><div class="dlr-name">' + dealer + '</div><div class="dlr-badge ' + dealerBadgeClass + '">' + dealerBadgeText + '</div></div>'
-        + '<div class="dlr-stats">'
-        + '<div><div class="dlr-stat-l">Discount off MSRP</div><div class="dlr-stat-v">' + (userDisc ? userDisc + '%' : '—') + '</div></div>'
-        + '<div><div class="dlr-stat-l">MF Markup</div><div class="dlr-stat-v">' + (mf > 0 ? '+' + markup.toFixed(5) : '—') + '</div></div>'
-        + '<div><div class="dlr-stat-l">County Avg Discount</div><div class="dlr-stat-v">' + (avgDisc ? avgDisc + '%' : '—') + '</div></div>'
-        + '</div>'
-        + '<div class="dlr-obs">' + (mf > 0 && markup > 0.0004
-          ? 'This dealer appears to mark up the money factor above the base rate. Their margin comes primarily from financing. Shoppers who specifically negotiate the MF tend to get better total deals here.'
-          : 'Based on available data, this dealer offers competitive terms. Always verify the money factor and compare with at least one other dealer.'
-        ) + '</div>';
+      // Build dealer card with advertised deals table
+      const avgDealerPay = Math.round(countyDealerComps.reduce((s,c) => s + c.monthly_payment, 0) / countyDealerComps.length);
+      const lowestDealer = Math.min(...countyDealerComps.map(c => c.monthly_payment));
+      const highestDealer = Math.max(...countyDealerComps.map(c => c.monthly_payment));
+
+      // Same-model dealer comps
+      const sameModelDealer = countyDealerComps.filter(c => c.make === make && c.model === model);
+      const sameModelAvg = sameModelDealer.length ? Math.round(sameModelDealer.reduce((s,c) => s + c.monthly_payment, 0) / sameModelDealer.length) : null;
+
+      let dealerHTML = '<div class="dlr-head">'
+        + '<div class="dlr-name">' + county + ' County Dealer Landscape</div>'
+        + '<div class="dlr-badge avg">' + countyDealerComps.length + ' Advertised Deals</div>'
+        + '</div>';
+
+      dealerHTML += '<div class="dlr-stats">'
+        + '<div><div class="dlr-stat-l">Lowest Advertised</div><div class="dlr-stat-v">$' + lowestDealer + '/mo</div></div>'
+        + '<div><div class="dlr-stat-l">Average Advertised</div><div class="dlr-stat-v">$' + avgDealerPay + '/mo</div></div>'
+        + '<div><div class="dlr-stat-l">Highest Advertised</div><div class="dlr-stat-v">$' + highestDealer + '/mo</div></div>'
+        + '</div>';
+
+      if (sameModelAvg) {
+        dealerHTML += '<div style="padding:12px 0;border-top:1px solid var(--bg2);border-bottom:1px solid var(--bg2);margin:10px 0;">'
+          + '<div style="font-family:var(--mono);font-size:0.44rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink4);margin-bottom:4px;">' + make + ' ' + model + ' Dealer Average</div>'
+          + '<div style="font-family:var(--serif);font-size:1.3rem;color:var(--ink);">$' + sameModelAvg + '/mo</div>'
+          + '<div style="font-size:0.72rem;color:var(--ink4);margin-top:2px;">From ' + sameModelDealer.length + ' advertised ' + model + ' deals in area</div>'
+          + '</div>';
+      }
+
+      // How user's deal compares to advertised
+      let dealerObservation = '';
+      if (payment < avgDealerPay) {
+        dealerObservation = 'Your deal at $' + payment + '/mo is <strong>below the average dealer advertised rate</strong> of $' + avgDealerPay + '/mo in ' + county + ' County. This suggests you negotiated well relative to what dealers are publicly offering.';
+      } else if (payment < avgDealerPay * 1.05) {
+        dealerObservation = 'Your deal at $' + payment + '/mo is <strong>close to the average dealer advertised rate</strong> of $' + avgDealerPay + '/mo. Dealer advertised rates are typically pre-negotiation starting points — there may still be room to negotiate down.';
+      } else {
+        dealerObservation = 'Your deal at $' + payment + '/mo is <strong>above the average dealer advertised rate</strong> of $' + avgDealerPay + '/mo. This suggests the deal terms may include add-ons, a marked-up money factor, or unfavorable cap cost. The negotiation playbook below shows how to address this.';
+      }
+      dealerHTML += '<div class="dlr-obs">' + dealerObservation + '</div>';
+
+      document.getElementById('dealerCard').innerHTML = dealerHTML;
     }
 
   } catch (e) {
-    console.error('Comps load error:', e);
+    console.error('Report data load error:', e);
     document.getElementById('compsBody').innerHTML = '<tr><td colspan="5" style="color:var(--ink4);text-align:center;padding:20px;">Unable to load comparables.</td></tr>';
   }
 }
 
-// Load Supabase SDK and fetch comps
+// Load Supabase SDK and fetch data
 const sbScript = document.createElement('script');
 sbScript.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
-sbScript.onload = loadComps;
+sbScript.onload = loadReportData;
 document.head.appendChild(sbScript);
 </script>
 </body>
