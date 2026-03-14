@@ -1838,6 +1838,11 @@
     }
     try {
       const { county } = getCounty(data.zip);
+      // Pre-compute grade so the DB trigger can use it for the email
+      const { comps } = findComparables(data.make, data.model, county, data.termNum || 36);
+      const score = computeScore(data.payment || 0, data.driveoff || 0, data.mf, data.residual, data.msrp, data.capcost, comps, data.termNum || 36);
+      const grade = score ? score.grade.g : null;
+
       const { error } = await supabaseClient.from('lease_submissions').insert([{
         email, make: data.make || null, model: data.model || null, trim: data.trim || null,
         monthly_payment: data.payment || null, due_at_signing: data.driveoff || null,
@@ -1846,6 +1851,7 @@
         msrp: data.msrp || null, cap_cost: data.capcost || null,
         residual_pct: data.residual || null, money_factor: data.mf || null,
         dealer_name: data.dealer || null, check_type: data.checkType || null,
+        grade: grade,
         submission_type: 'teaser', deal_status: 'quote_check',
         founder_eligible: false, verification_status: 'na', trust_tier: 'low', report_entitlement: 'none'
       }]);
