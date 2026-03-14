@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — LeaseCheckr</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f0e0c; --bg-2: #1a1815; --bg-3: #242220;
+      --text: #e8e4dc; --text-2: #a8a29a; --text-3: #6b6259;
+      --copper: #c4864a; --copper-dim: rgba(196,134,74,0.15);
+      --green: #5c9a6b; --green-dim: rgba(92,154,107,0.15);
+      --red: #b85a4a; --red-dim: rgba(184,90,74,0.15);
+      --blue: #5a8ab8; --blue-dim: rgba(90,138,184,0.15);
+      --border: rgba(232,228,220,0.08); --border-2: rgba(232,228,220,0.15);
+      --radius: 6px;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; min-height: 100vh; }
+
+    /* LOGIN */
+    .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .login-box { background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 40px; width: 360px; }
+    .login-logo { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--copper); margin-bottom: 24px; }
+    .login-title { font-size: 1.3rem; font-weight: 500; margin-bottom: 8px; }
+    .login-sub { font-size: 0.82rem; color: var(--text-2); margin-bottom: 24px; }
+    .login-input { width: 100%; padding: 12px 14px; background: var(--bg); border: 1px solid var(--border-2); border-radius: var(--radius); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.88rem; outline: none; margin-bottom: 16px; }
+    .login-input:focus { border-color: var(--copper); }
+    .login-btn { width: 100%; padding: 12px; background: var(--copper); color: var(--bg); border: none; border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 500; cursor: pointer; transition: opacity 0.2s; }
+    .login-btn:hover { opacity: 0.9; }
+    .login-error { font-size: 0.78rem; color: var(--red); margin-top: 8px; display: none; }
+
+    /* DASHBOARD */
+    .dashboard { display: none; }
+    .top-bar { display: flex; align-items: center; justify-content: space-between; padding: 16px 32px; border-bottom: 1px solid var(--border); background: var(--bg-2); }
+    .top-logo { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--copper); }
+    .top-right { display: flex; align-items: center; gap: 16px; }
+    .top-btn { font-size: 0.72rem; color: var(--text-3); cursor: pointer; background: none; border: none; font-family: 'DM Sans', sans-serif; }
+    .top-btn:hover { color: var(--text); }
+
+    /* STATS */
+    .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; padding: 24px 32px; }
+    .stat-card { background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; }
+    .stat-label { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); margin-bottom: 6px; }
+    .stat-value { font-size: 1.8rem; font-weight: 500; }
+    .stat-value.copper { color: var(--copper); }
+    .stat-value.green { color: var(--green); }
+    .stat-value.red { color: var(--red); }
+    .stat-value.blue { color: var(--blue); }
+
+    /* TABS */
+    .tabs { display: flex; gap: 0; padding: 0 32px; border-bottom: 1px solid var(--border); }
+    .tab { padding: 14px 20px; font-size: 0.78rem; font-weight: 500; color: var(--text-3); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+    .tab:hover { color: var(--text-2); }
+    .tab.active { color: var(--copper); border-color: var(--copper); }
+
+    /* TABLE */
+    .table-wrap { padding: 16px 32px; overflow-x: auto; }
+    .admin-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+    .admin-table th { text-align: left; padding: 10px 12px; font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); border-bottom: 1px solid var(--border-2); font-weight: 500; white-space: nowrap; }
+    .admin-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text-2); vertical-align: middle; }
+    .admin-table tr:hover td { background: rgba(196,134,74,0.03); }
+
+    /* BADGES */
+    .badge { display: inline-flex; padding: 3px 8px; border-radius: 100px; font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.06em; }
+    .badge-seed { background: var(--blue-dim); color: var(--blue); }
+    .badge-teaser { background: var(--copper-dim); color: var(--copper); }
+    .badge-manual { background: var(--green-dim); color: var(--green); }
+    .badge-upload { background: var(--green-dim); color: var(--green); }
+    .badge-pending { background: rgba(232,228,220,0.08); color: var(--text-2); }
+    .badge-verified { background: var(--green-dim); color: var(--green); }
+    .badge-rejected { background: var(--red-dim); color: var(--red); }
+
+    /* ACTION BUTTONS */
+    .action-btn { padding: 5px 10px; border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: 0.7rem; font-weight: 500; cursor: pointer; border: none; transition: opacity 0.2s; }
+    .action-btn:hover { opacity: 0.8; }
+    .btn-approve { background: var(--green); color: #fff; }
+    .btn-reject { background: var(--red); color: #fff; }
+    .btn-send { background: var(--copper); color: var(--bg); }
+    .btn-small { padding: 4px 8px; font-size: 0.65rem; background: var(--bg-3); color: var(--text-2); border: 1px solid var(--border-2); }
+
+    /* EMPTY STATE */
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--text-3); }
+    .empty-state-icon { font-size: 2rem; margin-bottom: 12px; opacity: 0.3; }
+    .empty-state-text { font-size: 0.88rem; }
+
+    /* MODAL */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--bg-2); border: 1px solid var(--border-2); border-radius: var(--radius); padding: 32px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+    .modal-title { font-size: 1.1rem; font-weight: 500; margin-bottom: 16px; }
+    .modal-field { margin-bottom: 12px; }
+    .modal-label { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); margin-bottom: 4px; }
+    .modal-value { font-size: 0.85rem; color: var(--text); }
+    .modal-actions { display: flex; gap: 8px; margin-top: 20px; }
+    .modal-close { position: absolute; top: 16px; right: 20px; background: none; border: none; color: var(--text-3); font-size: 1.2rem; cursor: pointer; }
+
+    /* TOAST */
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--bg-3); border: 1px solid var(--border-2); border-radius: var(--radius); padding: 12px 20px; font-size: 0.82rem; color: var(--text); z-index: 200; transform: translateY(100px); opacity: 0; transition: all 0.3s ease; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { border-left: 3px solid var(--green); }
+    .toast.error { border-left: 3px solid var(--red); }
+
+    @media (max-width: 900px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .table-wrap { padding: 16px; }
+      .top-bar, .tabs { padding-left: 16px; padding-right: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ LOGIN ═══ -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div class="login-logo">LeaseCheckr Admin</div>
+    <div class="login-title">Sign in</div>
+    <div class="login-sub">Admin access only.</div>
+    <input type="password" class="login-input" id="loginPassword" placeholder="Admin password" autofocus>
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-error" id="loginError">Incorrect password.</div>
+  </div>
+</div>
+
+<!-- ═══ DASHBOARD ═══ -->
+<div class="dashboard" id="dashboard">
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="top-logo">LeaseCheckr · Admin</div>
+    <div class="top-right">
+      <button class="top-btn" onclick="loadData()">↻ Refresh</button>
+      <button class="top-btn" onclick="logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row" id="statsRow">
+    <div class="stat-card"><div class="stat-label">Total Submissions</div><div class="stat-value" id="statTotal">—</div></div>
+    <div class="stat-card"><div class="stat-label">Teaser Leads</div><div class="stat-value copper" id="statTeasers">—</div></div>
+    <div class="stat-card"><div class="stat-label">Pending Review</div><div class="stat-value red" id="statPending">—</div></div>
+    <div class="stat-card"><div class="stat-label">Verified Deals</div><div class="stat-value green" id="statVerified">—</div></div>
+    <div class="stat-card"><div class="stat-label">Founder Eligible</div><div class="stat-value blue" id="statFounders">—</div></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active" data-tab="pending" onclick="switchTab('pending')">Pending Review</div>
+    <div class="tab" data-tab="teasers" onclick="switchTab('teasers')">Teaser Leads</div>
+    <div class="tab" data-tab="verified" onclick="switchTab('verified')">Verified Deals</div>
+    <div class="tab" data-tab="all" onclick="switchTab('all')">All Submissions</div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Email</th>
+          <th>Vehicle</th>
+          <th>Payment</th>
+          <th>County</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Grade</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+      </tbody>
+    </table>
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <div class="empty-state-icon">◇</div>
+      <div class="empty-state-text">No submissions in this view.</div>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal" style="position:relative;">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title" id="modalTitle">Submission Detail</div>
+    <div id="modalBody"></div>
+    <div class="modal-actions" id="modalActions"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════
+const SUPABASE_URL = 'https://xqjsvlhdpdfvzixlmdxk.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxanN2bGhkcGRmdnppeGxtZHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzg2ODcsImV4cCI6MjA4ODg1NDY4N30.MT0tEDMLaBDLtZkX9xEVEkaUfPdIA9QsJrWjGDpeWsE';
+const ADMIN_PASSWORD = 'leasecheckr2026';
+const RESEND_KEY = 're_8QYYBk6n_EV3gB4TjePRVnsHxmS5okF2A';
+
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let allData = [];
+let currentTab = 'pending';
+
+// ═══════════════════════════════════
+// AUTH
+// ═══════════════════════════════════
+function doLogin() {
+  const pw = document.getElementById('loginPassword').value;
+  if (pw === ADMIN_PASSWORD) {
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    sessionStorage.setItem('lc_admin', '1');
+    loadData();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+}
+document.getElementById('loginPassword').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+function logout() {
+  sessionStorage.removeItem('lc_admin');
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('loginWrap').style.display = 'flex';
+  document.getElementById('loginPassword').value = '';
+}
+
+// Auto-login if session exists
+if (sessionStorage.getItem('lc_admin') === '1') {
+  document.getElementById('loginWrap').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  loadData();
+}
+
+// ═══════════════════════════════════
+// LOAD DATA
+// ═══════════════════════════════════
+async function loadData() {
+  const { data, error } = await sb.from('lease_submissions')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(500);
+
+  if (error) { showToast('Failed to load data: ' + error.message, 'error'); return; }
+  allData = data || [];
+  updateStats();
+  renderTable();
+}
+
+function updateStats() {
+  const d = allData;
+  document.getElementById('statTotal').textContent = d.length;
+  document.getElementById('statTeasers').textContent = d.filter(r => r.submission_type === 'teaser').length;
+  document.getElementById('statPending').textContent = d.filter(r => r.verification_status === 'pending').length;
+  document.getElementById('statVerified').textContent = d.filter(r => r.deal_status === 'signed_verified' && r.submission_type !== 'seed').length;
+  document.getElementById('statFounders').textContent = d.filter(r => r.founder_eligible === true).length;
+}
+
+// ═══════════════════════════════════
+// TABS & TABLE
+// ═══════════════════════════════════
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.tab[data-tab="${tab}"]`).classList.add('active');
+  renderTable();
+}
+
+function getFilteredData() {
+  switch (currentTab) {
+    case 'pending': return allData.filter(r => r.verification_status === 'pending');
+    case 'teasers': return allData.filter(r => r.submission_type === 'teaser');
+    case 'verified': return allData.filter(r => r.deal_status === 'signed_verified' && r.submission_type !== 'seed');
+    default: return allData.filter(r => r.submission_type !== 'seed');
+  }
+}
+
+function renderTable() {
+  const rows = getFilteredData();
+  const tbody = document.getElementById('tableBody');
+  const empty = document.getElementById('emptyState');
+
+  if (rows.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = rows.map(r => {
+    const date = r.created_at ? new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
+    const vehicle = [r.make, r.model, r.trim].filter(Boolean).join(' ') || '—';
+    const pay = r.monthly_payment ? '$' + r.monthly_payment : '—';
+    const typeBadge = badgeFor('type', r.submission_type);
+    const statusBadge = badgeFor('status', r.verification_status);
+    const grade = r.grade || '—';
+
+    let actions = `<button class="btn-small" onclick="showDetail(${r.id})">View</button>`;
+    if (r.verification_status === 'pending') {
+      actions += ` <button class="action-btn btn-approve" onclick="approve(${r.id})">Approve</button>`;
+      actions += ` <button class="action-btn btn-reject" onclick="reject(${r.id})">Reject</button>`;
+    }
+    if (r.email && r.submission_type !== 'seed') {
+      actions += ` <button class="action-btn btn-send" onclick="sendReport(${r.id})">Send Report</button>`;
+    }
+
+    return `<tr>
+      <td>${date}</td>
+      <td>${r.email || '<span style="color:var(--text-3)">—</span>'}</td>
+      <td>${vehicle}</td>
+      <td>${pay}</td>
+      <td>${r.county || '—'}</td>
+      <td>${typeBadge}</td>
+      <td>${statusBadge}</td>
+      <td>${grade}</td>
+      <td style="white-space:nowrap;">${actions}</td>
+    </tr>`;
+  }).join('');
+}
+
+function badgeFor(type, val) {
+  if (!val) return '<span class="badge badge-pending">—</span>';
+  const map = {
+    type: { seed: 'badge-seed', teaser: 'badge-teaser', manual_signed: 'badge-manual', verified_upload: 'badge-upload' },
+    status: { pending: 'badge-pending', verified: 'badge-verified', rejected: 'badge-rejected', na: 'badge-pending' }
+  };
+  const cls = (map[type] && map[type][val]) || 'badge-pending';
+  return `<span class="badge ${cls}">${val.replace(/_/g, ' ')}</span>`;
+}
+
+// ═══════════════════════════════════
+// DETAIL MODAL
+// ═══════════════════════════════════
+function showDetail(id) {
+  const r = allData.find(d => d.id === id);
+  if (!r) return;
+
+  document.getElementById('modalTitle').textContent = [r.make, r.model, r.trim].filter(Boolean).join(' ') || 'Submission #' + r.id;
+
+  const fields = [
+    ['Email', r.email],
+    ['Type', r.submission_type],
+    ['Status', r.verification_status],
+    ['Deal Status', r.deal_status],
+    ['Grade', r.grade],
+    ['Payment', r.monthly_payment ? '$' + r.monthly_payment + '/mo' : null],
+    ['Due at Signing', r.due_at_signing ? '$' + r.due_at_signing : null],
+    ['Term', r.term ? r.term + ' months' : null],
+    ['Mileage', r.annual_mileage ? r.annual_mileage.toLocaleString() + '/yr' : null],
+    ['ZIP', r.zip],
+    ['County', r.county],
+    ['MSRP', r.msrp ? '$' + r.msrp.toLocaleString() : null],
+    ['Selling Price', r.selling_price ? '$' + r.selling_price.toLocaleString() : null],
+    ['Money Factor', r.money_factor],
+    ['Residual %', r.residual_pct ? r.residual_pct + '%' : null],
+    ['Dealer', r.dealer_name],
+    ['Signed', r.signed_month_year],
+    ['Partial VIN', r.partial_vin],
+    ['Trust Tier', r.trust_tier],
+    ['Founder Eligible', r.founder_eligible ? 'Yes' : 'No'],
+    ['Report Entitlement', r.report_entitlement],
+    ['Source', r.source],
+    ['Notes', r.notes],
+    ['Created', r.created_at ? new Date(r.created_at).toLocaleString() : null],
+  ];
+
+  document.getElementById('modalBody').innerHTML = fields
+    .filter(([, v]) => v != null && v !== '')
+    .map(([label, val]) => `<div class="modal-field"><div class="modal-label">${label}</div><div class="modal-value">${val}</div></div>`)
+    .join('');
+
+  let actions = '';
+  if (r.verification_status === 'pending') {
+    actions += `<button class="action-btn btn-approve" onclick="approve(${r.id});closeModal();">Approve</button>`;
+    actions += `<button class="action-btn btn-reject" onclick="reject(${r.id});closeModal();">Reject</button>`;
+  }
+  if (r.email) {
+    actions += `<button class="action-btn btn-send" onclick="sendReport(${r.id});closeModal();">Send Full Report</button>`;
+  }
+  document.getElementById('modalActions').innerHTML = actions;
+  document.getElementById('detailModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('detailModal').classList.remove('open');
+}
+
+// ═══════════════════════════════════
+// ACTIONS: Approve / Reject
+// ═══════════════════════════════════
+async function approve(id) {
+  const { error } = await sb.from('lease_submissions')
+    .update({ verification_status: 'verified', deal_status: 'signed_verified', trust_tier: 'high' })
+    .eq('id', id);
+
+  if (error) { showToast('Approve failed: ' + error.message, 'error'); return; }
+  showToast('Submission approved', 'success');
+  loadData();
+}
+
+async function reject(id) {
+  const { error } = await sb.from('lease_submissions')
+    .update({ verification_status: 'rejected', trust_tier: 'low' })
+    .eq('id', id);
+
+  if (error) { showToast('Reject failed: ' + error.message, 'error'); return; }
+  showToast('Submission rejected', 'success');
+  loadData();
+}
+
+// ═══════════════════════════════════
+// SEND FULL REPORT EMAIL
+// ═══════════════════════════════════
+async function sendReport(id) {
+  const r = allData.find(d => d.id === id);
+  if (!r || !r.email) { showToast('No email for this submission', 'error'); return; }
+
+  const vehicle = [r.make, r.model, r.trim].filter(Boolean).join(' ') || 'Your Vehicle';
+  const grade = r.grade || 'B';
+  const payment = r.monthly_payment || 0;
+  const county = r.county || 'NJ';
+  const mf = r.money_factor;
+  const residual = r.residual_pct;
+  const msrp = r.msrp;
+  const sp = r.selling_price;
+  const term = r.term || 36;
+  const das = r.due_at_signing || 0;
+  const effMonthly = Math.round((payment * term + das) / term);
+
+  // Grade styling
+  const gc = { 'A': '#4a8f5a', 'B+': '#5c7a65', 'B': '#5c7a65', 'C+': '#a8692e', 'C': '#a8692e', 'D': '#a85a4a' };
+  const gradeColor = gc[grade] || '#5c7a65';
+
+  // Build MF analysis section
+  let mfSection = '';
+  if (mf) {
+    const apr = (mf * 2400).toFixed(2);
+    mfSection = `
+      <tr><td style="padding:0 32px 16px;">
+        <div style="background:#1a1512;border-radius:4px;padding:20px 24px;">
+          <div style="font-family:monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#c4864a;margin-bottom:10px;">Money Factor Analysis</div>
+          <table width="100%" cellpadding="0" cellspacing="0"><tr>
+            <td width="48%"><div style="font-size:12px;color:#a89f94;">Your MF</div><div style="font-size:22px;color:#e8e4dc;font-family:monospace;">${mf}</div><div style="font-size:11px;color:#6b6259;">≈ ${apr}% APR</div></td>
+            <td width="48%"><div style="font-size:12px;color:#a89f94;">Effective Monthly</div><div style="font-size:22px;color:#e8e4dc;font-family:monospace;">$${effMonthly}</div><div style="font-size:11px;color:#6b6259;">Payment + DAS amortized</div></td>
+          </tr></table>
+        </div>
+      </td></tr>`;
+  }
+
+  // Build residual/discount section
+  let detailSection = '';
+  if (residual || (msrp && sp)) {
+    const disc = msrp && sp ? ((1 - sp / msrp) * 100).toFixed(1) : null;
+    detailSection = `
+      <tr><td style="padding:0 32px 16px;">
+        <table width="100%" cellpadding="0" cellspacing="0"><tr>
+          ${residual ? `<td style="background:#f8f5f0;border:1px solid rgba(28,25,23,0.10);border-radius:3px;padding:12px 16px;"><div style="font-family:monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#a89f94;margin-bottom:4px;">Residual</div><div style="font-size:20px;color:#1c1917;">${residual}%</div></td><td width="8px"></td>` : ''}
+          ${disc ? `<td style="background:#f8f5f0;border:1px solid rgba(28,25,23,0.10);border-radius:3px;padding:12px 16px;"><div style="font-family:monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#a89f94;margin-bottom:4px;">Discount off MSRP</div><div style="font-size:20px;color:#1c1917;">${disc}%</div></td>` : ''}
+        </tr></table>
+      </td></tr>`;
+  }
+
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#f8f5f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8f5f0;"><tr><td align="center" style="padding:40px 20px 0;">
+    <table width="600" cellpadding="0" cellspacing="0"><tr><td style="font-family:Georgia,'Times New Roman',serif;font-size:22px;color:#1c1917;">Lease<span style="color:#a8692e;">Checkr</span></td></tr></table>
+  </td></tr></table>
+
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8f5f0;"><tr><td align="center" style="padding:16px 20px 8px;">
+    <table width="600" cellpadding="0" cellspacing="0"><tr><td style="font-family:monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#c4864a;">Full Deal Report</td></tr></table>
+  </td></tr></table>
+
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8f5f0;"><tr><td align="center" style="padding:8px 20px 40px;">
+    <table width="600" cellpadding="0" cellspacing="0" style="background:#fdfaf6;border:1px solid rgba(28,25,23,0.10);border-radius:4px;">
+
+      <tr><td style="padding:28px 32px 0;">
+        <div style="font-family:monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#a89f94;">${vehicle}</div>
+        <div style="font-size:12px;color:#a89f94;margin-top:4px;">${term}mo · ${county} County, NJ</div>
+      </td></tr>
+
+      <tr><td style="padding:20px 32px;">
+        <table cellpadding="0" cellspacing="0"><tr>
+          <td style="vertical-align:top;padding-right:18px;"><div style="font-family:Georgia,serif;font-size:72px;font-weight:300;line-height:0.85;color:${gradeColor};">${grade}</div></td>
+          <td style="vertical-align:middle;"><div style="font-size:14px;color:#6b6259;line-height:1.55;max-width:280px;">Your full deal analysis based on verified NJ lease benchmark data.</div></td>
+        </tr></table>
+      </td></tr>
+
+      <tr><td style="padding:0 32px;"><div style="height:1px;background:rgba(28,25,23,0.10);"></div></td></tr>
+
+      <tr><td style="padding:20px 32px;">
+        <table width="100%" cellpadding="0" cellspacing="0"><tr>
+          <td width="30%" style="background:#f8f5f0;border:1px solid rgba(28,25,23,0.10);border-radius:3px;padding:12px 16px;">
+            <div style="font-family:monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#a89f94;margin-bottom:4px;">Payment</div>
+            <div style="font-size:22px;color:#1c1917;">$${payment}</div>
+          </td>
+          <td width="5%"></td>
+          <td width="30%" style="background:#f8f5f0;border:1px solid rgba(28,25,23,0.10);border-radius:3px;padding:12px 16px;">
+            <div style="font-family:monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#a89f94;margin-bottom:4px;">Due at Signing</div>
+            <div style="font-size:22px;color:#1c1917;">$${das.toLocaleString()}</div>
+          </td>
+          <td width="5%"></td>
+          <td width="30%" style="background:#f8f5f0;border:1px solid rgba(28,25,23,0.10);border-radius:3px;padding:12px 16px;">
+            <div style="font-family:monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#a89f94;margin-bottom:4px;">Total Cost</div>
+            <div style="font-size:22px;color:#1c1917;">$${(payment * term + das).toLocaleString()}</div>
+          </td>
+        </tr></table>
+      </td></tr>
+
+      ${mfSection}
+      ${detailSection}
+
+      <tr><td style="padding:16px 32px 28px;">
+        <div style="font-size:13px;color:#6b6259;line-height:1.7;">
+          This report was generated from the LeaseCheckr NJ benchmark — verified signed lease deals from NJ drivers. For questions or to contribute more data, visit <a href="https://leasecheckr.vercel.app" style="color:#a8692e;text-decoration:none;">leasecheckr.vercel.app</a>.
+        </div>
+      </td></tr>
+
+    </table>
+  </td></tr></table>
+
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8f5f0;"><tr><td align="center" style="padding:0 20px 40px;">
+    <table width="600"><tr><td style="text-align:center;font-size:11px;color:#a89f94;line-height:1.6;">
+      <a href="https://leasecheckr.vercel.app" style="color:#a8692e;text-decoration:none;">LeaseCheckr</a> · NJ Lease Intelligence<br>
+      <a href="https://leasecheckr.vercel.app/privacy.html" style="color:#a89f94;text-decoration:none;">Privacy</a> · <a href="https://leasecheckr.vercel.app/terms.html" style="color:#a89f94;text-decoration:none;">Terms</a>
+    </td></tr></table>
+  </td></tr></table>
+</body></html>`;
+
+  // Send via Resend
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESEND_KEY },
+      body: JSON.stringify({
+        from: 'LeaseCheckr <onboarding@resend.dev>',
+        to: [r.email],
+        subject: 'Your Full Lease Report: ' + grade + ' — ' + vehicle,
+        html: html
+      })
+    });
+
+    const result = await res.json();
+    if (res.ok) {
+      // Update report_entitlement in DB
+      await sb.from('lease_submissions').update({ report_entitlement: 'sent' }).eq('id', id);
+      showToast('Full report sent to ' + r.email, 'success');
+    } else {
+      showToast('Email failed: ' + JSON.stringify(result), 'error');
+    }
+  } catch (err) {
+    showToast('Email error: ' + err.message, 'error');
+  }
+}
+
+// ═══════════════════════════════════
+// TOAST
+// ═══════════════════════════════════
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(() => { t.className = 'toast'; }, 3500);
+}
+</script>
+
+</body>
+</html>
