@@ -416,7 +416,7 @@
     try{if(window.supabase){sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}}catch(e){}
 
     (async function(){
-      let claimed=153;
+      let claimed=1;
       if(sb){
         try{
           const{data}=await sb.from('founder_slots').select('claimed_count').eq('id',1).single();

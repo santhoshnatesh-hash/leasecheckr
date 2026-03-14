@@ -306,7 +306,6 @@
     .sold-out .spots-text{color:var(--ink-3)}
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231c1917'/><text x='5' y='22' font-family='Georgia,serif' font-size='18' font-weight='500' fill='%23a8692e'>LC</text></svg>">
 </head>
 <body>
 
@@ -321,7 +320,7 @@
   <p class="hero-subhead">The first 1,000 NJ drivers who contribute a verified lease document become Founding Members — early contributors helping build LeaseCheckr's benchmark from day one.</p>
   <div class="spots-counter">
     <div class="spots-dot"></div>
-    <span class="spots-text" id="spotsText">847 spots remaining</span>
+    <span class="spots-text" id="spotsText">999 spots remaining</span>
   </div>
 </section>
 
@@ -446,20 +445,20 @@
 
 <script>
   // ── SUPABASE
-  const SUPABASE_URL='https://xqjsvlhdpdfvzixlmdxk.supabase.co';
-  const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxanN2bGhkcGRmdnppeGxtZHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzg2ODcsImV4cCI6MjA4ODg1NDY4N30.MT0tEDMLaBDLtZkX9xEVEkaUfPdIA9QsJrWjGDpeWsE';
+  const SUPABASE_URL='YOUR_SUPABASE_URL';
+  const SUPABASE_KEY='YOUR_SUPABASE_ANON_KEY';
   let sb=null;
-  try{if(window.supabase){sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}}catch(e){console.error(e)}
+  try{if(SUPABASE_URL!=='YOUR_SUPABASE_URL'&&window.supabase){sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}}catch(e){console.error(e)}
 
   const TOTAL=1000;
 
   // ── LIVE FOUNDER COUNT
   async function loadFounderCount(){
-    let claimed=153; // fallback
+    let claimed=1; // fallback
     if(sb){
       try{
-        const{data,error}=await sb.from('founder_slots').select('claimed_count').eq('id',1).single();
-        if(!error&&data)claimed=data.claimed_count;
+        const{data,error}=await sb.rpc('get_founder_count');
+        if(!error&&typeof data==='number'&&data>0)claimed=data;
       }catch(e){console.error(e)}
     }
     const remaining=TOTAL-claimed;
