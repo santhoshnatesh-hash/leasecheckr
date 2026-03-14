@@ -207,10 +207,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:60px;display:flex;ali
 
 <script>
 // ── SUPABASE
-const SUPABASE_URL='YOUR_SUPABASE_URL';
-const SUPABASE_KEY='YOUR_SUPABASE_ANON_KEY';
+const SUPABASE_URL='https://xqjsvlhdpdfvzixlmdxk.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxanN2bGhkcGRmdnppeGxtZHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzg2ODcsImV4cCI6MjA4ODg1NDY4N30.MT0tEDMLaBDLtZkX9xEVEkaUfPdIA9QsJrWjGDpeWsE';
 let sb=null;
-try{if(SUPABASE_URL!=='YOUR_SUPABASE_URL'&&window.supabase){sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}}catch(e){console.error('Supabase init:',e)}
+try{if(window.supabase){sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}}catch(e){console.error('Supabase init:',e)}
 
 // ── STATE
 let originalImageSrc=null;
@@ -401,11 +401,11 @@ async function submitLease(){
       const filePath='lease-uploads/'+fileName;
       const{error:ue}=await sb.storage.from('lease-documents').upload(filePath,blob,{contentType:'image/jpeg',upsert:false});
       if(ue)console.error('Upload error:',ue);else documentUrl=filePath;
-      const{error:ie}=await sb.from('submissions').insert({
+      const{error:ie}=await sb.from('lease_submissions').insert([{
         email:email,submission_type:'verified_upload',deal_status:'signed_verified',
         trust_tier:'high',verification_status:'pending',report_entitlement:'free_verified',
-        document_url:documentUrl
-      });
+        founder_eligible:true,source:'document_upload'
+      }]);
       if(ie)console.error('Insert error:',ie);
     }
     setProgress(100);
@@ -420,6 +420,12 @@ async function submitLease(){
 
 // ── INIT
 setProgress(10);
+// Pre-fill email if user already provided it on homepage
+const savedEmail = sessionStorage.getItem('lc_email');
+if (savedEmail) {
+  const ei = document.getElementById('emailInput');
+  if (ei) { ei.value = savedEmail; checkEmail(); }
+}
 </script>
 
 <!-- FOOTER -->
