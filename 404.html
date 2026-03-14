@@ -4,232 +4,45 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Page Not Found — LeaseCheckr</title>
+  <meta name="description" content="This page doesn't exist. Head back to LeaseCheckr to check your NJ lease deal.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --canvas:      #f8f5f0;
-      --canvas-2:    #f2ede6;
-      --ink:         #1c1917;
-      --ink-2:       #3d3830;
-      --ink-3:       #6b6259;
-      --ink-4:       #a89f94;
-      --copper:      #a8692e;
-      --copper-lt:   #c4864a;
-      --border:      rgba(28,25,23,0.09);
-      --ease:        cubic-bezier(0.16, 1, 0.3, 1);
-      --f-display:   'Cormorant Garamond', Georgia, serif;
-      --f-body:      'DM Sans', system-ui, sans-serif;
-      --f-mono:      'DM Mono', monospace;
+      --canvas:#f8f5f0;--ink:#1c1917;--ink-2:#3d3830;--ink-3:#6b6259;--ink-4:#a89f94;
+      --copper:#a8692e;--copper-lt:#c4864a;--border:rgba(28,25,23,0.10);
     }
-
-    body {
-      background: var(--canvas);
-      color: var(--ink);
-      font-family: var(--f-body);
-      -webkit-font-smoothing: antialiased;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* ── NAV ── */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
-      height: 56px;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 48px;
-      background: rgba(248,245,240,0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-logo {
-      font-family: var(--f-display);
-      font-size: 1.3rem; font-weight: 500;
-      letter-spacing: 0.02em;
-      color: var(--ink); text-decoration: none;
-    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--canvas); color: var(--ink); -webkit-font-smoothing: antialiased; min-height: 100vh; display: flex; flex-direction: column; }
+    nav { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 48px; background: rgba(248,245,240,0.92); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+    .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 500; letter-spacing: 0.02em; color: var(--ink); text-decoration: none; }
     .nav-logo span { color: var(--copper); }
-    .nav-links { display: flex; align-items: center; gap: 28px; }
-    .nav-links a {
-      font-size: 0.8rem; color: var(--ink-3);
-      text-decoration: none; transition: color 0.2s;
-    }
-    .nav-links a:hover { color: var(--ink); }
-    .nav-cta {
-      font-size: 0.78rem; font-weight: 500;
-      color: var(--canvas) !important;
-      background: var(--ink);
-      padding: 8px 18px; border-radius: 6px;
-      transition: background 0.2s !important;
-    }
-    .nav-cta:hover { background: var(--ink-2) !important; }
-
-    /* ── MAIN ── */
-    main {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 120px 24px 80px;
-      text-align: center;
-    }
-
-    .error-wrap { max-width: 520px; }
-
-    .error-code {
-      font-family: var(--f-mono);
-      font-size: 0.75rem;
-      letter-spacing: 0.12em;
-      color: var(--copper);
-      text-transform: uppercase;
-      margin-bottom: 20px;
-    }
-
-    .error-headline {
-      font-family: var(--f-display);
-      font-size: clamp(2.4rem, 6vw, 3.6rem);
-      font-weight: 400;
-      line-height: 1.15;
-      color: var(--ink);
-      margin-bottom: 20px;
-    }
-
-    .error-headline em {
-      font-style: italic;
-      color: var(--ink-3);
-    }
-
-    .error-body {
-      font-size: 0.95rem;
-      color: var(--ink-3);
-      line-height: 1.7;
-      margin-bottom: 40px;
-    }
-
-    .error-actions {
-      display: flex;
-      gap: 14px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .btn-primary {
-      display: inline-block;
-      font-family: var(--f-body);
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: var(--canvas);
-      background: var(--ink);
-      padding: 13px 28px;
-      border-radius: 8px;
-      text-decoration: none;
-      transition: background 0.2s;
-    }
-    .btn-primary:hover { background: var(--ink-2); }
-
-    .btn-secondary {
-      display: inline-block;
-      font-family: var(--f-body);
-      font-size: 0.85rem;
-      font-weight: 400;
-      color: var(--ink-2);
-      background: transparent;
-      border: 1px solid var(--border);
-      padding: 13px 28px;
-      border-radius: 8px;
-      text-decoration: none;
-      transition: border-color 0.2s, color 0.2s;
-    }
-    .btn-secondary:hover { border-color: var(--ink-3); color: var(--ink); }
-
-    .divider-line {
-      width: 40px;
-      height: 1px;
-      background: var(--copper);
-      margin: 32px auto;
-      opacity: 0.4;
-    }
-
-    .helpful-links {
-      font-size: 0.78rem;
-      color: var(--ink-4);
-      letter-spacing: 0.04em;
-    }
-    .helpful-links a {
-      color: var(--ink-3);
-      text-decoration: none;
-      border-bottom: 1px solid rgba(168,105,46,0.25);
-      padding-bottom: 1px;
-      margin: 0 8px;
-      transition: color 0.2s;
-    }
-    .helpful-links a:hover { color: var(--copper); }
-
-    /* ── FOOTER ── */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 28px 64px;
-      display: flex; align-items: center; justify-content: space-between;
-      background: var(--canvas);
-    }
-    .footer-logo { font-family: var(--f-display); font-size: 1rem; color: var(--ink-3); }
-    .footer-logo span { color: var(--copper); }
-    .footer-links { display: flex; gap: 24px; }
-    .footer-links a { font-size: 0.71rem; color: var(--ink-4); text-decoration: none; transition: color 0.2s; }
-    .footer-links a:hover { color: var(--ink); }
-
-    @media (max-width: 768px) {
-      nav { padding: 0 24px; }
-      .nav-links { display: none; }
-      footer { padding: 24px; flex-direction: column; gap: 16px; text-align: center; }
-      .footer-links { flex-wrap: wrap; justify-content: center; }
-    }
+    .content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 24px; text-align: center; }
+    .four-oh-four { font-family: 'Cormorant Garamond', serif; font-size: 8rem; font-weight: 300; color: rgba(28,25,23,0.06); line-height: 1; margin-bottom: 16px; }
+    .error-title { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 500; color: var(--ink); margin-bottom: 12px; }
+    .error-desc { font-size: 0.92rem; font-weight: 300; line-height: 1.7; color: var(--ink-3); max-width: 400px; margin-bottom: 32px; }
+    .error-cta { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; background: var(--ink); color: var(--canvas); border-radius: 3px; text-decoration: none; font-size: 0.88rem; font-weight: 500; transition: all 0.2s; }
+    .error-cta:hover { background: var(--ink-2); transform: translateY(-1px); }
+    .error-links { display: flex; gap: 24px; margin-top: 24px; }
+    .error-links a { font-size: 0.78rem; color: var(--copper); text-decoration: none; border-bottom: 1px solid rgba(168,105,46,0.3); padding-bottom: 1px; }
+    .error-links a:hover { border-color: var(--copper); }
   </style>
 </head>
 <body>
-
   <nav>
     <a href="index.html" class="nav-logo">Lease<span>Checkr</span></a>
-    <div class="nav-links">
-      <a href="index.html">Check My Deal</a>
+  </nav>
+  <div class="content">
+    <div class="four-oh-four">404</div>
+    <h1 class="error-title">This page doesn't exist.</h1>
+    <p class="error-desc">The page you're looking for may have been moved or removed. Head back to the homepage to check your NJ lease deal.</p>
+    <a href="index.html" class="error-cta">Back to LeaseCheckr →</a>
+    <div class="error-links">
       <a href="pricing.html">Pricing</a>
       <a href="sample-report.html">Sample Report</a>
-      <a href="founder.html" class="nav-cta">Founding Member</a>
-    </div>
-  </nav>
-
-  <main>
-    <div class="error-wrap">
-      <div class="error-code">404 — Page not found</div>
-      <h1 class="error-headline">This page <em>doesn't exist.</em><br>Your lease deal might.</h1>
-      <p class="error-body">The page you're looking for isn't here — but if you're shopping for a car lease in New Jersey, you're in the right place.</p>
-      <div class="error-actions">
-        <a href="index.html" class="btn-primary">Check my deal →</a>
-        <a href="pricing.html" class="btn-secondary">See how it works</a>
-      </div>
-      <div class="divider-line"></div>
-      <div class="helpful-links">
-        Or go to
-        <a href="sample-report.html">Sample Report</a>
-        <a href="founder.html">Founding Member</a>
-        <a href="privacy.html">Privacy</a>
-      </div>
-    </div>
-  </main>
-
-  <footer>
-    <span class="footer-logo">Lease<span>Checkr</span></span>
-    <div class="footer-links">
-      <a href="index.html">Home</a>
-      <a href="pricing.html">Pricing</a>
+      <a href="blog.html">Learn</a>
       <a href="founder.html">Founding Member</a>
-      <a href="privacy.html">Privacy</a>
-      <a href="terms.html">Terms</a>
     </div>
-  </footer>
-
+  </div>
 </body>
 </html>

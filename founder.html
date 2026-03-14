@@ -310,14 +310,8 @@
 <body>
 
 <nav>
-  <a class="nav-logo" href="index.html">Lease<span>Checkr</span></a>
-  <div class="nav-right">
-    <a class="nav-link" href="blog.html">Learn</a>
-    <a class="nav-link" href="calculator.html">Calculator</a>
-    <a class="nav-link" href="pricing.html">Pricing</a>
-    <a class="nav-link" href="sample-report.html">Sample Report</a>
-    <a class="nav-founder" href="founder.html">Founding Member →</a>
-  </div>
+  <a href="index.html" class="nav-logo">Lease<span>Checkr</span></a>
+  <a href="index.html" class="nav-back">← Back to LeaseCheckr</a>
 </nav>
 
 <section class="hero">
@@ -441,11 +435,8 @@
 <footer>
   <span class="footer-logo">Lease<span>Checkr</span></span>
   <div class="footer-links">
-    <a href="index.html">Home</a>
-    <a href="blog.html">Learn</a>
-    <a href="calculator.html">Calculator</a>
+    <a href="index.html">Check a Lease</a>
     <a href="pricing.html">Pricing</a>
-    <a href="founder.html">Founding Member</a>
     <a href="sample-report.html">Sample Report</a>
     <a href="privacy.html">Privacy</a>
     <a href="terms.html">Terms</a>
@@ -454,8 +445,8 @@
 
 <script>
   // ── SUPABASE
-  const SUPABASE_URL='https://xqjsvlhdpdfvzixlmdxk.supabase.co';
-  const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxanN2bGhkcGRmdnppeGxtZHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzg2ODcsImV4cCI6MjA4ODg1NDY4N30.MT0tEDMLaBDLtZkX9xEVEkaUfPdIA9QsJrWjGDpeWsE';
+  const SUPABASE_URL='YOUR_SUPABASE_URL';
+  const SUPABASE_KEY='YOUR_SUPABASE_ANON_KEY';
   let sb=null;
   try{if(SUPABASE_URL!=='YOUR_SUPABASE_URL'&&window.supabase){sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}}catch(e){console.error(e)}
 
@@ -507,15 +498,5 @@
     card.style.transform='perspective(1000px) rotateX(2deg) rotateY(-2deg)';
   });
 </script>
-<nav>
-  <a class="nav-logo" href="index.html">Lease<span>Checkr</span></a>
-  <div class="nav-right">
-    <a class="nav-link" href="blog.html">Learn</a>
-    <a class="nav-link" href="calculator.html">Calculator</a>
-    <a class="nav-link" href="pricing.html">Pricing</a>
-    <a class="nav-link" href="sample-report.html">Sample Report</a>
-    <a class="nav-founder" href="founder.html">Founding Member →</a>
-  </div>
-</nav>
 </body>
 </html>

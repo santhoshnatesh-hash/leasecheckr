@@ -275,15 +275,15 @@
 
     /* ── EMAIL GATE ── */
     .email-gate {
-      display: none;
+      max-height: 0; overflow: hidden; opacity: 0;
       margin-top: 14px;
-      padding: 16px 18px;
+      padding: 0 18px;
       background: var(--copper-bg);
       border: 1px solid rgba(168,105,46,0.14);
       border-radius: 4px;
-      animation: fadeUp 0.4s var(--ease) both;
+      transition: max-height 0.4s var(--ease), opacity 0.3s var(--ease), padding 0.4s var(--ease);
     }
-    .email-gate.visible { display: block; }
+    .email-gate.visible { max-height: 250px; opacity: 1; padding: 16px 18px; }
     .email-gate-title {
       font-family: 'Cormorant Garamond', serif;
       font-size: 1.05rem; font-weight: 500; color: var(--ink);
@@ -1088,7 +1088,7 @@
           <span>Show Me My Score</span>
           <span class="cta-arrow">→</span>
         </button>
-        <div class="trust-line">No account required · NJ leases only · Under 60 seconds</div>
+        <div class="trust-line">Just your email · NJ leases only · Under 60 seconds</div>
 
         <!-- EMAIL GATE (appears after CTA click) -->
         <div class="email-gate" id="emailGate">
@@ -1395,7 +1395,7 @@
 
     <div class="compare-grid">
       <div class="compare-card free-card reveal">
-        <div class="cc-badge free">Free · No account required</div>
+        <div class="cc-badge free">Free · Just your email</div>
         <div class="cc-title">Instant Score</div>
         <div class="cc-price">Always free</div>
         <div class="cc-items">
@@ -1543,7 +1543,7 @@
 
   let supabaseClient = null;
   try {
-    if (window.supabase && SUPABASE_URL !== 'https://YOUR_PROJECT_ID.supabase.co') {
+    if (window.supabase) {
       supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
   } catch (e) { console.warn('Supabase init skipped:', e.message); }
