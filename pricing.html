@@ -419,8 +419,8 @@
       let claimed=1;
       if(sb){
         try{
-          const{data}=await sb.from('founder_slots').select('claimed_count').eq('id',1).single();
-          if(data)claimed=data.claimed_count;
+          const{data,error}=await sb.rpc('get_founder_count');
+          if(!error && typeof data==='number' && data>0) claimed=data;
         }catch(e){}
       }
       document.getElementById('spotsLeft').textContent=(1000-claimed).toLocaleString();
