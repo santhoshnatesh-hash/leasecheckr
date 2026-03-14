@@ -720,7 +720,8 @@
     .bsr-value { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 400; color: var(--ink); line-height: 1; }
     .bsr-label { font-family: 'DM Mono', monospace; font-size: 0.54rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-4); }
 
-    /* ── FOOTER ── */
+  
+  /* ── FOOTER ── */
     footer {
       border-top: 1px solid var(--border);
       padding: 28px 64px;
@@ -771,12 +772,13 @@
 <nav>
   <a href="index.html" class="nav-logo">Lease<span>Checkr</span></a>
   <div class="nav-right">
+    <a href="blog.html" class="nav-link">Learn</a>
+    <a href="calculator.html" class="nav-link">Calculator</a>
     <a href="pricing.html" class="nav-link">Pricing</a>
-    <a href="sample-report.html" target="_blank" class="nav-link">Sample Report</a>
+    <a href="sample-report.html" class="nav-link">Sample Report</a>
     <a href="founder.html" class="nav-founder">Founding Member →</a>
   </div>
 </nav>
-
 <!-- ═══ HERO SPLIT ═══ -->
 <div class="hero-split">
 
@@ -1015,17 +1017,33 @@
           </div>
         </div>
 
-        <div class="teaser-ctas">
-          <a href="access.html" class="cta-primary">
-            <span class="cta-primary-label">Get Full Report</span>
-            <span class="cta-primary-price">$19.99 or upload your lease free →</span>
-          </a>
-          <a href="sample-report.html" target="_blank" class="cta-secondary">View Sample Report →</a>
-          <div class="cta-tertiary">
-            Or <a href="founder.html">contribute your lease and join 153 Founding Members</a> — full report free, Premium access permanent.
-          </div>
-        </div>
-      </div>
+        <!-- GATED CTAS — controlled by showTeaser() -->
+<div class="teaser-ctas" id="ctaReportReady" style="display:none;">
+  <a href="access.html" class="cta-primary">
+    <span class="cta-primary-label">Get Full Report</span>
+    <span class="cta-primary-price">$19.99 or upload your lease free →</span>
+  </a>
+  <a href="sample-report.html" target="_blank" class="cta-secondary">View Sample Report →</a>
+  <div class="cta-tertiary">
+    Or <a href="founder.html">become a Founding Member</a> — upload your lease, get full report free + lifetime Premium.
+  </div>
+</div>
+
+<div class="teaser-ctas" id="ctaNeedData" style="display:none;">
+  <div style="background:var(--copper-bg);border:1px solid rgba(168,105,46,0.15);border-radius:8px;padding:18px 20px;margin-bottom:10px;">
+    <div style="font-family:'DM Mono',monospace;font-size:0.52rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--copper);margin-bottom:6px;">Building Your Local Benchmark</div>
+    <div style="font-size:0.88rem;color:var(--ink-2,#3d3830);line-height:1.65;margin-bottom:10px;">We need at least <strong>3 verified deals</strong> for this vehicle in your county before we can generate an accurate report. We'd rather be honest than sell you something thin.</div>
+    <div style="font-size:0.78rem;color:var(--ink-3,#6b6259);" id="ctaDataNote">Currently 0 verified deals for this vehicle in your area.</div>
+  </div>
+  <a href="intake-upload.html" class="cta-primary" style="background:var(--copper);">
+    <span class="cta-primary-label">Help Build the Benchmark</span>
+    <span class="cta-primary-price">Upload your lease → get a free report when data is ready →</span>
+  </a>
+  <a href="submit-deal.html" class="cta-secondary">Or submit your deal terms for $9.99 →</a>
+  <div class="cta-tertiary">
+    Your contribution helps every NJ driver who leases this vehicle. <a href="founder.html">Founding Members</a> get lifetime Premium access.
+  </div>
+</div>
 
     </div>
   </div>
@@ -1352,11 +1370,37 @@
   </div>
 </section>
 
+<!-- LEARN & TOOLS TEASER -->
+<section style="padding:80px 48px;background:var(--canvas);">
+  <div style="max-width:1000px;margin:0 auto;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:32px;">
+      <span style="font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--copper);">Learn &amp; Tools</span>
+      <span style="flex:1;height:1px;background:var(--border);"></span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+      <a href="blog.html" style="text-decoration:none;background:var(--cream,#fdfaf6);border:1px solid var(--border);border-radius:12px;padding:36px 32px;transition:all 0.25s;display:flex;flex-direction:column;gap:16px;">
+        <div style="font-size:2rem;">📚</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:400;color:var(--ink);line-height:1.2;">Learning Center</div>
+        <div style="font-size:0.88rem;color:var(--ink-3,#6b6259);line-height:1.65;">Free guides on how lease payments work, what money factor means, NJ tax rules, negotiation tips, and what to check before you sign.</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--copper);">Read the guides →</div>
+      </a>
+      <a href="calculator.html" style="text-decoration:none;background:var(--cream,#fdfaf6);border:1px solid var(--border);border-radius:12px;padding:36px 32px;transition:all 0.25s;display:flex;flex-direction:column;gap:16px;">
+        <div style="font-size:2rem;">🧮</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:400;color:var(--ink);line-height:1.2;">Lease Calculator</div>
+        <div style="font-size:0.88rem;color:var(--ink-3,#6b6259);line-height:1.65;">Enter MSRP, selling price, residual, money factor, and term to see exactly what your monthly payment should be — including NJ tax.</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--copper);">Open calculator →</div>
+      </a>
+    </div>
+  </div>
+</section>
 
 <!-- FOOTER -->
 <footer>
   <span class="footer-logo">Lease<span>Checkr</span></span>
   <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="blog.html">Learn</a>
+    <a href="calculator.html">Calculator</a>
     <a href="pricing.html">Pricing</a>
     <a href="founder.html">Founding Member</a>
     <a href="sample-report.html">Sample Report</a>
@@ -1364,7 +1408,6 @@
     <a href="terms.html">Terms</a>
   </div>
 </footer>
-
 
 <script>
   // ── SUPABASE INIT ──────────────────────────────────
@@ -1420,21 +1463,13 @@
     return           { g:'D',  cls:'grade-d', v:'Significantly Overpaying',bc:'poor', i:"This deal is well above what other NJ drivers are paying. The full report shows you exactly where and by how much." };
   }
 
-  function showTeaser() {
+ function showTeaser() {
     const make = document.getElementById('fMake').value || '';
     const model = document.getElementById('fModel').value || '';
     const trim = document.getElementById('fTrim').value || '';
     const pay = parseFloat(document.getElementById('fPayment').value) || 412;
     const zip = document.getElementById('fZip').value || '';
     const term = document.querySelector('#termPills .pill.selected')?.textContent || '36 mo';
-    const mileage = document.querySelector('#mileagePills .pill.selected')?.textContent || '10,000';
-    const driveoff = parseFloat(document.getElementById('fDriveoff').value) || null;
-    const msrp = parseFloat(document.getElementById('fMsrp').value) || null;
-    const capcost = parseFloat(document.getElementById('fCapcost').value) || null;
-    const residual = parseFloat(document.getElementById('fResidual').value) || null;
-    const mf = document.getElementById('fMF').value || null;
-    const dealer = document.getElementById('fDealer').value || '';
-    const checkType = document.getElementById('fCheckType').value || '';
 
     const { county, label, avg } = getCounty(zip);
     const { g, cls, v, bc, i } = gradeIt(pay, avg);
@@ -1459,38 +1494,42 @@
     document.getElementById('editVehicle').textContent = vehicle;
     document.getElementById('editDetails').textContent = '$' + pay + '/mo · ' + label + ' · ' + term;
 
-    // ── Save to sessionStorage (for pre-populating manual form later)
-    const teaserData = {
-      make, model, trim, monthly_payment: pay, due_at_signing: driveoff,
-      lease_term: parseInt(term), annual_mileage: parseInt(mileage.replace(/,/g,'')),
-      zip_code: zip, dealer_name: dealer, residual_value: residual,
-      money_factor: mf ? parseFloat(mf) : null
-    };
-    sessionStorage.setItem('leaseCheckrTeaser', JSON.stringify(teaserData));
+    // ── DATA GATE: check deal count before showing buy CTA ──
+    const ctaReady = document.getElementById('ctaReportReady');
+    const ctaNeed = document.getElementById('ctaNeedData');
+    const MIN_DEALS = 3;
 
-    // ── Save teaser to Supabase (fire and forget — don't block UI)
-    if (sb) {
-      sb.from('submissions').insert({
-        submission_type: 'teaser',
-        deal_status: 'quote_check',
-        trust_tier: 'low',
-        make: make || null,
-        model: model || null,
-        trim: trim || null,
-        monthly_payment: pay,
-        due_at_signing: driveoff,
-        lease_term: parseInt(term) || null,
-        annual_mileage: parseInt(mileage.replace(/,/g,'')) || null,
-        zip_code: zip || null,
-        dealer_name: dealer || null,
-        residual_value: residual,
-        money_factor: mf ? parseFloat(mf) : null,
-        vehicle_text: vehicle,
-        verification_status: 'na',
-        report_entitlement: 'none'
-      }).then(({ error }) => {
-        if (error) console.error('Supabase teaser save error:', error);
-      });
+    ctaReady.style.display = 'none';
+    ctaNeed.style.display = 'flex';
+    document.getElementById('ctaDataNote').textContent = 'Checking available data...';
+
+    if (sb && make && model) {
+      sb.from('submissions')
+        .select('id', { count: 'exact', head: true })
+        .ilike('make', make)
+        .ilike('model', model)
+        .in('deal_status', ['signed_verified', 'signed_manual'])
+        .in('trust_tier', ['high', 'medium'])
+        .then(({ count, error }) => {
+          const dealCount = count || 0;
+          if (dealCount >= MIN_DEALS) {
+            ctaReady.style.display = 'flex';
+            ctaNeed.style.display = 'none';
+          } else {
+            ctaReady.style.display = 'none';
+            ctaNeed.style.display = 'flex';
+            const need = MIN_DEALS - dealCount;
+            document.getElementById('ctaDataNote').textContent = 
+              dealCount === 0 
+                ? 'No verified deals yet for ' + (model || 'this vehicle') + ' in ' + label + '. Be the first to contribute.'
+                : dealCount + ' verified deal' + (dealCount > 1 ? 's' : '') + ' found — ' + need + ' more needed to generate a full report.';
+          }
+        })
+        .catch(() => {
+          document.getElementById('ctaDataNote').textContent = 'We\'re still building data for this vehicle in ' + label + '.';
+        });
+    } else if (!sb) {
+      document.getElementById('ctaDataNote').textContent = 'We\'re building the NJ benchmark — contribute your deal to help.';
     }
 
     const fp = document.getElementById('formPanel');
@@ -1505,7 +1544,6 @@
       requestAnimationFrame(() => { tp.classList.add('visible'); });
     }, 380);
   }
-
   function showForm() {
     const fp = document.getElementById('formPanel');
     const tp = document.getElementById('teaserPanel');
