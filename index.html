@@ -1807,7 +1807,7 @@
     document.getElementById('gateEmail').focus();
   }
 
-  function submitEmailGate() {
+  async function submitEmailGate() {
     const emailInput = document.getElementById('gateEmail');
     const email = emailInput.value.trim();
     const errorEl = document.getElementById('gateError');
@@ -1819,9 +1819,117 @@
     errorEl.style.display = 'none';
     emailInput.style.borderColor = 'var(--border-2)';
     sessionStorage.setItem('lc_email', email);
-    saveTeaserToSupabase(pendingFormData, email);
+
+    // Save teaser to Supabase (async, don't await — let it run in background)
+    const teaserPromise = saveTeaserToSupabase(pendingFormData, email);
+
+    // Check entitlements while teaser saves
+    let entitlements = null;
+    if (supabaseClient) {
+      try {
+        const { data, error } = await supabaseClient.rpc('check_entitlements', { user_email: email });
+        if (!error && data) entitlements = data;
+      } catch (e) { console.warn('Entitlement check failed:', e); }
+    }
+
+    // Hide email gate and show teaser
     document.getElementById('emailGate').classList.remove('visible');
     showTeaser(pendingFormData);
+
+    // Wait for teaser to be saved so we have the row ID
+    await teaserPromise;
+
+    // Update CTAs based on entitlements
+    updateTeaserCTAs(entitlements, email);
+  }
+
+  // Store last teaser insert ID for report sending
+  let lastTeaserInsertId = null;
+
+  function updateTeaserCTAs(ent, email) {
+    const ctaContainer = document.querySelector('.teaser-ctas');
+    if (!ctaContainer) return;
+
+    if (ent && ent.is_founder) {
+      // FOUNDER: Free report, one click
+      ctaContainer.innerHTML = `
+        <div style="background:var(--copper-bg);border:1px solid rgba(168,105,46,0.2);border-radius:3px;padding:14px 18px;margin-bottom:10px;text-align:center;">
+          <div style="font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--copper);margin-bottom:4px;">Founding Member #${ent.founder_number}</div>
+          <div style="font-size:0.82rem;color:var(--ink-2);">Your full report is free — included with your Founding Member status.</div>
+        </div>
+        <button class="cta-primary" onclick="requestFreeReport('${email}')" style="border:none;cursor:pointer;width:100%;text-align:center;display:block;">
+          <span class="cta-primary-label">Send My Full Report — Free</span>
+          <span class="cta-primary-price">Founding Member benefit →</span>
+        </button>
+        <a href="sample-report.html" target="_blank" class="cta-secondary">View Sample Report →</a>
+      `;
+    } else if (ent && ent.free_credits > 0) {
+      // HAS CREDITS: Free report, one click
+      ctaContainer.innerHTML = `
+        <div style="background:var(--sage-pale);border:1px solid rgba(92,122,101,0.2);border-radius:3px;padding:14px 18px;margin-bottom:10px;text-align:center;">
+          <div style="font-size:0.82rem;color:var(--ink-2);">You have <strong>${ent.free_credits} free report${ent.free_credits > 1 ? 's' : ''}</strong> from your verified lease upload.</div>
+        </div>
+        <button class="cta-primary" onclick="requestFreeReport('${email}')" style="border:none;cursor:pointer;width:100%;text-align:center;display:block;">
+          <span class="cta-primary-label">Send My Full Report — Free</span>
+          <span class="cta-primary-price">${ent.free_credits} credit${ent.free_credits > 1 ? 's' : ''} remaining →</span>
+        </button>
+        <a href="sample-report.html" target="_blank" class="cta-secondary">View Sample Report →</a>
+      `;
+    } else {
+      // DEFAULT: Paid path (already rendered in HTML, just update founder count)
+      const slotsLeft = ent ? ent.founder_slots_remaining : 847;
+      const tfc = document.getElementById('tFounderCount');
+      if (tfc) tfc.textContent = (1000 - slotsLeft);
+    }
+  }
+
+  async function requestFreeReport(email) {
+    // Find the most recent teaser for this email
+    if (!supabaseClient) return;
+
+    const btn = event.target.closest('.cta-primary');
+    if (btn) { btn.style.opacity = '0.6'; btn.style.pointerEvents = 'none'; }
+
+    try {
+      // Get the latest teaser ID for this email
+      const { data: rows, error: fetchErr } = await supabaseClient
+        .from('lease_submissions')
+        .select('id')
+        .eq('email', email)
+        .eq('submission_type', 'teaser')
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (fetchErr || !rows || rows.length === 0) {
+        alert('Could not find your submission. Please try again.');
+        if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }
+        return;
+      }
+
+      const teaserId = rows[0].id;
+
+      // Use credit and send report
+      const { data, error } = await supabaseClient.rpc('use_credit_and_send_report', {
+        user_email: email,
+        teaser_id: teaserId
+      });
+
+      if (error) {
+        alert('Error sending report: ' + error.message);
+        if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }
+        return;
+      }
+
+      // Success — update button
+      if (btn) {
+        btn.innerHTML = '<span class="cta-primary-label">Report Sent — Check Your Inbox</span>';
+        btn.style.opacity = '1';
+        btn.style.background = 'var(--sage)';
+      }
+    } catch (err) {
+      alert('Something went wrong. Please try again.');
+      if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }
+    }
   }
 
   document.addEventListener('DOMContentLoaded', function() {
@@ -1959,11 +2067,27 @@
   // ═══════════════════════════════════
   // COUNTERS
   // ═══════════════════════════════════
-  const CLAIMED = 153, TOTAL = 1000;
-  document.getElementById('foundersCount').textContent = CLAIMED;
-  document.getElementById('spotsLeft').textContent = (TOTAL - CLAIMED).toLocaleString() + ' spots remaining';
-  const tfc = document.getElementById('tFounderCount');
-  if (tfc) tfc.textContent = CLAIMED;
+  // ═══════════════════════════════════
+  // FOUNDER COUNTER (live from Supabase)
+  // ═══════════════════════════════════
+  const TOTAL = 1000;
+  let founderCount = 153; // fallback
+
+  async function updateFounderCount() {
+    if (!supabaseClient) return;
+    try {
+      const { data, error } = await supabaseClient.rpc('get_founder_count');
+      if (!error && typeof data === 'number' && data > 0) {
+        founderCount = data;
+      }
+    } catch (e) { console.warn('Founder count fetch failed'); }
+
+    document.getElementById('foundersCount').textContent = founderCount;
+    document.getElementById('spotsLeft').textContent = (TOTAL - founderCount).toLocaleString() + ' spots remaining';
+    const tfc = document.getElementById('tFounderCount');
+    if (tfc) tfc.textContent = founderCount;
+  }
+  updateFounderCount();
 
   // ═══════════════════════════════════
   // COUNTY BAR CHART ANIMATION
