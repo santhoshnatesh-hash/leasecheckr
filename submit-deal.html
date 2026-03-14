@@ -255,7 +255,7 @@ let sb=null;
 try{if(SUPABASE_URL!=='YOUR_SUPABASE_URL'&&window.supabase){sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}}catch(e){console.error(e)}
 
 // ── STRIPE PAYMENT LINK
-const STRIPE_MANUAL_LINK='YOUR_9_99_PAYMENT_LINK'; // e.g. https://buy.stripe.com/test_xxx
+const STRIPE_MANUAL_LINK='https://buy.stripe.com/test_28EcN571r98kfma7AAdby01';
 
 // ── PRE-POPULATE FROM TEASER
 (function prefill(){
@@ -334,7 +334,7 @@ async function handleSubmit(){
   sessionStorage.setItem('leaseCheckrManualEmail',data.email);
 
   // Redirect to Stripe $9.99 payment
-  if(STRIPE_MANUAL_LINK!=='YOUR_9_99_PAYMENT_LINK'){
+  if(STRIPE_MANUAL_LINK){
     window.location.href=STRIPE_MANUAL_LINK;
   }else{
     btn.textContent='Payment link not configured';
