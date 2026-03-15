@@ -419,6 +419,7 @@ const isPreliminary = g('preliminary') === '1';
 const benchmarkNote = g('benchmark_note') || '';
 const verdict = g('verdict') || '';
 const userEmc = gn('emc') || Math.round((payment * term + das) / term);
+const compAvg = gn('avg') || 0;  // Comparable average from V2 engine
 
 const vehicle = [make, model].filter(Boolean).join(' ') || 'Your Vehicle';
 const vehicleFull = [year, make, model].filter(Boolean).join(' ');
@@ -470,8 +471,12 @@ document.getElementById('cvDate').textContent = 'Generated ' + new Date().toLoca
 document.getElementById('rPay').innerHTML = '$' + payment.toLocaleString() + '<span style="font-size:0.8rem;color:var(--ink4)">/mo</span>';
 document.getElementById('rDas').textContent = '$' + das.toLocaleString() + ' due at signing';
 document.getElementById('rAvgLabel').textContent = benchmarkNote || 'Comparable Average';
-document.getElementById('rAvg').innerHTML = '$' + eff.toLocaleString() + '<span style="font-size:0.8rem;color:var(--ink4)">/mo eff.</span>';
-document.getElementById('rAvgNote').textContent = 'Effective monthly = payment + (DAS ÷ term)';
+document.getElementById('rAvg').innerHTML = compAvg > 0 
+  ? '$' + compAvg.toLocaleString() + '<span style="font-size:0.8rem;color:var(--ink4)">/mo</span>'
+  : '$' + eff.toLocaleString() + '<span style="font-size:0.8rem;color:var(--ink4)">/mo eff.</span>';
+document.getElementById('rAvgNote').textContent = compAvg > 0 
+  ? 'Weighted median of comparable deals'
+  : 'Effective monthly = payment + (DAS ÷ term)';
 document.getElementById('rEff').textContent = '$' + eff.toLocaleString();
 document.getElementById('rTotal').textContent = '$' + totalCost.toLocaleString();
 document.getElementById('rTotalNote').textContent = 'Over ' + term + ' months';
@@ -504,10 +509,10 @@ if (mf > 0 && markup > 0.0002) {
 }
 document.getElementById('rNarrative').innerHTML = narrativeHTML;
 
-// Comparison bar — use EMC as center reference
-// avgRef is estimated from the grade: if B, user is at median, so avgRef ≈ eff
-// This gets updated with real data when Supabase loads in loadReportData()
-let avgRef = Math.round(eff * (1 - (grade === 'A' ? 0.12 : grade === 'B+' ? 0.06 : grade === 'B' ? 0.01 : grade === 'C+' ? -0.07 : grade === 'C' ? -0.14 : -0.22)));
+// Comparison bar — use real comparable average from V2 engine
+let avgRef = compAvg > 0 
+  ? compAvg 
+  : Math.round(eff * (1 - (grade === 'A' ? 0.12 : grade === 'B+' ? 0.06 : grade === 'B' ? 0.01 : grade === 'C+' ? -0.07 : grade === 'C' ? -0.14 : -0.22)));
 const range = avgRef * 0.3;
 const low = Math.round(avgRef - range * 0.6);
 const high = Math.round(avgRef + range * 0.4);
@@ -820,8 +825,8 @@ async function loadReportData() {
       // This ensures homepage teaser and full report always show the same grade
       // Comparable deals are shown for context but do NOT override the grade
 
-      // Update county average display with verified data if available
-      if (avgVerifiedPay > 0) {
+      // Update county average display — but ONLY if homepage V2 didn't pass one
+      if (avgVerifiedPay > 0 && compAvg <= 0) {
         document.getElementById('rAvg').innerHTML = '$' + avgVerifiedPay + '<span style="font-size:0.8rem;color:var(--ink4)">/mo</span>';
         document.getElementById('rAvgNote').textContent = 'Based on ' + verifiedDeals.length + ' verified ' + (make || 'NJ') + ' deals';
         // Recalculate diff and narrative with real avg
