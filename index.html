@@ -2800,16 +2800,17 @@
     btn.disabled = false;
     btn.textContent = 'See Score';
 
-    // If founder, show the welcome message briefly
+    // If founder, show the welcome message briefly, then auto-send report
     if (_isFounder) {
       document.getElementById('gateFounder').classList.add('visible');
-      // Wait a beat so they see the message, then show score
+      // Wait a beat so they see the welcome message, then show score + auto-send
       setTimeout(() => {
         document.getElementById('emailGate').classList.remove('visible');
         document.getElementById('gateFounder').classList.remove('visible');
         showTeaser();
-        // Override CTA to skip payment — go straight to email report
         overrideCTAForFounder();
+        // Auto-trigger report — no extra click needed for verified founders
+        requestFounderReport();
       }, 1500);
     } else {
       // Not a founder — hide gate, show score with normal pricing CTAs
@@ -2817,8 +2818,10 @@
       showTeaser();
     }
 
-    // Save teaser to Supabase
-    saveTeaserToSupabase(email);
+    // Save teaser to Supabase (skip for founders — requestFounderReport handles their insert)
+    if (!_isFounder) {
+      saveTeaserToSupabase(email);
+    }
   }
 
   function overrideCTAForFounder() {
@@ -2891,16 +2894,16 @@
       } catch(e) { console.error('Report request failed:', e); }
     }
 
-    // Show confirmation
-    btn.innerHTML = '<span class="cta-primary-label">✓ Report Requested</span>' +
-      '<span class="cta-primary-price">We\'ll email it to ' + _userEmail + '</span>';
+    // Show confirmation — report is being sent automatically
+    btn.innerHTML = '<span class="cta-primary-label">✓ Report Being Sent</span>' +
+      '<span class="cta-primary-price">Emailing to ' + _userEmail + '</span>';
     btn.style.background = 'var(--sage)';
     btn.disabled = true;
 
     // Update the tertiary area with confirmation details
     const tertiary = document.querySelector('.cta-tertiary');
     if (tertiary) {
-      tertiary.innerHTML = '<strong style="color:var(--sage);">Your full report is being prepared.</strong> ' +
+      tertiary.innerHTML = '<strong style="color:var(--sage);">Your full report is on its way.</strong> ' +
         'It will arrive at ' + _userEmail + ' shortly. Check your spam folder if you don\'t see it within a few minutes.';
     }
   }
