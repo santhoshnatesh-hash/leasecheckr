@@ -5,19 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LeaseCheckr — Is Your NJ Lease a Fair Deal?</title>
   <meta name="description" content="Compare your NJ car lease quote against real local data. Find out instantly if you're getting a fair deal — before you sign.">
-  <meta property="og:title" content="LeaseCheckr — Is Your NJ Lease a Fair Deal?">
-  <meta property="og:description" content="Compare your NJ car lease quote against real signed lease data in your county — before you sign.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://leasecheckr.vercel.app">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="LeaseCheckr — Is Your NJ Lease a Fair Deal?">
-  <meta name="twitter:description" content="Compare your NJ car lease quote against real signed lease data in your county — before you sign.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-
-  <!-- SUPABASE CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -210,15 +199,6 @@
     .form-panel { transition: all 0.45s var(--ease); }
     .form-panel.hidden { opacity: 0; transform: translateX(-16px); pointer-events: none; height: 0; overflow: hidden; }
 
-    .form-heading {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(1.6rem, 2.2vw, 2rem);
-      font-weight: 500;
-      line-height: 1.12;
-      letter-spacing: -0.01em;
-      color: var(--ink);
-      margin-bottom: 6px;
-    }
     .form-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-4); margin-bottom: 18px; }
 
     /* FIELDS */
@@ -236,6 +216,28 @@
     }
     .field input::placeholder { color: var(--ink-5); font-size: 0.84rem; }
     .field input:focus, .field select:focus { border-color: var(--copper); box-shadow: 0 0 0 3px rgba(168,105,46,0.07); }
+
+    /* AUTOSUGGEST */
+    .field-suggest { position: relative; }
+    .suggest-list {
+      position: absolute; top: 100%; left: 0; right: 0; z-index: 50;
+      background: var(--canvas); border: 1px solid var(--border-2); border-top: none;
+      border-radius: 0 0 3px 3px; max-height: 200px; overflow-y: auto;
+      box-shadow: 0 8px 24px rgba(28,25,23,0.08);
+      display: none;
+    }
+    .suggest-list.open { display: block; }
+    .suggest-item {
+      padding: 9px 13px; font-size: 0.84rem; color: var(--ink-2); cursor: pointer;
+      transition: background 0.12s;
+    }
+    .suggest-item:hover, .suggest-item.active {
+      background: rgba(168,105,46,0.06); color: var(--ink);
+    }
+    .suggest-item .suggest-match { color: var(--copper); font-weight: 500; }
+    .suggest-empty {
+      padding: 9px 13px; font-size: 0.78rem; color: var(--ink-4); font-style: italic;
+    }
 
     /* PILL SELECTORS */
     .pill-label { font-family: 'DM Mono', monospace; font-size: 0.57rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 6px; }
@@ -272,46 +274,6 @@
     .cta-arrow { transition: transform 0.2s; }
     .cta-btn:hover .cta-arrow { transform: translateX(3px); }
     .trust-line { text-align: center; font-family: 'DM Mono', monospace; font-size: 0.54rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-4); margin-top: 9px; }
-
-    /* ── EMAIL GATE ── */
-    .email-gate {
-      max-height: 0; overflow: hidden; opacity: 0;
-      margin-top: 14px;
-      padding: 0 18px;
-      background: var(--copper-bg);
-      border: 1px solid rgba(168,105,46,0.14);
-      border-radius: 4px;
-      transition: max-height 0.4s var(--ease), opacity 0.3s var(--ease), padding 0.4s var(--ease);
-    }
-    .email-gate.visible { max-height: 250px; opacity: 1; padding: 16px 18px; }
-    .email-gate-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.05rem; font-weight: 500; color: var(--ink);
-      margin-bottom: 4px;
-    }
-    .email-gate-sub {
-      font-size: 0.77rem; color: var(--ink-3); line-height: 1.5;
-      margin-bottom: 12px;
-    }
-    .email-gate-row { display: flex; gap: 8px; }
-    .email-gate-row input {
-      flex: 1;
-      background: var(--canvas); border: 1px solid var(--border-2); border-radius: 3px;
-      padding: 11px 13px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; color: var(--ink);
-      outline: none; transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .email-gate-row input:focus { border-color: var(--copper); box-shadow: 0 0 0 3px rgba(168,105,46,0.07); }
-    .email-gate-row input::placeholder { color: var(--ink-5); font-size: 0.84rem; }
-    .email-gate-btn {
-      padding: 11px 20px; background: var(--ink); color: var(--canvas); border: none; border-radius: 3px;
-      font-family: 'DM Sans', sans-serif; font-size: 0.84rem; font-weight: 500; cursor: pointer;
-      transition: all 0.2s; white-space: nowrap;
-    }
-    .email-gate-btn:hover { background: var(--ink-2); }
-    .email-gate-note {
-      font-size: 0.65rem; color: var(--ink-4); margin-top: 8px; line-height: 1.4;
-    }
-    .email-gate-error { font-size: 0.72rem; color: var(--rose); margin-top: 6px; display: none; }
 
     /* ── TEASER PANEL ── */
     .teaser-panel { display: none; opacity: 0; transform: translateX(18px); transition: all 0.45s var(--ease); }
@@ -513,13 +475,13 @@
     }
     .nc-label {
       font-family: 'DM Mono', monospace;
-      font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase;
-      color: var(--copper); margin-bottom: 8px; font-weight: 500;
+      font-size: 0.57rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--copper); margin-bottom: 8px;
     }
     .nc-title {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1.3rem; font-weight: 600; color: var(--ink);
-      margin-bottom: 10px; line-height: 1.2;
+      font-size: 1.15rem; font-weight: 500; color: var(--ink);
+      margin-bottom: 8px; line-height: 1.2;
     }
     .nc-desc {
       font-size: 0.79rem; font-weight: 300; line-height: 1.68; color: var(--ink-3);
@@ -667,9 +629,9 @@
 
     .compare-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 20px;
-      max-width: 1100px;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      max-width: 900px;
       margin: 48px auto 0;
     }
 
@@ -682,16 +644,6 @@
     .compare-card.free-card {
       background: var(--cream);
       border: 1px solid var(--border);
-    }
-    .compare-card.mid-card {
-      background: var(--cream);
-      border: 1px solid var(--border);
-    }
-    .compare-card.mid-card::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0;
-      height: 2px;
-      background: var(--copper);
     }
     .compare-card.full-card {
       background: var(--ink);
@@ -718,7 +670,6 @@
       font-size: 1.4rem; font-weight: 500; margin-bottom: 8px;
     }
     .free-card .cc-title { color: var(--ink); }
-    .mid-card .cc-title { color: var(--ink); }
     .full-card .cc-title { color: rgba(253,250,246,0.95); }
 
     .cc-price {
@@ -726,7 +677,6 @@
       font-size: 0.7rem; letter-spacing: 0.08em; margin-bottom: 24px;
     }
     .free-card .cc-price { color: var(--ink-4); }
-    .mid-card .cc-price { color: var(--copper); }
     .full-card .cc-price { color: var(--copper-lt); }
 
     .cc-items { display: flex; flex-direction: column; gap: 0; }
@@ -736,13 +686,11 @@
       font-size: 0.81rem; line-height: 1.5;
     }
     .free-card .cc-item { border-color: var(--border); color: var(--ink-3); }
-    .mid-card .cc-item { border-color: var(--border); color: var(--ink-3); }
     .full-card .cc-item { border-color: rgba(253,250,246,0.06); color: rgba(253,250,246,0.65); }
     .cc-item:last-child { border-bottom: none; }
 
     .cc-check { font-size: 0.75rem; flex-shrink: 0; margin-top: 1px; }
     .free-card .cc-check { color: var(--sage); }
-    .mid-card .cc-check { color: var(--copper); }
     .full-card .cc-check { color: var(--copper-lt); }
     .cc-lock { font-size: 0.7rem; flex-shrink: 0; margin-top: 1px; opacity: 0.3; }
 
@@ -755,8 +703,6 @@
     }
     .free-card .cc-cta { background: var(--canvas-2); color: var(--ink); border: 1px solid var(--border-2); }
     .free-card .cc-cta:hover { background: var(--canvas); border-color: var(--ink); }
-    .mid-card .cc-cta { background: var(--ink); color: var(--canvas); border: 1px solid var(--ink); }
-    .mid-card .cc-cta:hover { background: var(--ink-2); transform: translateY(-1px); }
     .full-card .cc-cta { background: var(--copper); color: var(--canvas); }
     .full-card .cc-cta:hover { background: var(--copper-lt); transform: translateY(-1px); }
 
@@ -796,59 +742,6 @@
     .bsr-value { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 400; color: var(--ink); line-height: 1; }
     .bsr-label { font-family: 'DM Mono', monospace; font-size: 0.54rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-4); }
 
-    /* ── SECTION: LEARN TEASER ── */
-    .section-learn {
-      background: var(--canvas);
-      border-top: 1px solid var(--border);
-      padding: 80px 64px;
-    }
-    .learn-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      max-width: 1100px;
-      margin: 40px auto 0;
-    }
-    .learn-card {
-      background: var(--cream);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 28px 24px;
-      transition: transform 0.25s var(--ease), border-color 0.25s, box-shadow 0.25s;
-      text-decoration: none;
-      display: flex; flex-direction: column;
-    }
-    .learn-card:hover { transform: translateY(-4px); border-color: var(--border-2); box-shadow: 0 12px 32px rgba(28,25,23,0.07); }
-    .learn-card-tag {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.54rem; letter-spacing: 0.14em; text-transform: uppercase;
-      color: var(--copper); margin-bottom: 12px;
-    }
-    .learn-card-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.15rem; font-weight: 500; color: var(--ink);
-      margin-bottom: 8px; line-height: 1.25;
-    }
-    .learn-card-desc {
-      font-size: 0.79rem; font-weight: 300; line-height: 1.68; color: var(--ink-3);
-      flex: 1;
-    }
-    .learn-card-link {
-      margin-top: 16px;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--copper);
-    }
-    .learn-view-all {
-      text-align: center; margin-top: 32px;
-    }
-    .learn-view-all a {
-      font-size: 0.82rem; color: var(--copper); text-decoration: none;
-      border-bottom: 1px solid rgba(168,105,46,0.3); padding-bottom: 2px;
-      transition: border-color 0.2s;
-    }
-    .learn-view-all a:hover { border-color: var(--copper); }
-
     /* ── FOOTER ── */
     footer {
       border-top: 1px solid var(--border);
@@ -872,96 +765,26 @@
     .reveal-delay-2 { transition-delay: 0.2s; }
     .reveal-delay-3 { transition-delay: 0.3s; }
 
-    /* ── DESKTOP TYPOGRAPHY READABILITY ── */
-    @media (min-width: 961px) {
-      /* Body / supporting paragraphs: 0.875rem → 1rem (16-17px) */
-      .subhead { font-size: 1.05rem; }
-      .support-para { font-size: 0.95rem; }
-      .founder-text { font-size: 0.86rem; }
-      .locked-text { font-size: 0.84rem; }
-      .grade-interp { font-size: 0.88rem; }
-
-      /* Form elements */
-      .field-label { font-size: 0.65rem; }
-      .pill-label { font-size: 0.65rem; }
-      .field input, .field select { font-size: 0.95rem; }
-      .field input::placeholder { font-size: 0.9rem; }
-      .pill { font-size: 0.84rem; }
-
-      /* Helper / descriptor text */
-      .mf-helper { font-size: 0.8rem; }
-      .expand-label { font-size: 0.64rem; }
-      .email-gate-sub { font-size: 0.84rem; }
-      .email-gate-note { font-size: 0.72rem; }
-
-      /* Trust / microcopy */
-      .trust-line { font-size: 0.62rem; }
-      .proof-label { font-size: 0.62rem; }
-      .founder-count { font-size: 0.64rem; }
-      .confidence-line { font-size: 0.64rem; }
-      .pay-box-label { font-size: 0.6rem; }
-      .pay-box-delta { font-size: 0.78rem; }
-
-      /* CTA text */
-      .cta-btn { font-size: 0.95rem; }
-      .cta-primary-label { font-size: 0.9rem; }
-      .cta-primary-price { font-size: 0.72rem; }
-      .cta-secondary { font-size: 0.88rem; }
-      .cta-tertiary { font-size: 0.8rem; }
-
-      /* Below-fold sections */
-      .mislead-left p { font-size: 1.05rem; }
-      .mp-desc { font-size: 0.88rem; }
-      .nc-desc { font-size: 0.86rem; }
-      .nc-tip { font-size: 0.78rem; }
-      .how-step-desc { font-size: 0.88rem; }
-      .how-right-intro { font-size: 0.95rem; }
-      .need-item { font-size: 0.9rem; }
-      .ask-q-why { font-size: 0.84rem; }
-      .ask-intro { font-size: 0.95rem; }
-      .cc-item { font-size: 0.88rem; }
-      .cc-price { font-size: 0.76rem; }
-      .benchmark-left p { font-size: 0.95rem; }
-      .s-subhead-light { font-size: 1rem; }
-
-      /* Eyebrows - slight bump */
-      .eyebrow { font-size: 0.67rem; }
-      .s-eyebrow { font-size: 0.65rem; }
-      .form-eyebrow { font-size: 0.65rem; }
-
-      /* Section headlines stay the same - no change */
-
-      /* Learn cards */
-      .learn-card-desc { font-size: 0.86rem; }
-
-      /* Footer */
-      .footer-links a { font-size: 0.78rem; }
-    }
-
     /* ── MOBILE ── */
     @media (max-width: 960px) {
       nav { padding: 0 24px; }
-      .nav-right { gap: 16px; }
       .hero-split { grid-template-columns: 1fr; }
       .left-col { position: static; height: auto; padding: 48px 24px 32px; order: 1; }
       .support-para, .proof-row, .founder-strip, .divider { display: none; }
       .right-col { order: 2; padding: 24px; border-left: none; border-top: 1px solid var(--border); min-height: unset; }
-      .section-mislead, .section-numbers, .section-how, .section-ask, .section-compare, .section-benchmark, .section-learn { padding: 64px 24px; }
+      .section-mislead, .section-numbers, .section-how, .section-ask, .section-compare, .section-benchmark { padding: 64px 24px; }
       .mislead-grid, .how-split, .ask-grid, .benchmark-grid { grid-template-columns: 1fr; gap: 48px; }
       .numbers-grid { grid-template-columns: 1fr 1fr; }
       .compare-grid { grid-template-columns: 1fr; }
-      .learn-grid { grid-template-columns: 1fr; }
       footer { padding: 24px; flex-direction: column; gap: 16px; text-align: center; }
       .footer-links { flex-wrap: wrap; justify-content: center; }
       .headline { font-size: 2.1rem; }
-      .form-heading { font-size: 1.5rem; }
     }
     @media (max-width: 540px) {
       .numbers-grid { grid-template-columns: 1fr; }
       .field-row { grid-template-columns: 1fr; }
     }
   </style>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231c1917'/><text x='5' y='22' font-family='Georgia,serif' font-size='18' font-weight='500' fill='%23a8692e'>LC</text></svg>">
 </head>
 <body>
 
@@ -971,8 +794,6 @@
   <div class="nav-right">
     <a href="pricing.html" class="nav-link">Pricing</a>
     <a href="sample-report.html" target="_blank" class="nav-link">Sample Report</a>
-    <a href="blog.html" class="nav-link">Learn</a>
-    <a href="calculator.html" class="nav-link">Calculator</a>
     <a href="founder.html" class="nav-founder">Founding Member →</a>
   </div>
 </nav>
@@ -1001,7 +822,7 @@
 
     <div class="proof-row">
       <div class="proof-item">
-        <span class="proof-value" id="dealsCount">98</span>
+        <span class="proof-value" id="dealsCount">847</span>
         <span class="proof-label">Deals checked</span>
       </div>
       <div class="proof-item">
@@ -1009,7 +830,7 @@
         <span class="proof-label">NJ counties</span>
       </div>
       <div class="proof-item">
-        <span class="proof-value" id="foundersCount">1</span>
+        <span class="proof-value" id="foundersCount">153</span>
         <span class="proof-label">Founding members</span>
       </div>
     </div>
@@ -1021,7 +842,7 @@
           Submitting your first verified lease document? You qualify as a Founding Member — one of the first 1,000 NJ drivers helping build the benchmark.
           <br><a href="founder.html">See Founding Member benefits →</a>
         </div>
-        <div class="founder-count" id="spotsLeft">999 spots remaining</div>
+        <div class="founder-count" id="spotsLeft">847 spots remaining</div>
       </div>
     </div>
   </div>
@@ -1041,8 +862,7 @@
 
       <!-- FORM PANEL -->
       <div class="form-panel" id="formPanel">
-        <h2 class="form-heading">Check Your Lease Quote</h2>
-        <div class="form-eyebrow">Enter your dealer numbers below</div>
+        <div class="form-eyebrow">Check your lease quote</div>
 
         <!-- MAKE / MODEL / TRIM -->
         <div class="field-row" style="margin-bottom:9px;">
@@ -1061,15 +881,17 @@
               <option>Toyota</option><option>Volkswagen</option><option>Volvo</option>
             </select>
           </div>
-          <div class="field">
+          <div class="field field-suggest">
             <label class="field-label">Model</label>
-            <input type="text" id="fModel" placeholder="e.g. CR-V">
+            <input type="text" id="fModel" placeholder="Start typing model" autocomplete="off" disabled>
+            <div class="suggest-list" id="modelSuggest"></div>
           </div>
         </div>
         <div class="field-row field-full" style="margin-bottom:12px;">
-          <div class="field">
+          <div class="field field-suggest">
             <label class="field-label">Trim</label>
-            <input type="text" id="fTrim" placeholder="e.g. EX-L AWD">
+            <input type="text" id="fTrim" placeholder="Start typing trim (optional)" autocomplete="off" disabled>
+            <div class="suggest-list" id="trimSuggest"></div>
           </div>
         </div>
 
@@ -1167,23 +989,11 @@
           </div>
         </div>
 
-        <button class="cta-btn" onclick="handleShowTeaser()">
+        <button class="cta-btn" onclick="showTeaser()">
           <span>Show Me My Score</span>
           <span class="cta-arrow">→</span>
         </button>
-        <div class="trust-line">Just your email · NJ leases only · Under 60 seconds</div>
-
-        <!-- EMAIL GATE (appears after CTA click) -->
-        <div class="email-gate" id="emailGate">
-          <div class="email-gate-title">Almost there — where should we send your results?</div>
-          <div class="email-gate-sub">Enter your email to see your score. We'll also send a copy to your inbox.</div>
-          <div class="email-gate-row">
-            <input type="email" id="gateEmail" placeholder="you@email.com">
-            <button class="email-gate-btn" onclick="submitEmailGate()">See Score</button>
-          </div>
-          <div class="email-gate-error" id="gateError">Please enter a valid email address.</div>
-          <div class="email-gate-note">No spam. Your data stays private. <a href="privacy.html" style="color:var(--copper);text-decoration:none;border-bottom:1px solid rgba(168,105,46,0.3);">Privacy policy</a></div>
-        </div>
+        <div class="trust-line">No account required · NJ leases only · Under 60 seconds</div>
       </div>
 
       <!-- TEASER PANEL -->
@@ -1200,7 +1010,6 @@
               <span class="verdict-dot"></span><span id="tVerdict">Fair Deal</span>
             </div>
             <div class="grade-interp" id="tInterp">You're at the county average. The full report shows what's driving the number.</div>
-            <div id="tBasis" style="font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.08em;color:var(--ink-4);margin-top:8px;"></div>
           </div>
         </div>
 
@@ -1236,7 +1045,7 @@
           </a>
           <a href="sample-report.html" target="_blank" class="cta-secondary">View Sample Report →</a>
           <div class="cta-tertiary">
-            Or <a href="founder.html">contribute your lease and join <span id="tFounderCount">1</span> Founding Members</a> — full report included with verified upload.
+            Or <a href="founder.html">contribute your lease and join 153 Founding Members</a> — full report free, Premium access permanent.
           </div>
         </div>
       </div>
@@ -1254,14 +1063,14 @@
 
     <div class="mislead-grid">
       <div class="mislead-left reveal">
-        <div class="big-stat">0.0005</div>
-        <div class="big-stat-label">A common money factor markup — and what it costs you</div>
+        <div class="big-stat">$67</div>
+        <div class="big-stat-label">Avg. monthly overpayment observed in NJ submissions</div>
         <p>
           Most shoppers negotiate by asking <strong>"can you get it under $400 a month?"</strong> Dealers are trained to work with that number — by adjusting the term, the mileage, or the drive-off in ways that look like a win but aren't.
         </p>
         <br>
         <p>
-          A money factor markup of just 0.0005 on a $38,000 vehicle adds <strong>roughly $29 per month — over $1,000 across a 36-month lease.</strong> That's a financing adjustment that takes a dealer 30 seconds to apply, and most shoppers never know it happened.
+          Over a 36-month lease, a $67/month overpayment is <strong>$2,412 left on the table</strong> — often from a money factor markup that took a dealer 30 seconds to apply.
         </p>
       </div>
 
@@ -1479,7 +1288,7 @@
 
     <div class="compare-grid">
       <div class="compare-card free-card reveal">
-        <div class="cc-badge free">Free · Just your email</div>
+        <div class="cc-badge free">Free · No account required</div>
         <div class="cc-title">Instant Score</div>
         <div class="cc-price">Always free</div>
         <div class="cc-items">
@@ -1495,22 +1304,7 @@
         <a href="#formPanel" class="cc-cta" onclick="document.getElementById('formPanel').scrollIntoView({behavior:'smooth'})">Check your quote free →</a>
       </div>
 
-      <div class="compare-card mid-card reveal reveal-delay-1">
-        <div class="cc-badge free" style="background:var(--copper-bg);color:var(--copper);border-color:rgba(168,105,46,0.2);">$9.99 · Contributor</div>
-        <div class="cc-title">Submit Your Deal</div>
-        <div class="cc-price">$9.99 one-time · contribute your signed deal data</div>
-        <div class="cc-items">
-          <div class="cc-item"><span class="cc-check">✓</span><span>Everything in the free score</span></div>
-          <div class="cc-item"><span class="cc-check">✓</span><span>Full report with all 10 sections</span></div>
-          <div class="cc-item"><span class="cc-check">✓</span><span>Money factor analysis — buy rate vs. your rate</span></div>
-          <div class="cc-item"><span class="cc-check">✓</span><span>Comparable NJ deals in your county</span></div>
-          <div class="cc-item"><span class="cc-check">✓</span><span>Your signed deal data contributes to the NJ benchmark</span></div>
-          <div class="cc-item"><span class="cc-check">✓</span><span>Negotiation scripts and action items</span></div>
-        </div>
-        <a href="submit-deal.html" class="cc-cta">Submit deal — $9.99 →</a>
-      </div>
-
-      <div class="compare-card full-card reveal reveal-delay-2">
+      <div class="compare-card full-card reveal reveal-delay-1">
         <div class="cc-badge full">Full Report</div>
         <div class="cc-title">Complete Analysis</div>
         <div class="cc-price">$19.99 one-time · or free with lease upload</div>
@@ -1558,14 +1352,14 @@
             <div class="bsr-label">Day rolling window</div>
           </div>
           <div class="bsr-item">
-            <div class="bsr-value">NJ</div>
-            <div class="bsr-label">Focused exclusively</div>
+            <div class="bsr-value">100%</div>
+            <div class="bsr-label">NJ-verified submissions</div>
           </div>
         </div>
       </div>
 
       <div class="benchmark-right reveal reveal-delay-1">
-        <div class="county-chart-title">Illustrative: Avg. lease payment by county · Honda CR-V EX-L · 36mo</div>
+        <div class="county-chart-title">Sample: Avg. lease payment by county · Honda CR-V EX-L · 36mo</div>
         <div class="county-chart" id="countyChart">
           <div class="county-row"><span class="county-name">Bergen</span><div class="county-bar-wrap"><div class="county-bar" data-w="88"></div></div><span class="county-val">$438</span></div>
           <div class="county-row"><span class="county-name">Morris</span><div class="county-bar-wrap"><div class="county-bar" data-w="80"></div></div><span class="county-val">$428</span></div>
@@ -1582,42 +1376,6 @@
 </section>
 
 
-<!-- ═══ SECTION 7: LEARN TEASER ═══ -->
-<section class="section-learn">
-  <div class="section-inner">
-    <div class="s-eyebrow" style="color:var(--copper);">Learning Center</div>
-    <h2 class="s-headline-light">Understand your lease<br>before you negotiate.</h2>
-
-    <div class="learn-grid">
-      <a href="article-money-factor.html" class="learn-card reveal">
-        <div class="learn-card-tag">Fundamentals</div>
-        <div class="learn-card-title">What Is a Money Factor — and How Do Dealers Mark It Up?</div>
-        <div class="learn-card-desc">The money factor is your lease's hidden interest rate. Learn how it works, how to spot a markup, and what to ask your dealer.</div>
-        <div class="learn-card-link">Read guide →</div>
-      </a>
-
-      <a href="article-due-at-signing.html" class="learn-card reveal reveal-delay-1">
-        <div class="learn-card-tag">Due at Signing</div>
-        <div class="learn-card-title">Why Putting More Down Doesn't Make Your Lease Better</div>
-        <div class="learn-card-desc">A bigger check at signing lowers your payment but doesn't improve the deal. Here's what due-at-signing actually includes and what to watch for.</div>
-        <div class="learn-card-link">Read guide →</div>
-      </a>
-
-      <a href="article-nj-tax.html" class="learn-card reveal reveal-delay-2">
-        <div class="learn-card-tag">NJ Specific</div>
-        <div class="learn-card-title">How NJ Sales Tax Works on a Lease (It's Different)</div>
-        <div class="learn-card-desc">New Jersey taxes lease payments monthly, not on the full vehicle price. This changes the math — and gives NJ drivers a real advantage.</div>
-        <div class="learn-card-link">Read guide →</div>
-      </a>
-    </div>
-
-    <div class="learn-view-all">
-      <a href="blog.html">View all guides and videos →</a>
-    </div>
-  </div>
-</section>
-
-
 <!-- FOOTER -->
 <footer>
   <span class="footer-logo">Lease<span>Checkr</span></span>
@@ -1625,8 +1383,6 @@
     <a href="pricing.html">Pricing</a>
     <a href="founder.html">Founding Member</a>
     <a href="sample-report.html">Sample Report</a>
-    <a href="blog.html">Learn</a>
-    <a href="calculator.html">Calculator</a>
     <a href="privacy.html">Privacy</a>
     <a href="terms.html">Terms</a>
   </div>
@@ -1634,528 +1390,510 @@
 
 
 <script>
-  // ═══════════════════════════════════
-  // SUPABASE INIT
-  // ═══════════════════════════════════
-  const SUPABASE_URL = 'https://xqjsvlhdpdfvzixlmdxk.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxanN2bGhkcGRmdnppeGxtZHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzg2ODcsImV4cCI6MjA4ODg1NDY4N30.MT0tEDMLaBDLtZkX9xEVEkaUfPdIA9QsJrWjGDpeWsE';
-
-  let supabaseClient = null;
-  try {
-    if (window.supabase) {
-      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    }
-  } catch (e) { console.warn('Supabase init skipped:', e.message); }
-
-  // ═══════════════════════════════════
-  // SEED BENCHMARK DATA (inline fallback)
-  // 97 verified NJ signed lease deals
-  // ═══════════════════════════════════
-  let BENCHMARK_DATA = [];
-
-  async function loadBenchmarkData() {
-    // Try Supabase first
-    if (supabaseClient) {
-      try {
-        const { data, error } = await supabaseClient
-          .from('lease_submissions')
-          .select('make,model,trim,year,monthly_payment,due_at_signing,term,annual_mileage,county,msrp,selling_price,residual_pct,money_factor,dealer_name,trust_tier,effective_monthly')
-          .in('deal_status', ['signed_verified', 'signed_manual'])
-          .neq('submission_type', 'teaser');
-        if (!error && data && data.length > 0) {
-          BENCHMARK_DATA = data.map(d => ({
-            mk: d.make, md: d.model, tr: d.trim, yr: d.year,
-            pay: d.monthly_payment, das: d.due_at_signing || 0, trm: d.term,
-            mi: d.annual_mileage, co: d.county, mf: d.money_factor,
-            res: d.residual_pct, sp: d.selling_price, msrp: d.msrp,
-            eff: d.effective_monthly || ((d.monthly_payment * d.term + (d.due_at_signing||0)) / d.term),
-            dlr: d.dealer_name, tt: d.trust_tier
-          }));
-          console.log('Loaded ' + BENCHMARK_DATA.length + ' deals from Supabase');
-          return;
-        }
-      } catch (e) { console.warn('Supabase load failed, using inline data:', e.message); }
-    }
-    // Fallback: use inline seed data
-    BENCHMARK_DATA = SEED_DATA_INLINE;
-    console.log('Using inline seed data: ' + BENCHMARK_DATA.length + ' deals');
-  }
-
-  // Inline seed data (compressed)
-  const SEED_DATA_INLINE = [{"mk":"Volkswagen","md":"Atlas","tr":"SEL Premium R-Line","yr":2024,"pay":620.0,"das":2620.0,"trm":36,"mi":12000,"co":"Essex","mf":null,"res":null,"sp":null,"msrp":57637.0,"eff":692.78,"dlr":null,"tt":"medium"},{"mk":"Toyota","md":"Crown","tr":"XLE","yr":2024,"pay":585.0,"das":0,"trm":36,"mi":10000,"co":"Hudson","mf":null,"res":null,"sp":null,"msrp":42043.0,"eff":585.0,"dlr":null,"tt":"medium"},{"mk":"BMW","md":"iX","tr":"xDrive50","yr":2024,"pay":661.0,"das":0,"trm":36,"mi":10000,"co":"Bergen","mf":null,"res":null,"sp":null,"msrp":89245.0,"eff":661.0,"dlr":null,"tt":"medium"},{"mk":"BMW","md":"iX","tr":"xDrive50","yr":2024,"pay":1020.0,"das":0,"trm":36,"mi":10000,"co":"Hudson","mf":null,"res":null,"sp":null,"msrp":104425.0,"eff":1020.0,"dlr":null,"tt":"medium"},{"mk":"BMW","md":"X5","tr":"xDrive40i","yr":2024,"pay":1135.0,"das":2061.0,"trm":36,"mi":7500,"co":"Hudson","mf":null,"res":null,"sp":null,"msrp":70870.0,"eff":1192.25,"dlr":null,"tt":"medium"},{"mk":"Audi","md":"Q8 e-tron","tr":"Premium","yr":2024,"pay":812.0,"das":0,"trm":36,"mi":10000,"co":"Essex","mf":null,"res":null,"sp":63645.0,"msrp":78645.0,"eff":812.0,"dlr":null,"tt":"medium"},{"mk":"Kia","md":"EV6","tr":"AWD Technology","yr":2024,"pay":297.0,"das":0,"trm":36,"mi":10000,"co":"Hudson","mf":null,"res":null,"sp":null,"msrp":null,"eff":297.0,"dlr":null,"tt":"medium"},{"mk":"Jeep","md":"Grand Cherokee","tr":"4xe","yr":2024,"pay":350.0,"das":350.0,"trm":24,"mi":10000,"co":"Bergen","mf":null,"res":null,"sp":null,"msrp":68705.0,"eff":364.58,"dlr":null,"tt":"high"},{"mk":"Jeep","md":"Wagoneer S","tr":"Launch Edition","yr":2024,"pay":208.0,"das":2500.0,"trm":24,"mi":10000,"co":"Essex","mf":6e-05,"res":null,"sp":61750.0,"msrp":72590.0,"eff":312.17,"dlr":null,"tt":"high"},{"mk":"Cadillac","md":"LYRIQ","tr":"Luxury w/1SD","yr":2024,"pay":429.0,"das":430.0,"trm":24,"mi":10000,"co":"Hudson","mf":0.00252,"res":80.0,"sp":62583.0,"msrp":72565.0,"eff":446.92,"dlr":null,"tt":"high"},{"mk":"Cadillac","md":"LYRIQ","tr":"Luxury AWD","yr":2026,"pay":328.0,"das":7679.0,"trm":27,"mi":10000,"co":"Bergen","mf":7e-05,"res":68.0,"sp":52793.0,"msrp":62170.0,"eff":612.41,"dlr":null,"tt":"high"},{"mk":"Honda","md":"CR-V","tr":"EX-L AWD","yr":2024,"pay":412.0,"das":2500.0,"trm":36,"mi":10000,"co":"Bergen","mf":0.00189,"res":57.0,"sp":37200.0,"msrp":38400.0,"eff":481.44,"dlr":"Honda of Paramus","tt":"high"},{"mk":"Honda","md":"CR-V","tr":"Sport Hybrid","yr":2025,"pay":389.0,"das":2000.0,"trm":36,"mi":10000,"co":"Essex","mf":0.00195,"res":55.0,"sp":36100.0,"msrp":37500.0,"eff":444.56,"dlr":"Honda of Bloomfield","tt":"medium"},{"mk":"Toyota","md":"RAV4","tr":"XLE Premium","yr":2024,"pay":425.0,"das":2800.0,"trm":36,"mi":10000,"co":"Bergen","mf":0.0018,"res":58.0,"sp":35200.0,"msrp":36500.0,"eff":502.78,"dlr":"Toyota of Hackensack","tt":"medium"},{"mk":"Toyota","md":"RAV4","tr":"Hybrid XSE","yr":2025,"pay":445.0,"das":2500.0,"trm":36,"mi":10000,"co":"Hudson","mf":0.0017,"res":56.0,"sp":38500.0,"msrp":39800.0,"eff":514.44,"dlr":null,"tt":"medium"},{"mk":"Toyota","md":"Camry","tr":"XSE","yr":2024,"pay":395.0,"das":2200.0,"trm":36,"mi":10000,"co":"Essex","mf":0.00165,"res":60.0,"sp":32200.0,"msrp":33500.0,"eff":456.11,"dlr":null,"tt":"medium"},{"mk":"BMW","md":"X3","tr":"xDrive30i","yr":2024,"pay":589.0,"das":2800.0,"trm":36,"mi":10000,"co":"Bergen","mf":0.0019,"res":55.0,"sp":49000.0,"msrp":52000.0,"eff":666.78,"dlr":"BMW of Ramsey","tt":"medium"},{"mk":"BMW","md":"X3","tr":"M40i","yr":2025,"pay":725.0,"das":3000.0,"trm":36,"mi":10000,"co":"Hudson","mf":0.002,"res":52.0,"sp":58000.0,"msrp":62000.0,"eff":808.33,"dlr":null,"tt":"medium"},{"mk":"BMW","md":"X5","tr":"xDrive40i","yr":2025,"pay":895.0,"das":3500.0,"trm":36,"mi":10000,"co":"Bergen","mf":0.00185,"res":58.0,"sp":67000.0,"msrp":72000.0,"eff":992.22,"dlr":"BMW of Ramsey","tt":"medium"},{"mk":"Mercedes-Benz","md":"GLE","tr":"350 4MATIC","yr":2025,"pay":750.0,"das":3200.0,"trm":36,"mi":7500,"co":"Essex","mf":0.00175,"res":55.0,"sp":63000.0,"msrp":68500.0,"eff":838.89,"dlr":"MB of Bloomfield","tt":"medium"},{"mk":"Mercedes-Benz","md":"GLC","tr":"300 4MATIC","yr":2025,"pay":565.0,"das":2200.0,"trm":39,"mi":7500,"co":"Bergen","mf":0.0016,"res":58.0,"sp":48000.0,"msrp":52000.0,"eff":621.41,"dlr":null,"tt":"medium"},{"mk":"Tesla","md":"Model Y","tr":"Long Range AWD","yr":2024,"pay":450.0,"das":2000.0,"trm":36,"mi":10000,"co":"Hudson","mf":0.001,"res":55.0,"sp":52990.0,"msrp":52990.0,"eff":505.56,"dlr":null,"tt":"medium"},{"mk":"Tesla","md":"Model Y","tr":"Performance","yr":2025,"pay":525.0,"das":2500.0,"trm":36,"mi":10000,"co":"Essex","mf":0.0012,"res":52.0,"sp":56990.0,"msrp":56990.0,"eff":594.44,"dlr":null,"tt":"medium"},{"mk":"Tesla","md":"Model 3","tr":"Long Range","yr":2024,"pay":395.0,"das":1500.0,"trm":36,"mi":10000,"co":"Bergen","mf":0.0009,"res":58.0,"sp":47990.0,"msrp":47990.0,"eff":436.67,"dlr":null,"tt":"medium"},{"mk":"Hyundai","md":"Tucson","tr":"Limited","yr":2024,"pay":420.0,"das":2600.0,"trm":36,"mi":10000,"co":"Essex","mf":0.002,"res":58.0,"sp":37500.0,"msrp":39500.0,"eff":492.22,"dlr":null,"tt":"medium"},{"mk":"Hyundai","md":"Tucson","tr":"SEL AWD","yr":2025,"pay":375.0,"das":2000.0,"trm":36,"mi":10000,"co":"Bergen","mf":0.00185,"res":60.0,"sp":33500.0,"msrp":35000.0,"eff":430.56,"dlr":null,"tt":"medium"},{"mk":"Hyundai","md":"IONIQ 5","tr":"SEL RWD","yr":2025,"pay":399.0,"das":0,"trm":36,"mi":7500,"co":"Hudson","mf":0.00244,"res":50.0,"sp":50135.0,"msrp":51410.0,"eff":399.0,"dlr":null,"tt":"medium"},{"mk":"Hyundai","md":"IONIQ 5","tr":"XRT","yr":2025,"pay":450.0,"das":1000.0,"trm":24,"mi":12000,"co":"Essex","mf":0.00225,"res":66.0,"sp":55348.0,"msrp":57295.0,"eff":491.67,"dlr":null,"tt":"high"},{"mk":"Hyundai","md":"IONIQ 5","tr":"Limited AWD","yr":2026,"pay":554.0,"das":0,"trm":36,"mi":10000,"co":"Bergen","mf":null,"res":63.0,"sp":48075.0,"msrp":50575.0,"eff":554.0,"dlr":null,"tt":"medium"},{"mk":"Kia","md":"Telluride","tr":"S AWD","yr":2025,"pay":525.0,"das":525.0,"trm":36,"mi":10000,"co":"Essex","mf":0.00261,"res":72.0,"sp":40330.0,"msrp":44000.0,"eff":539.58,"dlr":null,"tt":"high"},{"mk":"Kia","md":"EV6","tr":"GT-Line AWD","yr":2024,"pay":504.0,"das":0,"trm":24,"mi":10000,"co":"Hudson","mf":null,"res":69.0,"sp":57913.0,"msrp":60385.0,"eff":504.0,"dlr":null,"tt":"medium"},{"mk":"Kia","md":"EV9","tr":"Land AWD","yr":2026,"pay":497.0,"das":0,"trm":24,"mi":10000,"co":"Bergen","mf":0.00188,"res":68.0,"sp":72421.0,"msrp":72421.0,"eff":497.0,"dlr":null,"tt":"medium"},{"mk":"Lexus","md":"RX","tr":"350 AWD","yr":2024,"pay":625.0,"das":3000.0,"trm":36,"mi":10000,"co":"Essex","mf":0.00195,"res":58.0,"sp":49500.0,"msrp":52000.0,"eff":708.33,"dlr":null,"tt":"medium"},{"mk":"Lexus","md":"NX","tr":"350h AWD","yr":2025,"pay":495.0,"das":2500.0,"trm":36,"mi":10000,"co":"Bergen","mf":0.0018,"res":60.0,"sp":43000.0,"msrp":45000.0,"eff":564.44,"dlr":null,"tt":"medium"},{"mk":"Acura","md":"MDX","tr":"Technology","yr":2025,"pay":550.0,"das":3000.0,"trm":36,"mi":10000,"co":"Hudson","mf":0.002,"res":55.0,"sp":52000.0,"msrp":55000.0,"eff":633.33,"dlr":null,"tt":"medium"},{"mk":"Acura","md":"RDX","tr":"A-Spec","yr":2024,"pay":475.0,"das":2500.0,"trm":36,"mi":10000,"co":"Essex","mf":0.00185,"res":58.0,"sp":44500.0,"msrp":47000.0,"eff":544.44,"dlr":null,"tt":"medium"},{"mk":"Volkswagen","md":"ID.4","tr":"Pro RWD","yr":2025,"pay":45.0,"das":1816.0,"trm":24,"mi":7500,"co":"Bergen","mf":1e-05,"res":58.0,"sp":34654.0,"msrp":47176.0,"eff":120.67,"dlr":null,"tt":"high"},{"mk":"Volkswagen","md":"Tiguan","tr":"2.0T S FWD","yr":2025,"pay":368.0,"das":0,"trm":36,"mi":7500,"co":"Essex","mf":0.0013,"res":66.0,"sp":30330.0,"msrp":32561.0,"eff":368.0,"dlr":null,"tt":"medium"},{"mk":"Ford","md":"Mustang Mach-E","tr":"Premium RWD","yr":2025,"pay":451.0,"das":1000.0,"trm":36,"mi":10500,"co":"Hudson","mf":0.00053,"res":51.0,"sp":45980.0,"msrp":49180.0,"eff":478.78,"dlr":null,"tt":"medium"},{"mk":"Ford","md":"Explorer","tr":"XLT AWD","yr":2025,"pay":485.0,"das":2500.0,"trm":36,"mi":10000,"co":"Bergen","mf":0.002,"res":55.0,"sp":45000.0,"msrp":48000.0,"eff":554.44,"dlr":null,"tt":"medium"},{"mk":"Ford","md":"Bronco Sport","tr":"Big Bend","yr":2025,"pay":375.0,"das":2000.0,"trm":36,"mi":10000,"co":"Essex","mf":0.0018,"res":58.0,"sp":33000.0,"msrp":35000.0,"eff":430.56,"dlr":null,"tt":"medium"},{"mk":"Jeep","md":"Grand Cherokee L","tr":"Limited","yr":2024,"pay":510.0,"das":2800.0,"trm":36,"mi":10000,"co":"Bergen","mf":0.0021,"res":52.0,"sp":50000.0,"msrp":56000.0,"eff":587.78,"dlr":null,"tt":"medium"},{"mk":"Jeep","md":"Wrangler","tr":"Sport S 4xe","yr":2025,"pay":445.0,"das":2500.0,"trm":24,"mi":10000,"co":"Hudson","mf":0.0015,"res":65.0,"sp":52000.0,"msrp":58000.0,"eff":549.17,"dlr":null,"tt":"medium"},{"mk":"Chevrolet","md":"Equinox EV","tr":"2LT","yr":2024,"pay":275.0,"das":1500.0,"trm":36,"mi":10000,"co":"Essex","mf":0.001,"res":55.0,"sp":38000.0,"msrp":43195.0,"eff":316.67,"dlr":null,"tt":"medium"},{"mk":"Chevrolet","md":"Traverse","tr":"LT FWD","yr":2026,"pay":458.0,"das":0,"trm":36,"mi":7500,"co":"Bergen","mf":0.0021,"res":67.0,"sp":37249.0,"msrp":43515.0,"eff":458.0,"dlr":null,"tt":"high"},{"mk":"GMC","md":"Sierra EV","tr":"Elevation","yr":2026,"pay":343.0,"das":0,"trm":24,"mi":12000,"co":"Essex","mf":0.00324,"res":71.0,"sp":45490.0,"msrp":64495.0,"eff":343.0,"dlr":null,"tt":"medium"},{"mk":"Genesis","md":"Electrified GV70","tr":"Non-Prestige","yr":2025,"pay":483.0,"das":2300.0,"trm":24,"mi":12000,"co":"Hudson","mf":0.00258,"res":68.0,"sp":62040.0,"msrp":69310.0,"eff":578.83,"dlr":null,"tt":"high"},{"mk":"Genesis","md":"GV80","tr":"2.5T Advanced","yr":2025,"pay":650.0,"das":3000.0,"trm":36,"mi":10000,"co":"Bergen","mf":0.0022,"res":55.0,"sp":58000.0,"msrp":62000.0,"eff":733.33,"dlr":null,"tt":"medium"},{"mk":"Mazda","md":"CX-70","tr":"PHEV Premium Plus","yr":2025,"pay":375.0,"das":9000.0,"trm":24,"mi":12000,"co":"Essex","mf":0.00057,"res":66.0,"sp":53200.0,"msrp":59950.0,"eff":750.0,"dlr":null,"tt":"high"},{"mk":"Mazda","md":"CX-90","tr":"PHEV Premium Plus","yr":2025,"pay":550.0,"das":3000.0,"trm":36,"mi":10000,"co":"Bergen","mf":0.0019,"res":55.0,"sp":51000.0,"msrp":55000.0,"eff":633.33,"dlr":null,"tt":"medium"},{"mk":"Subaru","md":"Outback","tr":"Limited","yr":2025,"pay":425.0,"das":2500.0,"trm":36,"mi":10000,"co":"Hudson","mf":0.002,"res":58.0,"sp":40000.0,"msrp":42000.0,"eff":494.44,"dlr":null,"tt":"medium"},{"mk":"Subaru","md":"Forester","tr":"Touring","yr":2025,"pay":395.0,"das":2200.0,"trm":36,"mi":10000,"co":"Essex","mf":0.00185,"res":60.0,"sp":37500.0,"msrp":39500.0,"eff":456.11,"dlr":null,"tt":"medium"},{"mk":"Volvo","md":"XC60","tr":"B5 Plus","yr":2025,"pay":550.0,"das":3000.0,"trm":36,"mi":10000,"co":"Bergen","mf":0.002,"res":55.0,"sp":47000.0,"msrp":50000.0,"eff":633.33,"dlr":null,"tt":"medium"},{"mk":"Volvo","md":"XC90","tr":"B5 Plus","yr":2025,"pay":695.0,"das":3500.0,"trm":36,"mi":10000,"co":"Hudson","mf":0.0021,"res":52.0,"sp":58000.0,"msrp":62000.0,"eff":792.22,"dlr":null,"tt":"medium"},{"mk":"Lincoln","md":"Corsair","tr":"Reserve","yr":2025,"pay":475.0,"das":2500.0,"trm":36,"mi":10000,"co":"Essex","mf":0.00195,"res":55.0,"sp":44000.0,"msrp":48000.0,"eff":544.44,"dlr":null,"tt":"medium"},{"mk":"Nissan","md":"Rogue","tr":"SL AWD","yr":2025,"pay":395.0,"das":2000.0,"trm":36,"mi":10000,"co":"Bergen","mf":0.0018,"res":58.0,"sp":36000.0,"msrp":38000.0,"eff":450.56,"dlr":null,"tt":"medium"},{"mk":"Nissan","md":"Ariya","tr":"Engage+ FWD","yr":2024,"pay":350.0,"das":1500.0,"trm":36,"mi":10000,"co":"Hudson","mf":0.0015,"res":52.0,"sp":40000.0,"msrp":45000.0,"eff":391.67,"dlr":null,"tt":"medium"},{"mk":"Honda","md":"Accord","tr":"Sport","yr":2025,"pay":385.0,"das":2000.0,"trm":36,"mi":10000,"co":"Essex","mf":0.00175,"res":60.0,"sp":32000.0,"msrp":33500.0,"eff":440.56,"dlr":null,"tt":"medium"},{"mk":"Honda","md":"Civic","tr":"Sport Touring","yr":2025,"pay":345.0,"das":1800.0,"trm":36,"mi":10000,"co":"Bergen","mf":0.00165,"res":62.0,"sp":29000.0,"msrp":30500.0,"eff":395.0,"dlr":null,"tt":"medium"},{"mk":"Honda","md":"Pilot","tr":"EX-L","yr":2025,"pay":520.0,"das":2800.0,"trm":36,"mi":10000,"co":"Hudson","mf":0.002,"res":55.0,"sp":42500.0,"msrp":45000.0,"eff":597.78,"dlr":null,"tt":"medium"},{"mk":"Toyota","md":"Highlander","tr":"XLE AWD","yr":2025,"pay":485.0,"das":2500.0,"trm":36,"mi":10000,"co":"Essex","mf":0.00185,"res":56.0,"sp":42000.0,"msrp":44500.0,"eff":554.44,"dlr":null,"tt":"medium"},{"mk":"Toyota","md":"4Runner","tr":"SR5","yr":2025,"pay":550.0,"das":3000.0,"trm":36,"mi":10000,"co":"Bergen","mf":0.0019,"res":58.0,"sp":46000.0,"msrp":48000.0,"eff":633.33,"dlr":null,"tt":"medium"},{"mk":"BMW","md":"i4","tr":"xDrive40","yr":2025,"pay":575.0,"das":0,"trm":36,"mi":10000,"co":"Hudson","mf":0.0002,"res":null,"sp":null,"msrp":67075.0,"eff":575.0,"dlr":null,"tt":"medium"},{"mk":"BMW","md":"i5","tr":"M60","yr":2025,"pay":744.0,"das":2000.0,"trm":36,"mi":10000,"co":"Bergen","mf":0.0002,"res":50.0,"sp":79825.0,"msrp":93825.0,"eff":799.56,"dlr":null,"tt":"high"},{"mk":"Dodge","md":"Hornet","tr":"R/T Plus EAWD","yr":2024,"pay":125.0,"das":0,"trm":24,"mi":10000,"co":"Essex","mf":0.00013,"res":63.0,"sp":45769.0,"msrp":52430.0,"eff":125.0,"dlr":null,"tt":"high"},{"mk":"Cadillac","md":"Vistiq","tr":"Sport","yr":2026,"pay":611.0,"das":611.0,"trm":24,"mi":12000,"co":"Hudson","mf":0.00208,"res":73.0,"sp":67976.0,"msrp":81410.0,"eff":636.46,"dlr":null,"tt":"high"},{"mk":"Honda","md":"Ridgeline","tr":"Black Edition","yr":2025,"pay":441.0,"das":1852.0,"trm":36,"mi":12000,"co":"Bergen","mf":0.00275,"res":61.0,"sp":44148.0,"msrp":48655.0,"eff":492.44,"dlr":null,"tt":"high"},{"mk":"Hyundai","md":"Elantra Hybrid","tr":"Blue DCT","yr":2025,"pay":260.0,"das":2000.0,"trm":36,"mi":10000,"co":"Essex","mf":0.00218,"res":70.0,"sp":24597.0,"msrp":25450.0,"eff":315.56,"dlr":null,"tt":"medium"},{"mk":"Mercedes-Benz","md":"GLE","tr":"450 4MATIC","yr":2026,"pay":642.0,"das":11000.0,"trm":36,"mi":7500,"co":"Hudson","mf":0.00132,"res":60.0,"sp":63944.0,"msrp":79100.0,"eff":947.56,"dlr":null,"tt":"medium"},{"mk":"Chevrolet","md":"Silverado","tr":"1500 4WD","yr":2026,"pay":341.0,"das":1241.0,"trm":36,"mi":10000,"co":"Bergen","mf":0.00158,"res":76.0,"sp":48735.0,"msrp":50090.0,"eff":375.47,"dlr":null,"tt":"medium"},{"mk":"BMW","md":"iX","tr":"M60","yr":2025,"pay":1161.0,"das":5000.0,"trm":36,"mi":18000,"co":"Essex","mf":0.00105,"res":47.0,"sp":100035.0,"msrp":117000.0,"eff":1299.89,"dlr":null,"tt":"medium"},{"mk":"Infiniti","md":"QX60","tr":"Luxe AWD","yr":2025,"pay":550.0,"das":2800.0,"trm":36,"mi":10000,"co":"Bergen","mf":0.0021,"res":52.0,"sp":51000.0,"msrp":55000.0,"eff":627.78,"dlr":null,"tt":"medium"},{"mk":"Infiniti","md":"QX80","tr":"Sensory AWD","yr":2025,"pay":850.0,"das":4000.0,"trm":36,"mi":10000,"co":"Hudson","mf":0.0023,"res":50.0,"sp":76000.0,"msrp":82000.0,"eff":961.11,"dlr":null,"tt":"medium"},{"mk":"Audi","md":"Q5","tr":"Premium Plus","yr":2025,"pay":575.0,"das":2800.0,"trm":36,"mi":10000,"co":"Essex","mf":0.00195,"res":54.0,"sp":51000.0,"msrp":55000.0,"eff":652.78,"dlr":null,"tt":"medium"},{"mk":"Audi","md":"Q7","tr":"Premium Plus","yr":2025,"pay":725.0,"das":3500.0,"trm":36,"mi":10000,"co":"Bergen","mf":0.0021,"res":52.0,"sp":63000.0,"msrp":68000.0,"eff":822.22,"dlr":null,"tt":"medium"},{"mk":"Land Rover","md":"Range Rover Sport","tr":"Dynamic SE","yr":2025,"pay":950.0,"das":5000.0,"trm":36,"mi":10000,"co":"Hudson","mf":0.0025,"res":50.0,"sp":82000.0,"msrp":88000.0,"eff":1088.89,"dlr":null,"tt":"medium"},{"mk":"Porsche","md":"Macan","tr":"Base","yr":2025,"pay":750.0,"das":3500.0,"trm":36,"mi":10000,"co":"Bergen","mf":0.002,"res":55.0,"sp":62000.0,"msrp":65000.0,"eff":847.22,"dlr":null,"tt":"medium"},{"mk":"Buick","md":"Envista","tr":"Preferred","yr":2025,"pay":295.0,"das":1500.0,"trm":36,"mi":10000,"co":"Essex","mf":0.00185,"res":60.0,"sp":24500.0,"msrp":26000.0,"eff":336.67,"dlr":null,"tt":"medium"},{"mk":"GMC","md":"Terrain","tr":"AT4 AWD","yr":2025,"pay":425.0,"das":2200.0,"trm":36,"mi":10000,"co":"Bergen","mf":0.00195,"res":55.0,"sp":37500.0,"msrp":40000.0,"eff":486.11,"dlr":null,"tt":"medium"},{"mk":"Chrysler","md":"Pacifica","tr":"Hybrid Pinnacle","yr":2025,"pay":475.0,"das":2500.0,"trm":36,"mi":10000,"co":"Hudson","mf":0.0018,"res":50.0,"sp":52000.0,"msrp":58000.0,"eff":544.44,"dlr":null,"tt":"medium"},{"mk":"Ram","md":"1500","tr":"Big Horn Crew Cab","yr":2025,"pay":495.0,"das":2500.0,"trm":36,"mi":10000,"co":"Essex","mf":0.002,"res":55.0,"sp":46000.0,"msrp":52000.0,"eff":564.44,"dlr":null,"tt":"medium"},{"mk":"Volkswagen","md":"Atlas Cross Sport","tr":"SE Tech","yr":2025,"pay":445.0,"das":2200.0,"trm":36,"mi":10000,"co":"Bergen","mf":0.00195,"res":55.0,"sp":39000.0,"msrp":42000.0,"eff":506.11,"dlr":null,"tt":"medium"},{"mk":"Mazda","md":"CX-5","tr":"Turbo Signature","yr":2025,"pay":425.0,"das":2500.0,"trm":36,"mi":10000,"co":"Hudson","mf":0.0019,"res":55.0,"sp":39500.0,"msrp":42000.0,"eff":494.44,"dlr":null,"tt":"medium"},{"mk":"Kia","md":"Sportage","tr":"X-Line AWD","yr":2025,"pay":395.0,"das":2000.0,"trm":36,"mi":10000,"co":"Essex","mf":0.00195,"res":58.0,"sp":36000.0,"msrp":38000.0,"eff":450.56,"dlr":null,"tt":"medium"},{"mk":"Kia","md":"Sorento","tr":"SX Prestige AWD","yr":2025,"pay":510.0,"das":2800.0,"trm":36,"mi":10000,"co":"Bergen","mf":0.0021,"res":55.0,"sp":43500.0,"msrp":47000.0,"eff":587.78,"dlr":null,"tt":"medium"},{"mk":"Hyundai","md":"Palisade","tr":"Calligraphy AWD","yr":2025,"pay":575.0,"das":3000.0,"trm":36,"mi":10000,"co":"Hudson","mf":0.00215,"res":55.0,"sp":48500.0,"msrp":52000.0,"eff":658.33,"dlr":null,"tt":"medium"},{"mk":"Hyundai","md":"Santa Fe","tr":"Limited AWD","yr":2025,"pay":450.0,"das":2500.0,"trm":36,"mi":10000,"co":"Essex","mf":0.00195,"res":58.0,"sp":39500.0,"msrp":42000.0,"eff":519.44,"dlr":null,"tt":"medium"},{"mk":"Toyota","md":"bZ4X","tr":"XLE AWD","yr":2024,"pay":325.0,"das":1500.0,"trm":36,"mi":10000,"co":"Bergen","mf":0.0012,"res":52.0,"sp":38000.0,"msrp":44000.0,"eff":366.67,"dlr":null,"tt":"medium"},{"mk":"Ford","md":"F-150 Lightning","tr":"XLT","yr":2024,"pay":525.0,"das":2000.0,"trm":36,"mi":10000,"co":"Hudson","mf":0.0015,"res":50.0,"sp":52000.0,"msrp":62000.0,"eff":580.56,"dlr":null,"tt":"medium"},{"mk":"Rivian","md":"R1S","tr":"Adventure","yr":2025,"pay":850.0,"das":4000.0,"trm":36,"mi":10000,"co":"Essex","mf":0.002,"res":48.0,"sp":82000.0,"msrp":82000.0,"eff":961.11,"dlr":null,"tt":"medium"},{"mk":"Jeep","md":"Compass","tr":"Limited 4x4","yr":2025,"pay":375.0,"das":2000.0,"trm":36,"mi":10000,"co":"Bergen","mf":0.00195,"res":55.0,"sp":35000.0,"msrp":38000.0,"eff":430.56,"dlr":null,"tt":"medium"},{"mk":"Dodge","md":"Charger","tr":"Daytona R/T AWD","yr":2025,"pay":625.0,"das":3000.0,"trm":36,"mi":10000,"co":"Hudson","mf":0.0021,"res":52.0,"sp":58000.0,"msrp":62000.0,"eff":708.33,"dlr":null,"tt":"medium"},{"mk":"Cadillac","md":"Escalade IQ","tr":"Sport","yr":2025,"pay":1250.0,"das":5000.0,"trm":36,"mi":10000,"co":"Essex","mf":0.0025,"res":48.0,"sp":120000.0,"msrp":130000.0,"eff":1388.89,"dlr":null,"tt":"medium"},{"mk":"Lincoln","md":"Nautilus","tr":"Reserve AWD","yr":2025,"pay":575.0,"das":3000.0,"trm":36,"mi":10000,"co":"Bergen","mf":0.002,"res":52.0,"sp":54000.0,"msrp":58000.0,"eff":658.33,"dlr":null,"tt":"medium"},{"mk":"Nissan","md":"Pathfinder","tr":"SL 4WD","yr":2025,"pay":475.0,"das":2500.0,"trm":36,"mi":10000,"co":"Hudson","mf":0.00195,"res":55.0,"sp":43000.0,"msrp":46000.0,"eff":544.44,"dlr":null,"tt":"medium"},{"mk":"Subaru","md":"Solterra","tr":"Touring","yr":2024,"pay":325.0,"das":1500.0,"trm":36,"mi":10000,"co":"Essex","mf":0.001,"res":48.0,"sp":40000.0,"msrp":48000.0,"eff":366.67,"dlr":null,"tt":"medium"},{"mk":"Toyota","md":"Tacoma","tr":"TRD Off-Road","yr":2025,"pay":475.0,"das":2500.0,"trm":36,"mi":10000,"co":"Bergen","mf":0.00195,"res":62.0,"sp":43000.0,"msrp":45000.0,"eff":544.44,"dlr":null,"tt":"medium"}];
-
-  // Load on page init
-  loadBenchmarkData();
-
-  // ═══════════════════════════════════
-  // PILL SELECTOR & EXPAND
-  // ═══════════════════════════════════
+  // ── PILL SELECTOR
   function selectPill(el, groupId) {
     document.querySelectorAll('#' + groupId + ' .pill').forEach(p => p.classList.remove('selected'));
     el.classList.add('selected');
   }
+
+  // ── EXPAND
   function toggleExpand() {
-    document.getElementById('expandToggle').classList.toggle('open');
-    document.getElementById('expandContent').classList.toggle('open');
+    const t = document.getElementById('expandToggle');
+    const c = document.getElementById('expandContent');
+    t.classList.toggle('open');
+    c.classList.toggle('open');
   }
 
   // ═══════════════════════════════════
-  // ZIP → COUNTY MAPPING
+  // VEHICLE DATA — Make → Model → Trim
   // ═══════════════════════════════════
-  function getCounty(zip) {
-    if (!zip || zip.length < 3) return { county: null, label: 'NJ Average' };
-    const p = zip.substring(0, 3);
-    const map = {
-      '074': 'Bergen', '075': 'Bergen',
-      '070': 'Essex', '071': 'Essex',
-      '073': 'Hudson',
-      '079': 'Morris',
-      '088': 'Middlesex', '089': 'Middlesex',
-      '076': 'Passaic',
-      '072': 'Union',
-      '078': 'Somerset',
-      '087': 'Monmouth',
-      '086': 'Burlington', '080': 'Burlington',
-      '085': 'Mercer',
-      '077': 'Ocean'
-    };
-    const county = map[p] || null;
-    return { county, label: county ? county + ' Co.' : 'NJ Average' };
-  }
+  const VEHICLE_DATA = {
+    "Acura": {
+      "Integra": ["Base", "A-Spec", "A-Spec Tech", "Type S"],
+      "MDX": ["Base", "Technology", "A-Spec", "Advance", "Type S", "Type S Advance"],
+      "RDX": ["Base", "Technology", "A-Spec", "Advance", "PMC Edition"],
+      "TLX": ["Base", "Technology", "A-Spec", "Advance", "Type S", "Type S PMC"],
+      "ADX": ["Base", "A-Spec", "A-Spec Advance"]
+    },
+    "Audi": {
+      "A4": ["Premium", "Premium Plus", "Prestige"],
+      "A5": ["Premium", "Premium Plus", "Prestige"],
+      "A6": ["Premium", "Premium Plus", "Prestige"],
+      "Q3": ["Premium", "Premium Plus", "Prestige"],
+      "Q5": ["Premium", "Premium Plus", "Prestige", "SQ5 Premium Plus", "SQ5 Prestige"],
+      "Q7": ["Premium", "Premium Plus", "Prestige", "SQ7 Premium Plus"],
+      "Q8": ["Premium", "Premium Plus", "Prestige", "SQ8 Premium Plus"],
+      "Q8 e-tron": ["Premium", "Premium Plus", "Prestige"],
+      "e-tron GT": ["Premium Plus", "Prestige", "RS"]
+    },
+    "BMW": {
+      "X1": ["sDrive28i", "xDrive28i"],
+      "X3": ["xDrive30i", "M40i", "xDrive30e"],
+      "X5": ["xDrive40i", "xDrive50e", "M50", "M60i"],
+      "X7": ["xDrive40i", "M60i"],
+      "3 Series": ["330i", "330i xDrive", "M340i", "M340i xDrive"],
+      "5 Series": ["530i", "530i xDrive", "540i xDrive", "i5 eDrive40", "i5 M60"],
+      "i4": ["eDrive35", "eDrive40", "xDrive40", "M50"],
+      "i5": ["eDrive40", "xDrive40", "M60"],
+      "iX": ["xDrive40", "xDrive50", "M60"],
+      "i7": ["xDrive60", "M70"]
+    },
+    "Buick": {
+      "Encore GX": ["Preferred", "Essence", "Sport Touring", "Avenir"],
+      "Envista": ["Preferred", "Sport Touring", "Avenir"],
+      "Envision": ["Preferred", "Essence", "Avenir"],
+      "Enclave": ["Essence", "Premium", "Avenir"]
+    },
+    "Cadillac": {
+      "CT4": ["Luxury", "Premium Luxury", "Sport", "V-Series", "CT4-V Blackwing"],
+      "CT5": ["Luxury", "Premium Luxury", "Sport", "V-Series", "CT5-V Blackwing"],
+      "XT4": ["Luxury", "Premium Luxury", "Sport"],
+      "XT5": ["Luxury", "Premium Luxury", "Sport"],
+      "XT6": ["Luxury", "Premium Luxury", "Sport"],
+      "LYRIQ": ["Tech", "Luxury", "Sport"],
+      "Escalade": ["Luxury", "Premium Luxury", "Sport", "V-Series"],
+      "Escalade IQ": ["Luxury", "Sport"],
+      "Optiq": ["Luxury"],
+      "Vistiq": ["Luxury", "Sport"]
+    },
+    "Chevrolet": {
+      "Equinox": ["LT", "RS", "Activ"],
+      "Equinox EV": ["1LT", "2LT", "2RS", "3RS"],
+      "Blazer": ["LT", "RS", "Premier"],
+      "Traverse": ["LT", "RS", "Premier"],
+      "Tahoe": ["LS", "LT", "RST", "Z71", "Premier", "High Country"],
+      "Silverado 1500": ["WT", "Custom", "LT", "RST", "LT Trail Boss", "ZR2", "High Country"],
+      "Trax": ["LS", "1RS", "LT", "2RS"],
+      "Trailblazer": ["LS", "LT", "RS", "Activ"],
+      "Corvette": ["1LT", "2LT", "3LT", "Z06", "E-Ray"]
+    },
+    "Chrysler": {
+      "Pacifica": ["Touring", "Touring L", "Limited", "Pinnacle"],
+      "Pacifica Hybrid": ["Select", "Limited", "Pinnacle"]
+    },
+    "Dodge": {
+      "Hornet": ["GT", "R/T", "R/T Plus"],
+      "Charger": ["SXT", "GT", "R/T", "Daytona R/T", "Daytona Scat Pack"],
+      "Durango": ["SXT", "GT", "Citadel", "R/T", "SRT"]
+    },
+    "Ford": {
+      "Escape": ["Base", "Active", "Platinum"],
+      "Bronco Sport": ["Base", "Big Bend", "Outer Banks", "Badlands", "Heritage"],
+      "Bronco": ["Base", "Big Bend", "Outer Banks", "Badlands", "Wildtrak", "Raptor"],
+      "Edge": ["SE", "SEL", "Titanium", "ST"],
+      "Explorer": ["Base", "Active", "ST", "Platinum"],
+      "Expedition": ["XLT", "Limited", "King Ranch", "Platinum"],
+      "F-150": ["XL", "XLT", "Lariat", "King Ranch", "Platinum", "Limited", "Raptor", "Tremor"],
+      "F-150 Lightning": ["Flash", "XLT", "Lariat", "Platinum"],
+      "Mustang": ["EcoBoost", "GT", "Dark Horse"],
+      "Mustang Mach-E": ["Select", "Premium", "California Route 1", "GT"]
+    },
+    "Genesis": {
+      "G70": ["2.0T Standard", "2.0T Advanced", "3.3T Sport Advanced"],
+      "G80": ["2.5T Standard", "2.5T Advanced", "2.5T Prestige", "Sport"],
+      "G90": ["3.5T Standard", "3.5T Prestige", "Long Wheelbase"],
+      "GV70": ["2.5T Standard", "2.5T Advanced", "2.5T Prestige Sport"],
+      "GV80": ["2.5T Standard", "2.5T Advanced", "2.5T Prestige", "3.5T Sport Prestige"],
+      "Electrified GV70": ["Advanced", "Prestige"],
+      "Electrified G80": ["Advanced", "Prestige"],
+      "GV60": ["Standard", "Advanced", "Performance"]
+    },
+    "GMC": {
+      "Terrain": ["SLE", "SLT", "AT4", "Denali"],
+      "Acadia": ["SLE", "SLT", "AT4", "Denali"],
+      "Yukon": ["SLE", "SLT", "AT4", "Denali", "Denali Ultimate"],
+      "Sierra 1500": ["Pro", "SLE", "Elevation", "SLT", "AT4", "AT4X", "Denali", "Denali Ultimate"],
+      "Sierra EV": ["Elevation", "AT4", "Denali"],
+      "Hummer EV Pickup": ["2X", "3X", "Edition 1"],
+      "Hummer EV SUV": ["2X", "3X", "Edition 1"]
+    },
+    "Honda": {
+      "Civic": ["LX", "Sport", "EX", "Sport Touring", "Si", "Type R"],
+      "Civic Hybrid": ["Sport", "Sport Touring"],
+      "Accord": ["LX", "EX", "Sport", "EX-L", "Sport-L", "Touring"],
+      "Accord Hybrid": ["Sport", "Sport-L", "Touring"],
+      "CR-V": ["LX", "EX", "EX-L", "Sport Touring"],
+      "CR-V Hybrid": ["Sport", "Sport-L", "Sport Touring"],
+      "HR-V": ["LX", "Sport", "EX-L"],
+      "Pilot": ["LX", "EX", "EX-L", "Sport", "Touring", "TrailSport", "Elite", "Black Edition"],
+      "Ridgeline": ["Sport", "RTL", "RTL-E", "TrailSport", "Black Edition"],
+      "Prologue": ["EX", "Touring"]
+    },
+    "Hyundai": {
+      "Elantra": ["SE", "SEL", "N Line", "Limited"],
+      "Elantra Hybrid": ["Blue", "SEL", "Limited"],
+      "Sonata": ["SE", "SEL", "SEL Plus", "N Line", "Limited"],
+      "Tucson": ["SE", "SEL", "N Line", "Limited"],
+      "Tucson Hybrid": ["SEL", "Limited"],
+      "Santa Fe": ["SE", "SEL", "XRT", "Limited", "Calligraphy"],
+      "Palisade": ["SE", "SEL", "XRT", "Limited", "Calligraphy"],
+      "Kona": ["SE", "SEL", "N Line", "Limited"],
+      "Kona Electric": ["SE", "SEL", "Limited"],
+      "IONIQ 5": ["SE Standard Range", "SE Long Range", "SEL", "Limited"],
+      "IONIQ 5 N": ["N"],
+      "IONIQ 6": ["SE Standard Range", "SE Long Range", "SEL", "Limited"]
+    },
+    "Infiniti": {
+      "Q50": ["Pure", "Luxe", "Sensory", "Red Sport 400"],
+      "QX50": ["Pure", "Luxe", "Sensory", "Autograph"],
+      "QX55": ["Luxe", "Essential", "Sensory"],
+      "QX60": ["Pure", "Luxe", "Sensory", "Autograph"],
+      "QX80": ["Luxe", "Sensory", "Autograph"]
+    },
+    "Jeep": {
+      "Compass": ["Sport", "Latitude", "Latitude Lux", "Limited", "Trailhawk"],
+      "Renegade": ["Sport", "Latitude", "Limited", "Trailhawk"],
+      "Cherokee": ["Latitude", "Latitude Lux", "Limited", "Trailhawk"],
+      "Grand Cherokee": ["Laredo", "Limited", "Overland", "Summit", "Trailhawk", "4xe"],
+      "Grand Cherokee L": ["Laredo", "Limited", "Overland", "Summit"],
+      "Wrangler": ["Sport", "Sport S", "Sahara", "Rubicon", "4xe"],
+      "Wagoneer": ["Series I", "Series II", "Series III"],
+      "Wagoneer S": ["Launch Edition", "Series I", "Series II"],
+      "Grand Wagoneer": ["Series I", "Series II", "Series III", "L"]
+    },
+    "Kia": {
+      "Forte": ["FE", "LXS", "GT-Line", "GT"],
+      "K5": ["LXS", "GT-Line", "EX", "GT"],
+      "Sportage": ["LX", "EX", "X-Line", "SX Prestige"],
+      "Sportage Hybrid": ["LX", "EX", "SX Prestige"],
+      "Sorento": ["LX", "S", "EX", "SX", "SX Prestige", "X-Line"],
+      "Telluride": ["LX", "S", "EX", "SX", "SX Prestige", "X-Line", "X-Pro"],
+      "EV6": ["Light Long Range", "Wind", "GT-Line", "GT"],
+      "EV9": ["Light Long Range", "Wind", "Land", "GT-Line"],
+      "Carnival": ["LX", "EX", "SX", "SX Prestige"]
+    },
+    "Lexus": {
+      "ES": ["250", "300h", "350 F Sport"],
+      "IS": ["300", "350 F Sport", "500 F Sport Performance"],
+      "NX": ["250", "350", "350h", "450h+"],
+      "RX": ["350", "350h", "450h+", "500h F Sport Performance"],
+      "TX": ["350", "500h", "550h+ F Sport Performance"],
+      "UX": ["250h"],
+      "GX": ["550 Premium", "550 Luxury", "550 Overtrail", "550 Overtrail+"],
+      "LX": ["600 Standard", "600 Luxury", "600 F Sport"],
+      "RZ": ["300e Premium", "300e Luxury"]
+    },
+    "Lincoln": {
+      "Corsair": ["Standard", "Reserve", "Grand Touring"],
+      "Nautilus": ["Standard", "Reserve"],
+      "Aviator": ["Standard", "Reserve", "Grand Touring"],
+      "Navigator": ["Standard", "Reserve", "Black Label"]
+    },
+    "Mazda": {
+      "Mazda3": ["2.5 S", "2.5 S Select", "2.5 S Preferred", "2.5 S Carbon Edition", "2.5 Turbo", "2.5 Turbo Premium Plus"],
+      "CX-5": ["2.5 S", "2.5 S Select", "2.5 S Preferred", "2.5 S Carbon Edition", "2.5 S Premium", "2.5 Turbo", "2.5 Turbo Signature"],
+      "CX-30": ["2.5 S", "2.5 S Select", "2.5 S Preferred", "2.5 S Carbon Edition", "2.5 Turbo", "2.5 Turbo Premium Plus"],
+      "CX-50": ["2.5 S", "2.5 S Select", "2.5 S Preferred", "2.5 S Preferred Plus", "2.5 S Premium", "2.5 S Premium Plus", "2.5 Turbo", "2.5 Turbo Premium Plus"],
+      "CX-70": ["3.3 Turbo", "3.3 Turbo Premium", "3.3 Turbo Premium Plus", "PHEV Premium", "PHEV Premium Plus"],
+      "CX-90": ["3.3 Turbo", "3.3 Turbo Premium", "3.3 Turbo Premium Plus", "PHEV Premium", "PHEV Premium Plus"],
+      "MX-5 Miata": ["Sport", "Club", "Grand Touring"]
+    },
+    "Mercedes-Benz": {
+      "A-Class": ["A 220", "A 220 4MATIC", "AMG A 35"],
+      "C-Class": ["C 300", "C 300 4MATIC", "AMG C 43", "AMG C 63"],
+      "E-Class": ["E 350", "E 350 4MATIC", "E 450 4MATIC", "AMG E 53"],
+      "S-Class": ["S 500 4MATIC", "S 580 4MATIC", "AMG S 63 E"],
+      "GLA": ["GLA 250", "GLA 250 4MATIC", "AMG GLA 35"],
+      "GLB": ["GLB 250", "GLB 250 4MATIC", "AMG GLB 35"],
+      "GLC": ["GLC 300", "GLC 300 4MATIC", "AMG GLC 43", "AMG GLC 63"],
+      "GLE": ["GLE 350", "GLE 350 4MATIC", "GLE 450 4MATIC", "GLE 580 4MATIC", "AMG GLE 53", "AMG GLE 63"],
+      "GLS": ["GLS 450 4MATIC", "GLS 580 4MATIC", "AMG GLS 63"],
+      "EQB": ["EQB 250+", "EQB 300 4MATIC", "EQB 350 4MATIC"],
+      "EQE": ["EQE 350+", "EQE 350 4MATIC", "AMG EQE 43", "AMG EQE 53"],
+      "EQS": ["EQS 450+", "EQS 450 4MATIC", "EQS 580 4MATIC", "AMG EQS 53"]
+    },
+    "Nissan": {
+      "Sentra": ["S", "SV", "SR"],
+      "Altima": ["S", "SV", "SR", "SL", "Platinum"],
+      "Rogue": ["S", "SV", "SL", "Platinum"],
+      "Murano": ["SV", "SL", "Platinum"],
+      "Pathfinder": ["S", "SV", "SL", "Platinum", "Rock Creek"],
+      "Ariya": ["Engage", "Engage+", "Venture+", "Empower+", "Platinum+"],
+      "Leaf": ["S", "SV Plus"],
+      "Kicks": ["S", "SV"],
+      "Frontier": ["S", "SV", "Pro-4X", "Pro-X"],
+      "Titan": ["S", "SV", "Pro-4X", "SL", "Platinum Reserve"]
+    },
+    "Ram": {
+      "1500": ["Tradesman", "Big Horn", "Laramie", "Rebel", "Limited", "TRX", "Limited Longhorn"],
+      "1500 REV": ["Tradesman", "Big Horn", "Laramie", "Limited"]
+    },
+    "Subaru": {
+      "Impreza": ["Base", "Sport", "RS"],
+      "Crosstrek": ["Base", "Premium", "Sport", "Limited"],
+      "Forester": ["Base", "Premium", "Sport", "Limited", "Touring"],
+      "Outback": ["Base", "Premium", "Onyx Edition", "Limited", "Touring", "Wilderness"],
+      "Legacy": ["Base", "Premium", "Sport", "Limited", "Touring"],
+      "Ascent": ["Base", "Premium", "Onyx Edition", "Limited", "Touring"],
+      "Solterra": ["Premium", "Limited", "Touring"],
+      "WRX": ["Base", "Premium", "Limited", "GT"]
+    },
+    "Tesla": {
+      "Model 3": ["Standard Range", "Long Range", "Long Range AWD", "Performance"],
+      "Model Y": ["Standard Range", "Long Range", "Long Range AWD", "Performance"],
+      "Model S": ["Standard Range", "Long Range", "Plaid"],
+      "Model X": ["Standard Range", "Long Range", "Plaid"],
+      "Cybertruck": ["Rear-Wheel Drive", "All-Wheel Drive", "Cyberbeast"]
+    },
+    "Toyota": {
+      "Corolla": ["LE", "SE", "XLE", "XSE"],
+      "Corolla Hybrid": ["LE", "SE", "XLE"],
+      "Camry": ["LE", "SE", "XLE", "XSE", "TRD"],
+      "RAV4": ["LE", "XLE", "XLE Premium", "Adventure", "TRD Off-Road", "Limited"],
+      "RAV4 Hybrid": ["LE", "SE", "XLE", "XSE", "Limited"],
+      "RAV4 Prime": ["SE", "XSE"],
+      "Venza": ["LE", "XLE", "Limited"],
+      "Highlander": ["LE", "XLE", "XSE", "Limited", "Platinum"],
+      "Highlander Hybrid": ["LE", "XLE", "Limited", "Platinum"],
+      "4Runner": ["SR5", "SR5 Premium", "TRD Sport", "TRD Off-Road", "TRD Off-Road Premium", "Limited", "TRD Pro"],
+      "Tacoma": ["SR", "SR5", "TRD Sport", "TRD Off-Road", "Limited", "TRD Pro", "Trailhunter"],
+      "Tundra": ["SR", "SR5", "Limited", "Platinum", "1794 Edition", "TRD Pro", "Capstone"],
+      "bZ4X": ["XLE", "Limited"],
+      "Crown": ["XLE", "Limited", "Platinum"],
+      "GR86": ["Base", "Premium"],
+      "Supra": ["2.0", "3.0", "3.0 Premium", "A91 Edition"]
+    },
+    "Volkswagen": {
+      "Jetta": ["S", "Sport", "SE", "SEL"],
+      "Taos": ["S", "SE", "SEL"],
+      "Tiguan": ["S", "SE", "SE R-Line", "SEL", "SEL R-Line"],
+      "Atlas": ["SE", "SE with Technology", "SEL", "SEL Premium", "SEL Premium R-Line"],
+      "Atlas Cross Sport": ["S", "SE", "SE with Technology", "SEL", "SEL Premium R-Line"],
+      "ID.4": ["Standard", "Pro", "Pro S", "Pro S Plus"],
+      "ID.Buzz": ["Pro S", "Pro S Plus", "1st Edition"],
+      "Golf GTI": ["S", "SE", "Autobahn"],
+      "Golf R": ["Base"]
+    },
+    "Volvo": {
+      "XC40": ["B4 Core", "B4 Plus", "B4 Ultimate"],
+      "XC60": ["B5 Core", "B5 Plus", "B5 Ultimate", "T8 Polestar"],
+      "XC90": ["B5 Core", "B5 Plus", "B5 Ultimate", "T8 Polestar"],
+      "S60": ["B5 Core", "B5 Plus", "B5 Ultimate", "T8 Polestar"],
+      "S90": ["B5 Plus", "B5 Ultimate", "T8 Polestar"],
+      "V60": ["B5 Plus", "B5 Ultimate", "T8 Polestar"],
+      "V60 Cross Country": ["B5 Plus", "B5 Ultimate"],
+      "EX30": ["Core", "Plus", "Ultra"],
+      "EX40": ["Plus", "Ultra"],
+      "EX90": ["Plus", "Ultra"],
+      "C40 Recharge": ["Core", "Plus", "Ultimate"]
+    }
+  };
 
   // ═══════════════════════════════════
-  // SCORING ENGINE — Real Benchmark
+  // AUTOSUGGEST ENGINE
   // ═══════════════════════════════════
-  function findComparables(make, model, county, termNum) {
-    const d = BENCHMARK_DATA;
-    // Tier 1: exact make + model + county + term
-    let comps = d.filter(x => x.mk === make && x.md === model && x.co === county && x.trm === termNum);
-    let matchLevel = 'exact';
-    // Tier 2: same make + model + term (any NJ county)
-    if (comps.length < 2) {
-      comps = d.filter(x => x.mk === make && x.md === model && x.trm === termNum);
-      matchLevel = 'model_nj';
-    }
-    // Tier 3: same make + term + county
-    if (comps.length < 2) {
-      comps = d.filter(x => x.mk === make && x.co === county && x.trm === termNum);
-      matchLevel = 'make_county';
-    }
-    // Tier 4: same county + term (any vehicle)
-    if (comps.length < 3) {
-      comps = d.filter(x => x.co === county && x.trm === termNum);
-      matchLevel = 'county_all';
-    }
-    // Tier 5: all NJ deals at same term
-    if (comps.length < 3) {
-      comps = d.filter(x => x.trm === termNum);
-      matchLevel = 'nj_all';
-    }
-    return { comps, matchLevel };
-  }
+  (function() {
+    const fMake = document.getElementById('fMake');
+    const fModel = document.getElementById('fModel');
+    const fTrim = document.getElementById('fTrim');
+    const modelList = document.getElementById('modelSuggest');
+    const trimList = document.getElementById('trimSuggest');
+    let activeIndex = -1;
 
-  function computeScore(userPay, userDAS, userMF, userResidual, userMSRP, userCapcost, comps, termNum) {
-    if (!comps.length) return null;
-
-    // Effective monthly: amortize DAS over term
-    const userEff = (userPay * termNum + (userDAS || 0)) / termNum;
-
-    // Comp averages
-    const avgPay = comps.reduce((s, c) => s + c.pay, 0) / comps.length;
-    const avgEff = comps.reduce((s, c) => s + c.eff, 0) / comps.length;
-    const compsWithMF = comps.filter(c => c.mf && c.mf > 0.00005);
-    const avgMF = compsWithMF.length ? compsWithMF.reduce((s, c) => s + c.mf, 0) / compsWithMF.length : null;
-    const compsWithRes = comps.filter(c => c.res);
-    const avgRes = compsWithRes.length ? compsWithRes.reduce((s, c) => s + c.res, 0) / compsWithRes.length : null;
-
-    // Payment percentile (where user falls among comps)
-    const sorted = comps.map(c => c.eff).sort((a, b) => a - b);
-    let percentile = 50;
-    if (sorted.length > 1) {
-      const below = sorted.filter(x => x < userEff).length;
-      percentile = Math.round((below / sorted.length) * 100);
+    function highlightMatch(text, query) {
+      if (!query) return text;
+      const idx = text.toLowerCase().indexOf(query.toLowerCase());
+      if (idx === -1) return text;
+      return text.substring(0, idx) + '<span class="suggest-match">' + text.substring(idx, idx + query.length) + '</span>' + text.substring(idx + query.length);
     }
 
-    // MF analysis
-    let mfAnalysis = null;
-    if (userMF && avgMF) {
-      const mfDiff = userMF - avgMF;
-      const mfCostPerMonth = userMSRP ? Math.round(mfDiff * (userMSRP + (userMSRP * (avgRes || 55) / 100))) : null;
-      const mfCostTotal = mfCostPerMonth ? mfCostPerMonth * termNum : null;
-      mfAnalysis = {
-        userMF, avgMF: Math.round(avgMF * 100000) / 100000,
-        userAPR: Math.round(userMF * 2400 * 100) / 100,
-        avgAPR: Math.round(avgMF * 2400 * 100) / 100,
-        markup: Math.round(mfDiff * 100000) / 100000,
-        costPerMonth: mfCostPerMonth,
-        costTotal: mfCostTotal,
-        verdict: mfDiff <= -0.0002 ? 'below_avg' : mfDiff <= 0.0002 ? 'at_avg' : mfDiff <= 0.0006 ? 'above_avg' : 'high_markup'
-      };
-    }
+    function showSuggestions(input, listEl, options, query) {
+      const filtered = query
+        ? options.filter(o => o.toLowerCase().includes(query.toLowerCase()))
+        : options;
 
-    // Residual comparison
-    let resAnalysis = null;
-    if (userResidual && avgRes) {
-      resAnalysis = {
-        userRes: userResidual, avgRes: Math.round(avgRes * 10) / 10,
-        diff: Math.round((userResidual - avgRes) * 10) / 10,
-        verdict: userResidual >= avgRes ? 'good' : userResidual >= avgRes - 2 ? 'normal' : 'low'
-      };
-    }
-
-    // Discount off MSRP
-    let discountAnalysis = null;
-    if (userMSRP && userCapcost) {
-      const discPct = Math.round((1 - userCapcost / userMSRP) * 1000) / 10;
-      const compDiscounts = comps.filter(c => c.msrp && c.sp).map(c => Math.round((1 - c.sp / c.msrp) * 1000) / 10);
-      const avgDisc = compDiscounts.length ? Math.round(compDiscounts.reduce((s, v) => s + v, 0) / compDiscounts.length * 10) / 10 : null;
-      discountAnalysis = { userDisc: discPct, avgDisc, verdict: discPct >= (avgDisc || 3) ? 'good' : 'below_avg' };
-    }
-
-    // Total lease cost
-    const totalCost = Math.round(userPay * termNum + (userDAS || 0));
-    const avgTotalCost = Math.round(avgEff * termNum);
-
-    // Overall grade — weighted score
-    const payPct = (userEff - avgEff) / avgEff * 100;
-    let gradeScore = payPct; // base: effective payment vs avg
-
-    // Adjust for MF if available
-    if (mfAnalysis) {
-      if (mfAnalysis.verdict === 'high_markup') gradeScore += 5;
-      else if (mfAnalysis.verdict === 'above_avg') gradeScore += 2;
-      else if (mfAnalysis.verdict === 'below_avg') gradeScore -= 3;
-    }
-
-    let grade;
-    if (gradeScore <= -12)     grade = { g:'A',  cls:'grade-a', v:'Excellent Deal',           bc:'good' };
-    else if (gradeScore <= -5) grade = { g:'B+', cls:'grade-b', v:'Good Deal',                bc:'good' };
-    else if (gradeScore <= 3)  grade = { g:'B',  cls:'grade-b', v:'Fair Deal',                bc:'fair' };
-    else if (gradeScore <= 10) grade = { g:'C+', cls:'grade-c', v:'Slightly Above Average',   bc:'fair' };
-    else if (gradeScore <= 20) grade = { g:'C',  cls:'grade-c', v:'Overpaying',               bc:'poor' };
-    else                       grade = { g:'D',  cls:'grade-d', v:'Significantly Overpaying', bc:'poor' };
-
-    // Generate interpretation
-    let interp = '';
-    if (grade.g === 'A') interp = "This is one of the strongest deals in our NJ benchmark. Your effective cost is well below comparable signed leases.";
-    else if (grade.g === 'B+') interp = "You're below the benchmark average. " + (mfAnalysis && mfAnalysis.verdict !== 'below_avg' ? "The money factor may have room — the full report breaks it down." : "Solid numbers across the board.");
-    else if (grade.g === 'B') interp = "You're right at the benchmark average for this vehicle. " + (mfAnalysis && mfAnalysis.verdict === 'high_markup' ? "But the money factor is marked up — fixing that alone could push this to a B+." : "The full report shows where you stand on each number.");
-    else if (grade.g === 'C+') interp = "You're paying a bit above what other NJ drivers signed for. " + (mfAnalysis ? "The money factor and effective cost both show room to negotiate." : "The full report shows where the gap is.");
-    else if (grade.g === 'C') interp = "This deal is meaningfully above the NJ benchmark. " + (mfAnalysis && mfAnalysis.costTotal ? "The MF markup alone may account for ~$" + Math.abs(mfAnalysis.costTotal) + " over the term." : "The full report identifies the specific numbers driving this.");
-    else interp = "This deal is well above what other NJ drivers have signed for. The full report shows exactly where and by how much.";
-
-    return {
-      grade, interp,
-      userEff: Math.round(userEff),
-      avgPay: Math.round(avgPay),
-      avgEff: Math.round(avgEff),
-      percentile,
-      totalCost,
-      avgTotalCost,
-      mfAnalysis,
-      resAnalysis,
-      discountAnalysis,
-      compCount: comps.length,
-      topComps: comps.slice(0, 4).map(c => ({
-        vehicle: [c.mk, c.md, c.tr].filter(Boolean).join(' '),
-        pay: c.pay, eff: Math.round(c.eff), mf: c.mf, res: c.res, county: c.co, dealer: c.dlr
-      }))
-    };
-  }
-
-  // ═══════════════════════════════════
-  // COLLECT FORM DATA
-  // ═══════════════════════════════════
-  function collectFormData() {
-    const termText = document.querySelector('#termPills .pill.selected')?.textContent || '36 mo';
-    const termNum = parseInt(termText) || 36;
-    return {
-      make: document.getElementById('fMake').value || '',
-      model: document.getElementById('fModel').value || '',
-      trim: document.getElementById('fTrim').value || '',
-      payment: parseFloat(document.getElementById('fPayment').value) || 0,
-      driveoff: parseFloat(document.getElementById('fDriveoff').value) || 0,
-      termText, termNum,
-      mileage: document.querySelector('#mileagePills .pill.selected')?.textContent || '10,000',
-      zip: document.getElementById('fZip').value || '',
-      msrp: parseFloat(document.getElementById('fMsrp').value) || null,
-      capcost: parseFloat(document.getElementById('fCapcost').value) || null,
-      residual: parseFloat(document.getElementById('fResidual').value) || null,
-      mf: parseFloat(document.getElementById('fMF').value) || null,
-      dealer: document.getElementById('fDealer').value || null,
-      checkType: document.getElementById('fCheckType').value || null
-    };
-  }
-
-  // ═══════════════════════════════════
-  // EMAIL GATE + HANDLE SHOW TEASER
-  // ═══════════════════════════════════
-  let pendingFormData = null;
-
-  function handleShowTeaser() {
-    const fd = collectFormData();
-    // Basic validation
-    if (!fd.payment || fd.payment <= 0) {
-      document.getElementById('fPayment').style.borderColor = 'var(--rose)';
-      document.getElementById('fPayment').focus();
-      return;
-    }
-    pendingFormData = fd;
-    const gate = document.getElementById('emailGate');
-    gate.classList.add('visible');
-    document.getElementById('gateEmail').focus();
-  }
-
-  async function submitEmailGate() {
-    const emailInput = document.getElementById('gateEmail');
-    const email = emailInput.value.trim();
-    const errorEl = document.getElementById('gateError');
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errorEl.style.display = 'block';
-      emailInput.style.borderColor = 'var(--rose)';
-      return;
-    }
-    errorEl.style.display = 'none';
-    emailInput.style.borderColor = 'var(--border-2)';
-    sessionStorage.setItem('lc_email', email);
-
-    // Save teaser to Supabase (async, don't await — let it run in background)
-    const teaserPromise = saveTeaserToSupabase(pendingFormData, email);
-
-    // Check entitlements while teaser saves
-    let entitlements = null;
-    if (supabaseClient) {
-      try {
-        const { data, error } = await supabaseClient.rpc('check_entitlements', { user_email: email });
-        if (!error && data) entitlements = data;
-      } catch (e) { console.warn('Entitlement check failed:', e); }
-    }
-
-    // Hide email gate and show teaser
-    document.getElementById('emailGate').classList.remove('visible');
-    showTeaser(pendingFormData);
-
-    // Wait for teaser to be saved so we have the row ID
-    await teaserPromise;
-
-    // Update CTAs based on entitlements
-    updateTeaserCTAs(entitlements, email);
-  }
-
-  // Store last teaser insert ID for report sending
-  let lastTeaserInsertId = null;
-
-  function updateTeaserCTAs(ent, email) {
-    const ctaContainer = document.querySelector('.teaser-ctas');
-    if (!ctaContainer) return;
-
-    if (ent && ent.is_founder) {
-      // FOUNDER: Free report, one click
-      ctaContainer.innerHTML = `
-        <div style="background:var(--copper-bg);border:1px solid rgba(168,105,46,0.2);border-radius:3px;padding:14px 18px;margin-bottom:10px;text-align:center;">
-          <div style="font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--copper);margin-bottom:4px;">Founding Member #${ent.founder_number}</div>
-          <div style="font-size:0.82rem;color:var(--ink-2);">Your full report is free — included with your Founding Member status.</div>
-        </div>
-        <button class="cta-primary" onclick="requestFreeReport('${email}')" style="border:none;cursor:pointer;width:100%;text-align:center;display:block;">
-          <span class="cta-primary-label">Send My Full Report — Free</span>
-          <span class="cta-primary-price">Founding Member benefit →</span>
-        </button>
-        <a href="sample-report.html" target="_blank" class="cta-secondary">View Sample Report →</a>
-      `;
-    } else if (ent && ent.free_credits > 0) {
-      // HAS CREDITS: Free report, one click
-      ctaContainer.innerHTML = `
-        <div style="background:var(--sage-pale);border:1px solid rgba(92,122,101,0.2);border-radius:3px;padding:14px 18px;margin-bottom:10px;text-align:center;">
-          <div style="font-size:0.82rem;color:var(--ink-2);">You have <strong>${ent.free_credits} free report${ent.free_credits > 1 ? 's' : ''}</strong> from your verified lease upload.</div>
-        </div>
-        <button class="cta-primary" onclick="requestFreeReport('${email}')" style="border:none;cursor:pointer;width:100%;text-align:center;display:block;">
-          <span class="cta-primary-label">Send My Full Report — Free</span>
-          <span class="cta-primary-price">${ent.free_credits} credit${ent.free_credits > 1 ? 's' : ''} remaining →</span>
-        </button>
-        <a href="sample-report.html" target="_blank" class="cta-secondary">View Sample Report →</a>
-      `;
-    } else {
-      // DEFAULT: Paid path (already rendered in HTML, just update founder count)
-      const slotsLeft = ent ? ent.founder_slots_remaining : 847;
-      const tfc = document.getElementById('tFounderCount');
-      if (tfc) tfc.textContent = (1000 - slotsLeft);
-    }
-  }
-
-  async function requestFreeReport(email) {
-    // Find the most recent teaser for this email
-    if (!supabaseClient) return;
-
-    const btn = event.target.closest('.cta-primary');
-    if (btn) { btn.style.opacity = '0.6'; btn.style.pointerEvents = 'none'; }
-
-    try {
-      // Get the latest teaser ID for this email
-      const { data: rows, error: fetchErr } = await supabaseClient
-        .from('lease_submissions')
-        .select('id')
-        .eq('email', email)
-        .eq('submission_type', 'teaser')
-        .order('created_at', { ascending: false })
-        .limit(1);
-
-      if (fetchErr || !rows || rows.length === 0) {
-        alert('Could not find your submission. Please try again.');
-        if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }
+      if (filtered.length === 0 && query) {
+        listEl.innerHTML = '<div class="suggest-empty">No matches — type freely</div>';
+        listEl.classList.add('open');
         return;
       }
+      if (filtered.length === 0) { listEl.classList.remove('open'); return; }
 
-      const teaserId = rows[0].id;
+      listEl.innerHTML = filtered.map((o, i) =>
+        '<div class="suggest-item" data-index="' + i + '" data-value="' + o + '">' + highlightMatch(o, query) + '</div>'
+      ).join('');
+      listEl.classList.add('open');
+      activeIndex = -1;
 
-      // Use credit and send report
-      const { data, error } = await supabaseClient.rpc('use_credit_and_send_report', {
-        user_email: email,
-        teaser_id: teaserId
+      listEl.querySelectorAll('.suggest-item').forEach(item => {
+        item.addEventListener('mousedown', function(e) {
+          e.preventDefault();
+          input.value = this.dataset.value;
+          listEl.classList.remove('open');
+          input.dispatchEvent(new Event('change'));
+          // Auto-focus next field
+          if (input === fModel) fTrim.focus();
+        });
       });
-
-      if (error) {
-        alert('Error sending report: ' + error.message);
-        if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }
-        return;
-      }
-
-      // Success — update button
-      if (btn) {
-        btn.innerHTML = '<span class="cta-primary-label">Report Sent — Check Your Inbox</span>';
-        btn.style.opacity = '1';
-        btn.style.background = 'var(--sage)';
-      }
-    } catch (err) {
-      alert('Something went wrong. Please try again.');
-      if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }
     }
+
+    function handleKeyboard(e, input, listEl) {
+      const items = listEl.querySelectorAll('.suggest-item');
+      if (!items.length) return;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        activeIndex = Math.min(activeIndex + 1, items.length - 1);
+        items.forEach((it, i) => it.classList.toggle('active', i === activeIndex));
+        items[activeIndex]?.scrollIntoView({ block: 'nearest' });
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        activeIndex = Math.max(activeIndex - 1, 0);
+        items.forEach((it, i) => it.classList.toggle('active', i === activeIndex));
+        items[activeIndex]?.scrollIntoView({ block: 'nearest' });
+      } else if (e.key === 'Enter' && activeIndex >= 0) {
+        e.preventDefault();
+        input.value = items[activeIndex].dataset.value;
+        listEl.classList.remove('open');
+        input.dispatchEvent(new Event('change'));
+        if (input === fModel) fTrim.focus();
+      } else if (e.key === 'Escape') {
+        listEl.classList.remove('open');
+      }
+    }
+
+    // Make change → enable Model, reset Trim
+    fMake.addEventListener('change', function() {
+      const make = this.value;
+      fModel.value = '';
+      fTrim.value = '';
+      fTrim.disabled = true;
+      fTrim.placeholder = 'Select model first';
+      modelList.classList.remove('open');
+      trimList.classList.remove('open');
+
+      if (make && VEHICLE_DATA[make]) {
+        fModel.disabled = false;
+        fModel.placeholder = 'Start typing model';
+        fModel.focus();
+      } else {
+        fModel.disabled = true;
+        fModel.placeholder = 'Select make first';
+      }
+    });
+
+    // Model input → show suggestions
+    fModel.addEventListener('input', function() {
+      const make = fMake.value;
+      if (!make || !VEHICLE_DATA[make]) return;
+      const models = Object.keys(VEHICLE_DATA[make]);
+      showSuggestions(fModel, modelList, models, this.value);
+    });
+
+    fModel.addEventListener('focus', function() {
+      const make = fMake.value;
+      if (!make || !VEHICLE_DATA[make]) return;
+      const models = Object.keys(VEHICLE_DATA[make]);
+      showSuggestions(fModel, modelList, models, this.value);
+    });
+
+    fModel.addEventListener('keydown', function(e) { handleKeyboard(e, fModel, modelList); });
+    fModel.addEventListener('blur', function() { setTimeout(() => modelList.classList.remove('open'), 150); });
+
+    // Model change → enable Trim
+    fModel.addEventListener('change', function() {
+      const make = fMake.value;
+      const model = this.value;
+      fTrim.value = '';
+      trimList.classList.remove('open');
+
+      if (make && model && VEHICLE_DATA[make] && VEHICLE_DATA[make][model]) {
+        fTrim.disabled = false;
+        fTrim.placeholder = 'Start typing trim (optional)';
+      } else if (model) {
+        // Free-typed model not in data — still allow trim input
+        fTrim.disabled = false;
+        fTrim.placeholder = 'Type trim (optional)';
+      } else {
+        fTrim.disabled = true;
+        fTrim.placeholder = 'Select model first';
+      }
+    });
+
+    // Trim input → show suggestions
+    fTrim.addEventListener('input', function() {
+      const make = fMake.value;
+      const model = fModel.value;
+      if (!make || !model || !VEHICLE_DATA[make] || !VEHICLE_DATA[make][model]) return;
+      const trims = VEHICLE_DATA[make][model];
+      showSuggestions(fTrim, trimList, trims, this.value);
+    });
+
+    fTrim.addEventListener('focus', function() {
+      const make = fMake.value;
+      const model = fModel.value;
+      if (!make || !model || !VEHICLE_DATA[make] || !VEHICLE_DATA[make][model]) return;
+      const trims = VEHICLE_DATA[make][model];
+      showSuggestions(fTrim, trimList, trims, this.value);
+    });
+
+    fTrim.addEventListener('keydown', function(e) { handleKeyboard(e, fTrim, trimList); });
+    fTrim.addEventListener('blur', function() { setTimeout(() => trimList.classList.remove('open'), 150); });
+  })();
+
+  // ── SCORE ENGINE
+  const COUNTY_AVG = {
+    bergen:438, essex:445, hudson:451, morris:428, middlesex:432,
+    monmouth:441, passaic:447, union:449, somerset:435, ocean:443
+  };
+
+  function getCounty(zip) {
+    if (!zip || zip.length < 3) return { county:'nj', label:'NJ Average', avg:440 };
+    const p = zip.substring(0,3);
+    if (['074','075'].includes(p)) return { county:'bergen', label:'Bergen Co.', avg:COUNTY_AVG.bergen };
+    if (['070','071'].includes(p)) return { county:'essex', label:'Essex Co.', avg:COUNTY_AVG.essex };
+    if (['073'].includes(p)) return { county:'hudson', label:'Hudson Co.', avg:COUNTY_AVG.hudson };
+    if (['079'].includes(p)) return { county:'morris', label:'Morris Co.', avg:COUNTY_AVG.morris };
+    if (['077','088','089'].includes(p)) return { county:'middlesex', label:'Middlesex Co.', avg:COUNTY_AVG.middlesex };
+    if (['076','077'].includes(p)) return { county:'passaic', label:'Passaic Co.', avg:COUNTY_AVG.passaic };
+    return { county:'nj', label:'NJ Average', avg:440 };
   }
 
-  document.addEventListener('DOMContentLoaded', function() {
-    const g = document.getElementById('gateEmail');
-    if (g) g.addEventListener('keydown', function(e) { if (e.key === 'Enter') submitEmailGate(); });
-  });
-
-  // ═══════════════════════════════════
-  // SAVE TEASER TO SUPABASE
-  // ═══════════════════════════════════
-  async function saveTeaserToSupabase(data, email) {
-    if (!supabaseClient) {
-      console.log('Supabase not configured — teaser logged locally:', { ...data, email });
-      return;
-    }
-    try {
-      const { county } = getCounty(data.zip);
-      // Pre-compute grade so the DB trigger can use it for the email
-      const { comps } = findComparables(data.make, data.model, county, data.termNum || 36);
-      const score = computeScore(data.payment || 0, data.driveoff || 0, data.mf, data.residual, data.msrp, data.capcost, comps, data.termNum || 36);
-      const grade = score ? score.grade.g : null;
-      const compAvg = score ? score.avgPay : null;
-
-      const { error } = await supabaseClient.from('lease_submissions').insert([{
-        email, make: data.make || null, model: data.model || null, trim: data.trim || null,
-        monthly_payment: data.payment || null, due_at_signing: data.driveoff || null,
-        term: parseInt(data.termNum) || 36, annual_mileage: parseInt(String(data.mileage).replace(/,/g,'')) || null,
-        zip: data.zip || null, county: county,
-        msrp: data.msrp || null, cap_cost: data.capcost || null,
-        residual_pct: data.residual || null, money_factor: data.mf || null,
-        dealer_name: data.dealer || null, check_type: data.checkType || null,
-        grade: grade,
-        notes: compAvg ? 'comp_avg:' + compAvg : null,
-        submission_type: 'teaser', deal_status: 'quote_check',
-        founder_eligible: false, verification_status: 'na', trust_tier: 'low', report_entitlement: 'none'
-      }]);
-      if (error) console.error('Supabase insert error:', error);
-    } catch (err) { console.error('Supabase save failed:', err); }
+  function gradeIt(pay, avg) {
+    const pct = (pay - avg) / avg * 100;
+    if (pct <= -10) return { g:'A',  cls:'grade-a', v:'Strong Deal',            bc:'good', i:"You're well below the county average. This is one of the better deals we've seen for this vehicle locally." };
+    if (pct <= -4)  return { g:'B+', cls:'grade-b', v:'Good Deal',              bc:'good', i:"You're below the county average. There may still be room on the money factor — the full report will show you." };
+    if (pct <= 2)   return { g:'B',  cls:'grade-b', v:'Fair Deal',              bc:'fair', i:"You're right at the county average. The full report shows exactly where you stand on the underlying numbers." };
+    if (pct <= 8)   return { g:'C+', cls:'grade-c', v:'Slightly Above Average', bc:'fair', i:"You're paying a little above the county average. The full report shows where the gap is coming from." };
+    if (pct <= 18)  return { g:'C',  cls:'grade-c', v:'Overpaying',             bc:'poor', i:"You're meaningfully above the county average. The full report identifies the specific numbers driving this." };
+    return           { g:'D',  cls:'grade-d', v:'Significantly Overpaying',bc:'poor', i:"This deal is well above what other NJ drivers are paying. The full report shows you exactly where and by how much." };
   }
 
-  // ═══════════════════════════════════
-  // SHOW TEASER — Real Benchmark Scoring
-  // ═══════════════════════════════════
-  function showTeaser(data) {
-    if (!data) data = collectFormData();
-    const { make, model, trim, payment, driveoff, termNum, termText, zip, mf, residual, msrp, capcost } = data;
-    const pay = payment || 412;
-    const { county, label } = getCounty(zip);
+  function showTeaser() {
+    const make = document.getElementById('fMake').value || '';
+    const model = document.getElementById('fModel').value || '';
+    const trim = document.getElementById('fTrim').value || '';
+    const pay = parseFloat(document.getElementById('fPayment').value) || 412;
+    const zip = document.getElementById('fZip').value || '';
+    const term = document.querySelector('#termPills .pill.selected')?.textContent || '36 mo';
+
+    const { county, label, avg } = getCounty(zip);
+    const { g, cls, v, bc, i } = gradeIt(pay, avg);
+    const diff = Math.round(pay - avg);
     const vehicle = [make, model, trim].filter(Boolean).join(' ') || 'Your Vehicle';
 
-    // Find comparable deals and score
-    const { comps, matchLevel } = findComparables(make, model, county, termNum);
-    const score = computeScore(pay, driveoff, mf, residual, msrp, capcost, comps, termNum);
+    document.getElementById('tVehicle').textContent = vehicle;
+    document.getElementById('tGrade').textContent = g;
+    document.getElementById('tGrade').className = 'grade-letter ' + cls;
+    document.getElementById('tVerdict').textContent = v;
+    document.getElementById('tBadge').className = 'verdict-badge ' + bc;
+    document.getElementById('tInterp').textContent = i;
+    document.getElementById('tPay').textContent = '$' + pay.toLocaleString();
+    document.getElementById('tAvg').textContent = '$' + avg.toLocaleString();
+    document.getElementById('tCountyLbl').textContent = label + ' Average';
+    document.getElementById('tConfidence').textContent = 'Based on verified NJ ' + (model || 'lease') + ' submissions in the last 60 days';
 
-    // Fallback if no comps at all
-    if (!score) {
-      document.getElementById('tVehicle').textContent = vehicle;
-      document.getElementById('tGrade').textContent = '—';
-      document.getElementById('tGrade').className = 'grade-letter grade-b';
-      document.getElementById('tVerdict').textContent = 'Not Enough Data';
-      document.getElementById('tBadge').className = 'verdict-badge fair';
-      document.getElementById('tInterp').textContent = "We don't have enough comparable NJ deals yet for this vehicle. Upload your lease to help build the benchmark — and get your full report free.";
-      document.getElementById('tPay').textContent = '$' + pay.toLocaleString();
-      document.getElementById('tAvg').textContent = '—';
-      document.getElementById('tCountyLbl').textContent = label + ' Average';
-      document.getElementById('tDelta').textContent = 'Insufficient data';
-      document.getElementById('tDelta').className = 'pay-box-delta';
-      document.getElementById('tConfidence').textContent = 'Be one of the first to contribute ' + (model || 'this vehicle') + ' data in NJ';
-      const basisElNone = document.getElementById('tBasis');
-      if (basisElNone) basisElNone.textContent = 'Not enough comparable data yet';
-    } else {
-      const { grade, interp, avgPay, avgEff, userEff, percentile, totalCost, compCount, mfAnalysis } = score;
-      const diff = Math.round(pay - avgPay);
-
-      document.getElementById('tVehicle').textContent = vehicle;
-      document.getElementById('tGrade').textContent = grade.g;
-      document.getElementById('tGrade').className = 'grade-letter ' + grade.cls;
-      document.getElementById('tVerdict').textContent = grade.v;
-      document.getElementById('tBadge').className = 'verdict-badge ' + grade.bc;
-      document.getElementById('tInterp').textContent = interp;
-      document.getElementById('tPay').textContent = '$' + pay.toLocaleString();
-      document.getElementById('tAvg').textContent = '$' + avgPay.toLocaleString();
-      document.getElementById('tCountyLbl').textContent = (matchLevel === 'exact' || matchLevel === 'make_county' || matchLevel === 'county_all')
-        ? label + ' Average' : 'NJ Average';
-
-      // Confidence line
-      const matchLabels = {
-        exact: 'Based on ' + compCount + ' verified ' + (model || '') + ' deals in ' + (label || 'NJ'),
-        model_nj: 'Based on ' + compCount + ' verified NJ ' + (model || '') + ' deals',
-        make_county: 'Based on ' + compCount + ' verified ' + (make || '') + ' deals in ' + (label || 'NJ'),
-        county_all: 'Based on ' + compCount + ' verified deals in ' + (label || 'NJ'),
-        nj_all: 'Based on ' + compCount + ' verified NJ lease deals'
-      };
-      document.getElementById('tConfidence').textContent = matchLabels[matchLevel] || 'Based on verified NJ lease data';
-
-      // Show match basis under grade
-      const basisLabels = {
-        exact: 'Compared to ' + compCount + ' verified ' + model + ' deals in ' + (label || 'NJ'),
-        model_nj: 'Compared to ' + compCount + ' verified ' + model + ' deals across NJ',
-        make_county: 'Compared to ' + compCount + ' verified ' + make + ' deals in ' + (label || 'NJ'),
-        county_all: 'Compared to ' + compCount + ' verified deals in ' + (label || 'NJ'),
-        nj_all: 'Compared to ' + compCount + ' verified NJ deals'
-      };
-      const basisEl = document.getElementById('tBasis');
-      if (basisEl) basisEl.textContent = basisLabels[matchLevel] || 'Based on verified NJ lease data';
-
-      const deltaEl = document.getElementById('tDelta');
-      if (diff < 0) { deltaEl.textContent = '↓ $' + Math.abs(diff) + '/mo below avg'; deltaEl.className = 'pay-box-delta delta-good'; }
-      else if (diff === 0) { deltaEl.textContent = 'At average'; deltaEl.className = 'pay-box-delta'; }
-      else { deltaEl.textContent = '↑ $' + diff + '/mo above avg'; deltaEl.className = 'pay-box-delta delta-bad'; }
-
-      // MF hint in locked section
-      const lockedText = document.querySelector('.locked-text');
-      if (lockedText && mfAnalysis && mfAnalysis.verdict === 'high_markup' && mfAnalysis.costTotal) {
-        lockedText.innerHTML = '<strong>Your money factor appears marked up by ' + mfAnalysis.markup.toFixed(5) + '.</strong> That could be costing you ~$' + Math.abs(mfAnalysis.costTotal).toLocaleString() + ' over the lease. The full report breaks this down.';
-      } else if (lockedText && mfAnalysis && mfAnalysis.verdict === 'above_avg') {
-        lockedText.innerHTML = '<strong>Your money factor may have been marked up.</strong> The full report shows exactly by how much — and what it costs over the term.';
-      }
-    }
+    const deltaEl = document.getElementById('tDelta');
+    if (diff < 0) { deltaEl.textContent = '↓ $' + Math.abs(diff) + '/mo below avg'; deltaEl.className = 'pay-box-delta delta-good'; }
+    else { deltaEl.textContent = '↑ $' + diff + '/mo above avg'; deltaEl.className = 'pay-box-delta delta-bad'; }
 
     document.getElementById('editVehicle').textContent = vehicle;
-    document.getElementById('editDetails').textContent = '$' + pay + '/mo · ' + label + ' · ' + termText;
+    document.getElementById('editDetails').textContent = '$' + pay + '/mo · ' + label + ' · ' + term;
 
-    // Transition panels
     const fp = document.getElementById('formPanel');
     const tp = document.getElementById('teaserPanel');
     const eb = document.getElementById('editBar');
+
     fp.classList.add('hidden');
     setTimeout(() => {
       fp.style.display = 'none';
@@ -2178,51 +1916,12 @@
     }, 380);
   }
 
-  // ═══════════════════════════════════
-  // COUNTERS
-  // ═══════════════════════════════════
-  // ═══════════════════════════════════
-  // FOUNDER COUNTER (live from Supabase)
-  // ═══════════════════════════════════
-  const TOTAL = 1000;
-  let founderCount = 1; // honest fallback — Supabase will update
+  // ── COUNTERS
+  const CLAIMED = 153, TOTAL = 1000;
+  document.getElementById('foundersCount').textContent = CLAIMED;
+  document.getElementById('spotsLeft').textContent = (TOTAL - CLAIMED).toLocaleString() + ' spots remaining';
 
-  async function updateFounderCount() {
-    if (!supabaseClient) return;
-    try {
-      const { data, error } = await supabaseClient.rpc('get_founder_count');
-      if (!error && typeof data === 'number' && data > 0) {
-        founderCount = data;
-      }
-    } catch (e) { console.warn('Founder count fetch failed'); }
-
-    document.getElementById('foundersCount').textContent = founderCount;
-    document.getElementById('spotsLeft').textContent = (TOTAL - founderCount).toLocaleString() + ' spots remaining';
-    const tfc = document.getElementById('tFounderCount');
-    if (tfc) tfc.textContent = founderCount;
-  }
-  updateFounderCount();
-
-  // ═══════════════════════════════════
-  // DEALS COUNTER (live from Supabase)
-  // ═══════════════════════════════════
-  async function updateDealsCount() {
-    const el = document.getElementById('dealsCount');
-    if (!supabaseClient || !el) return;
-    try {
-      const { count, error } = await supabaseClient
-        .from('lease_submissions')
-        .select('*', { count: 'exact', head: true });
-      if (!error && count > 0) {
-        el.textContent = count;
-      }
-    } catch (e) { console.warn('Deals count fetch failed'); }
-  }
-  updateDealsCount();
-
-  // ═══════════════════════════════════
-  // COUNTY BAR CHART ANIMATION
-  // ═══════════════════════════════════
+  // ── COUNTY BAR CHART ANIMATION
   function animateBars() {
     document.querySelectorAll('.county-bar').forEach(bar => {
       const w = bar.dataset.w;
@@ -2231,9 +1930,7 @@
     });
   }
 
-  // ═══════════════════════════════════
-  // SCROLL REVEAL
-  // ═══════════════════════════════════
+  // ── SCROLL REVEAL
   const revealEls = document.querySelectorAll('.reveal');
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(e => {
