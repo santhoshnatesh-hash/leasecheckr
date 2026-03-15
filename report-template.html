@@ -225,6 +225,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);-webkit-font-
   <div class="cv-meta" id="cvMeta"></div>
   <div class="cv-grade-ring gb" id="cvRing"><div class="cv-letter" id="cvLetter">—</div></div>
   <div class="cv-verdict" id="cvVerdict"></div>
+  <div id="cvDealCount" style="font-family:var(--mono);font-size:0.52rem;letter-spacing:0.12em;color:var(--ink4);margin-top:10px;"></div>
   <div class="cv-date" id="cvDate"></div>
 </div>
 
@@ -266,14 +267,15 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);-webkit-font-
   <!-- METHODOLOGY + SCORE DRIVERS + CONFIDENCE -->
   <div style="margin-top:32px;padding:28px 24px;background:var(--bg2);border-radius:10px;border:1px solid var(--bg3);">
 
-    <div style="font-family:var(--mono);font-size:0.48rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--copper);margin-bottom:14px;">How LeaseCheckr Scored This Deal</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:500;color:var(--ink);margin-bottom:6px;">How LeaseCheckr Scored This Deal</div>
+    <div style="width:30px;height:2px;background:var(--copper);margin-bottom:14px;"></div>
     <div style="font-size:0.82rem;color:var(--ink3);line-height:1.8;margin-bottom:20px;">
       This score is based on recent comparable signed deals, lease structure, and the information provided in your submission. Factors may include monthly payment, due at signing, term, mileage, and available lease details such as money factor or residual value. Confidence depends on the number and quality of comparable verified deals.
     </div>
 
     <div style="height:1px;background:var(--bg3);margin:18px 0;"></div>
 
-    <div style="font-family:var(--mono);font-size:0.48rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--copper);margin-bottom:12px;">What Most Affected Your Score</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:500;color:var(--ink);margin-bottom:12px;">What Most Affected Your Score</div>
     <div id="rScoreDrivers" style="font-size:0.8rem;color:var(--ink2);line-height:1.85;"></div>
 
     <div style="height:1px;background:var(--bg3);margin:18px 0;"></div>
@@ -459,7 +461,24 @@ document.getElementById('rTotalNote').textContent = 'Over ' + term + ' months';
 
 const diffText = diff < 0 ? ('$' + Math.abs(diff) + ' below') : ('$' + diff + ' above');
 const savedText = diff < 0 ? ('$' + Math.abs(diff * term).toLocaleString() + ' saved') : ('$' + (diff * term).toLocaleString() + ' extra');
-document.getElementById('rNarrative').innerHTML = 'Your monthly payment of <em>$' + payment + '</em> is <strong>' + diffText + ' the ' + county + ' County average</strong> for this vehicle. Over ' + term + ' months, that\'s roughly <strong>' + savedText + '</strong> compared to the typical deal.' + (mf > 0 && markup > 0.0002 ? ' However, your money factor suggests there\'s about $' + mfCostTotal.toLocaleString() + ' in negotiable financing markup.' : '');
+
+// Effective monthly comparison is what matters
+const effDiff = eff - avgPay; // comparing effective monthly to avg
+let narrativeHTML = '';
+if (das > 0 && effDiff > 0 && diff <= 0) {
+  // Key insight: payment looks good, but DAS makes the real cost higher
+  narrativeHTML = 'Your monthly payment of <em>$' + payment + '</em> appears ' + diffText + ' the ' + county + ' County average. However, once your <strong>$' + das.toLocaleString() + ' due at signing</strong> is included, your <strong>effective monthly cost is $' + eff + '</strong> — which is <strong>$' + Math.abs(Math.round(effDiff)) + '/mo above</strong> the comparable average. Over ' + term + ' months, that\'s roughly <strong>$' + Math.abs(Math.round(effDiff * term)).toLocaleString() + ' extra</strong> in total lease cost.';
+} else if (das > 0 && effDiff <= 0) {
+  // Even with DAS, still a good deal
+  narrativeHTML = 'Your monthly payment of <em>$' + payment + '</em> is ' + diffText + ' the ' + county + ' County average. Even including your <strong>$' + das.toLocaleString() + ' due at signing</strong>, your <strong>effective monthly cost of $' + eff + '</strong> is still <strong>$' + Math.abs(Math.round(effDiff)) + '/mo below</strong> the comparable average. Over ' + term + ' months, that\'s roughly <strong>$' + Math.abs(Math.round(effDiff * term)).toLocaleString() + ' saved</strong> compared to the typical deal.';
+} else {
+  // No DAS or straightforward comparison
+  narrativeHTML = 'Your effective monthly cost of <em>$' + eff + '</em> is <strong>' + diffText + ' the ' + county + ' County average</strong> for this vehicle. Over ' + term + ' months, that\'s roughly <strong>' + savedText + '</strong> compared to the typical deal.';
+}
+if (mf > 0 && markup > 0.0002) {
+  narrativeHTML += ' Additionally, your money factor suggests there\'s about <strong>$' + mfCostTotal.toLocaleString() + ' in negotiable financing markup</strong> — fixing that alone could meaningfully improve this deal.';
+}
+document.getElementById('rNarrative').innerHTML = narrativeHTML;
 
 // Comparison bar
 const range = avgPay * 0.3;
@@ -495,51 +514,61 @@ document.getElementById('rInsightText').innerHTML = worstScore ? '<strong>Your b
 // ═══════════════════════════════════
 const drivers = [];
 
-// Payment vs comparable range
-if (diff < 0) {
-  drivers.push('Your payment is <strong>below</strong> the comparable range — this helped your score');
-} else if (diff <= avgPay * 0.05) {
-  drivers.push('Your payment is <strong>close to</strong> the local comparable average');
+// Each driver: { text, impact: 'positive' | 'negative' | 'neutral' | 'missing' }
+
+// Payment vs comparable range (use effective monthly, not raw payment)
+const effDiffForDrivers = eff - avgPay;
+if (effDiffForDrivers < -avgPay * 0.05) {
+  drivers.push({ text: 'Effective monthly cost is <strong>well below</strong> comparable deals', impact: 'positive' });
+} else if (effDiffForDrivers <= 0) {
+  drivers.push({ text: 'Effective monthly cost is <strong>at or below</strong> the comparable average', impact: 'positive' });
+} else if (effDiffForDrivers <= avgPay * 0.05) {
+  drivers.push({ text: 'Effective monthly cost is <strong>slightly above</strong> comparable deals', impact: 'negative' });
 } else {
-  drivers.push('Your payment is <strong>above</strong> the local comparable range — this is the primary factor in your score');
+  drivers.push({ text: 'Effective monthly cost is <strong>significantly above</strong> comparable deals', impact: 'negative' });
 }
 
-// Due at signing
+// Due at signing impact
 if (das > 3000) {
-  drivers.push('High due-at-signing amount (<strong>$' + das.toLocaleString() + '</strong>) increases your effective monthly cost');
+  drivers.push({ text: 'High due-at-signing (<strong>$' + das.toLocaleString() + '</strong>) raises your true monthly cost by <strong>$' + Math.round(das / term) + '/mo</strong>', impact: 'negative' });
+} else if (das > 0 && das <= 1500) {
+  drivers.push({ text: 'Low due-at-signing (<strong>$' + das.toLocaleString() + '</strong>) keeps effective cost close to your payment', impact: 'positive' });
 } else if (das > 0) {
-  drivers.push('Due-at-signing of <strong>$' + das.toLocaleString() + '</strong> factored into effective monthly cost');
+  drivers.push({ text: 'Due-at-signing of <strong>$' + das.toLocaleString() + '</strong> adds <strong>$' + Math.round(das / term) + '/mo</strong> to your effective cost', impact: 'neutral' });
 } else {
-  drivers.push('No drive-off reported — effective monthly equals your payment');
+  drivers.push({ text: 'No drive-off — your effective monthly cost equals your payment', impact: 'positive' });
 }
 
 // MF
 if (mf > 0 && markup > 0.0004) {
-  drivers.push('Money factor appears <strong>marked up</strong> above the typical base rate — this negatively affected your score');
+  drivers.push({ text: 'Money factor is <strong>marked up</strong> — costing you an estimated <strong>$' + mfCostMo + '/mo extra</strong>', impact: 'negative' });
 } else if (mf > 0 && markup <= 0.0001) {
-  drivers.push('Money factor is <strong>at or near the base rate</strong> — no financing penalty');
+  drivers.push({ text: 'Money factor is <strong>at or near the base rate</strong> — no financing penalty', impact: 'positive' });
 } else if (mf > 0) {
-  drivers.push('Money factor is <strong>slightly above base rate</strong> — minor impact on score');
+  drivers.push({ text: 'Money factor is <strong>slightly above base rate</strong> — minor financing premium', impact: 'neutral' });
 } else {
-  drivers.push('Money factor was <strong>not provided</strong> — score is based on payment and structure only, reducing precision');
+  drivers.push({ text: 'Money factor was <strong>not provided</strong> — limits scoring precision', impact: 'missing' });
 }
 
 // Residual
-if (residual > 0) {
-  drivers.push('Residual value of <strong>' + residual + '%</strong> was included in the analysis');
+if (residual >= 58) {
+  drivers.push({ text: 'Strong residual value of <strong>' + residual + '%</strong> supports lower payments', impact: 'positive' });
+} else if (residual > 0) {
+  drivers.push({ text: 'Residual value of <strong>' + residual + '%</strong> factored into analysis', impact: 'neutral' });
 } else {
-  drivers.push('Residual value was <strong>not provided</strong> — limits depth of structural analysis');
+  drivers.push({ text: 'Residual value <strong>not provided</strong> — limits structural analysis', impact: 'missing' });
 }
 
-// Comparable quality
-if (scoreItems.length >= 4) {
-  drivers.push('Strong data across <strong>' + scoreItems.length + ' scoring dimensions</strong>');
-} else {
-  drivers.push('Score based on <strong>' + scoreItems.length + ' available dimensions</strong> — providing more details improves precision');
-}
+// Render with green +, red −, grey ○
+const driverIcons = {
+  positive: '<span style="color:var(--sage);font-weight:700;font-size:1rem;flex-shrink:0;width:18px;text-align:center;">+</span>',
+  negative: '<span style="color:var(--rose);font-weight:700;font-size:1rem;flex-shrink:0;width:18px;text-align:center;">−</span>',
+  neutral:  '<span style="color:var(--copper);font-size:0.85rem;flex-shrink:0;width:18px;text-align:center;">●</span>',
+  missing:  '<span style="color:var(--ink4);font-size:0.85rem;flex-shrink:0;width:18px;text-align:center;">○</span>'
+};
 
 document.getElementById('rScoreDrivers').innerHTML = drivers.map(d => 
-  '<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;"><span style="color:var(--copper);flex-shrink:0;margin-top:2px;">›</span><span>' + d + '</span></div>'
+  '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;">' + driverIcons[d.impact] + '<span>' + d.text + '</span></div>'
 ).join('');
 
 // ═══════════════════════════════════
@@ -699,6 +728,12 @@ async function loadReportData() {
 
       document.getElementById('compsBody').innerHTML = rows;
       document.getElementById('compsNote').textContent = verifiedDeals.length + ' verified signed NJ deals · Real data from NJ drivers';
+
+      // Update cover with deal count
+      const dealCountEl = document.getElementById('cvDealCount');
+      if (dealCountEl) {
+        dealCountEl.textContent = 'Based on ' + verifiedDeals.length + ' verified comparable deals';
+      }
 
       // Insight
       const avgVerifiedPay = Math.round(verifiedDeals.reduce((s,c) => s + c.monthly_payment, 0) / verifiedDeals.length);
