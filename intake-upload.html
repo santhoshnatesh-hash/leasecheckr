@@ -740,7 +740,7 @@ nav {
         <div class="method-badge">At the Dealer? Use This</div>
         <div class="method-icon">📷</div>
         <div class="method-title">Photograph Lease</div>
-        <div class="method-desc">Use your phone camera to photograph page 1. We auto-redact your personal details and extract all fields instantly.</div>
+        <div class="method-desc">Use your phone camera to photograph page 1. You redact your personal details, then we extract all fields instantly.</div>
       </div>
       <div class="method-card" id="card-upload" onclick="selectMethod('upload')">
         <div class="method-badge">Recommended</div>
@@ -782,7 +782,7 @@ nav {
         </div>
         <div class="privacy-point">
           <span class="privacy-check">✓</span>
-          We automatically cover your name, address, and SSN before reading any data
+          We pre-cover common personal details — drag to add more redaction boxes before we read any data
         </div>
         <div class="privacy-point">
           <span class="privacy-check">✓</span>
@@ -1295,10 +1295,12 @@ function confirmUploadAndExtract() {
 const redactions = [];
 let isDrawing = false;
 let drawStart = {};
+let activeCanvasId = 'redactionCanvas'; // tracks which canvas is active
 
 function showRedaction(src, canvasId, panelId) {
   canvasId = canvasId || 'redactionCanvas';
   panelId = panelId || 'redactionPanel';
+  activeCanvasId = canvasId; // track which canvas is active
   const panel = document.getElementById(panelId);
   const canvas = document.getElementById(canvasId);
   const ctx = canvas.getContext('2d');
@@ -1343,14 +1345,14 @@ function getCanvasPos(e, canvas) {
 }
 
 function startDraw(e) {
-  const canvas = document.getElementById('redactionCanvas');
+  const canvas = document.getElementById(activeCanvasId);
   drawStart = getCanvasPos(e, canvas);
   isDrawing = true;
 }
 
 function duringDraw(e) {
   if (!isDrawing) return;
-  const canvas = document.getElementById('redactionCanvas');
+  const canvas = document.getElementById(activeCanvasId);
   const ctx = canvas.getContext('2d');
   const pos = getCanvasPos(e, canvas);
   redrawCanvas();
@@ -1366,7 +1368,7 @@ function duringDraw(e) {
 function endDraw(e) {
   if (!isDrawing) return;
   isDrawing = false;
-  const canvas = document.getElementById('redactionCanvas');
+  const canvas = document.getElementById(activeCanvasId);
   const pos = getCanvasPos(e || { clientX: 0, clientY: 0 }, canvas);
   if (Math.abs(pos.x - drawStart.x) > 0.02) {
     redactions.push({
@@ -1381,7 +1383,7 @@ function endDraw(e) {
 }
 
 function redrawCanvas() {
-  const canvas = document.getElementById('redactionCanvas');
+  const canvas = document.getElementById(activeCanvasId);
   const ctx = canvas.getContext('2d');
   const img = new Image();
   img.src = sessionStorage.getItem('leaseImage');
