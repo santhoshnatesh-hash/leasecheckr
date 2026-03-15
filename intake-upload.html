@@ -708,6 +708,16 @@ nav {
 .step.active .trust-bar    { animation: rise 0.5s 0.25s var(--ease) both; }
 .step.active .btn-primary  { animation: rise 0.5s 0.3s  var(--ease) both; }
 </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    let _sbUpload = null;
+    try {
+      _sbUpload = window.supabase.createClient(
+        'https://xqjsvlhdpdfvzixlmdxk.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxanN2bGhkcGRmdnppeGxtZHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzg2ODcsImV4cCI6MjA4ODg1NDY4N30.MT0tEDMLaBDLtZkX9xEVEkaUfPdIA9QsJrWjGDpeWsE'
+      );
+    } catch(e) { _sbUpload = null; }
+  </script>
 </head>
 <body>
 
@@ -717,8 +727,6 @@ nav {
   <div class="nav-step-indicator">
     <div class="step-dot active" id="dot1"></div>
     <div class="step-dot" id="dot2"></div>
-    <div class="step-dot" id="dot3"></div>
-    <div class="step-dot" id="dot4"></div>
   </div>
 </nav>
 
@@ -731,7 +739,7 @@ nav {
 
   <!-- ── STEP 1: METHOD CHOICE ── -->
   <div class="step active" id="step1">
-    <div class="step-kicker">Free Access — Step 1 of 3</div>
+    <div class="step-kicker">Free Access — Step 1 of 2</div>
     <h1 class="step-title">Upload your lease.<br><em>Get your full report free.</em></h1>
     <p class="step-body">To get free access to your full report, we need your actual lease document. Upload or photograph it — you redact your personal details first, and we extract all the deal terms instantly.</p>
 
@@ -767,7 +775,7 @@ nav {
   <!-- ── STEP 2A: PHOTO CAPTURE ── -->
   <div class="step" id="step2photo">
     <div class="back-link" onclick="goToStep1()">← Back</div>
-    <div class="step-kicker">Step 2 of 4 · Camera Capture</div>
+    <div class="step-kicker">Step 2 of 2 · Camera Capture</div>
     <h2 class="step-title">Photograph your <em>lease.</em></h2>
     <p class="step-body">Point your camera at page 1 of your NJ MVSC-1 contract. We'll automatically cover your personal details before reading anything.</p>
 
@@ -859,7 +867,7 @@ nav {
   <!-- ── STEP 2B: UPLOAD DOCUMENT ── -->
   <div class="step" id="step2upload">
     <div class="back-link" onclick="goToStep1()">← Back</div>
-    <div class="step-kicker">Step 2 of 4 · Document Upload</div>
+    <div class="step-kicker">Step 2 of 2 · Document Upload</div>
     <h2 class="step-title">Upload your <em>lease.</em></h2>
     <p class="step-body">Select a PDF or image of your lease document from your device. We apply the same redaction and privacy protection before extracting any data.</p>
 
@@ -929,7 +937,7 @@ nav {
   <!-- ── STEP 2C: MANUAL ENTRY ── -->
   <div class="step" id="step2manual">
     <div class="back-link" onclick="goToStep1()">← Back</div>
-    <div class="step-kicker">Step 2 of 4 · Lease Details</div>
+    <div class="step-kicker">Step 2 of 2 · Lease Details</div>
     <h2 class="step-title">Tell us about your <em>deal.</em></h2>
     <p class="step-body">Only your <strong>monthly payment</strong> is required. Each additional field improves your score accuracy — but never blocks you from getting a result.</p>
 
@@ -1062,75 +1070,42 @@ nav {
   </div>
 
   <!-- ── STEP 3: VERIFY EXTRACTED DATA ── -->
+  <!-- ── STEP 3: CONFIRMATION (replaces old review + scoring) ── -->
   <div class="step" id="step3">
-    <div class="back-link" onclick="goBack()">← Back</div>
-    <div class="step-kicker">Step 3 of 4 · Confirm Details</div>
-    <h2 class="step-title">Does this look <em>right?</em></h2>
-    <p class="step-body">Review the details below. Correct anything that looks off before we run your score.</p>
-
-    <div class="accuracy-banner" id="accuracyBanner">
-      <div class="acc-icon">⚡</div>
-      <div class="acc-text"><strong>87% extraction accuracy</strong> — We read 5 of 6 fields successfully. Review and correct any highlighted fields before continuing.</div>
+    <div style="text-align:center;padding:20px 0 10px;">
+      <div style="font-size:48px;margin-bottom:12px;">✓</div>
+      <div class="step-kicker" style="justify-content:center;">Upload Received</div>
+      <h2 class="step-title" style="text-align:center;">Thank you for your<br><em>submission.</em></h2>
     </div>
 
-    <div class="verify-grid">
-      <div class="verify-field auto-filled full" id="vf-vehicle">
-        <div class="vf-label">Vehicle <span class="vf-auto-badge">Auto-filled</span></div>
-        <input class="vf-edit" type="text" id="vv-vehicle" value="2024 BMW X3 xDrive30i" placeholder="Year Make Model Trim">
-      </div>
+    <p class="step-body" style="text-align:center;max-width:480px;margin:0 auto 24px;">
+      Your lease document has been received. We'll verify the deal details and email your full report once everything checks out. If we have any questions, we'll reach out.
+    </p>
 
-      <div class="verify-field auto-filled" id="vf-payment">
-        <div class="vf-label">Monthly Payment <span class="vf-auto-badge">Auto-filled</span></div>
-        <input class="vf-edit" type="text" id="vv-payment" value="$589 / mo" placeholder="$0 / mo">
-      </div>
+    <div class="verify-field full" style="margin-bottom:16px;background:var(--sage-bg,#e8f0ea);border-color:rgba(92,122,101,0.2);">
+      <div class="vf-label" style="color:var(--sage);">Your report will be sent to</div>
+      <div style="font-family:var(--f-display);font-size:18px;color:var(--ink);padding:4px 0;" id="confirmEmail">—</div>
+    </div>
 
-      <div class="verify-field auto-filled" id="vf-term">
-        <div class="vf-label">Term <span class="vf-auto-badge">Auto-filled</span></div>
-        <input class="vf-edit" type="text" id="vv-term" value="36 months" placeholder="36 months">
-      </div>
+    <div id="founderSlotMessage" style="display:none;margin-bottom:20px;padding:16px;background:var(--copper-bg,#faf3ea);border:1px solid rgba(168,105,46,0.2);border-radius:8px;">
+      <div style="font-family:var(--f-mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--copper);margin-bottom:6px;">Founding Member Opportunity</div>
+      <div style="font-size:14px;color:var(--ink-2);line-height:1.6;" id="founderSlotText"></div>
+    </div>
 
-      <div class="verify-field auto-filled" id="vf-mileage">
-        <div class="vf-label">Mileage <span class="vf-auto-badge">Auto-filled</span></div>
-        <input class="vf-edit" type="text" id="vv-mileage" value="10,000 / yr" placeholder="10,000 / yr">
-      </div>
-
-      <div class="verify-field auto-filled" id="vf-signing">
-        <div class="vf-label">Due at Signing <span class="vf-auto-badge">Auto-filled</span></div>
-        <input class="vf-edit" type="text" id="vv-signing" value="$2,800" placeholder="$0">
-      </div>
-
-      <div class="verify-field" id="vf-zip" style="border-color:rgba(168,105,46,0.4);background:var(--amber-bg,#fdf3e3)">
-        <div class="vf-label">Zip Code <span style="color:var(--copper);font-size:9px;font-family:var(--f-mono);letter-spacing:0.1em">PLEASE ADD</span></div>
-        <input class="vf-edit" type="text" id="vv-zip" value="" placeholder="07030" maxlength="5"
-          style="color:var(--copper)" oninput="checkVerifyComplete()">
-      </div>
-
-      <div class="verify-field auto-filled full" id="vf-dealer">
-        <div class="vf-label">Dealer <span class="vf-auto-badge">Auto-filled</span></div>
-        <input class="vf-edit" type="text" id="vv-dealer" value="BMW of Ramsey — Ramsey, NJ" placeholder="Dealer name">
+    <div style="padding:16px;background:var(--canvas-2);border-radius:8px;margin-bottom:24px;">
+      <div style="font-family:var(--f-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:8px;">What happens next</div>
+      <div style="font-size:13px;color:var(--ink-2);line-height:1.7;">
+        <div style="margin-bottom:6px;">1. Our team reviews your lease document (typically within 24 hours)</div>
+        <div style="margin-bottom:6px;">2. We verify the deal terms and run your full analysis</div>
+        <div>3. Your complete report is emailed to you — including comparable deals, money factor analysis, and negotiation scripts</div>
       </div>
     </div>
 
-    <!-- EMAIL FOR REPORT DELIVERY -->
-    <div class="verify-field full" id="vf-email" style="margin-top:12px;">
-      <div class="vf-label">Email <span style="color:var(--ink-4);font-size:9px;font-family:'DM Mono',monospace;letter-spacing:0.1em">WHERE WE'LL SEND YOUR REPORT</span></div>
-      <input class="vf-edit" type="email" id="vv-email" value="" placeholder="you@email.com">
-    </div>
-
-    <button class="btn-primary" id="step3btn" onclick="goToStep4()">
-      <span>Score My Deal</span>
+    <a href="/" class="btn-primary" style="text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;">
+      <span>Back to Home</span>
       <span style="opacity:0.5">→</span>
-    </button>
-    <div class="btn-sub">Just your email · No account needed · Free</div>
-  </div>
-
-  <!-- ── STEP 4: SCORING ── -->
-  <div class="step" id="step4">
-    <div class="scoring-state visible">
-      <div class="scoring-circle"></div>
-      <div class="scoring-label">Scoring your deal…</div>
-      <div class="scoring-sub">Comparing against 2,847 NJ submissions</div>
-    </div>
+    </a>
+    <div class="btn-sub">Check another deal or share LeaseCheckr with a friend</div>
   </div>
 
 </div><!-- /flow-wrapper -->
@@ -1147,8 +1122,9 @@ function setProgress(pct) {
 }
 
 function updateDots(step) {
-  [1,2,3,4].forEach(i => {
+  [1,2].forEach(i => {
     const d = document.getElementById('dot'+i);
+    if (!d) return;
     d.classList.remove('active','done');
     if (i < step) d.classList.add('done');
     else if (i === step) d.classList.add('active');
@@ -1286,9 +1262,8 @@ function resetUpload() {
 function confirmUploadAndExtract() {
   document.getElementById('redactionPanelUpload').classList.remove('visible');
   document.getElementById('uploadZone').style.display = 'none';
-  const ep = document.getElementById('extractingPanelUpload');
-  ep.classList.add('visible');
-  runExtractionAnimation('eu');
+  // Skip extraction — go straight to confirmation
+  showConfirmation();
 }
 
 // ── REDACTION ──────────────────────────────────────
@@ -1430,9 +1405,8 @@ function drawRedactions(ctx, w, h) {
 function confirmRedactionAndExtract() {
   document.getElementById('redactionPanel').classList.remove('visible');
   document.getElementById('cameraZone').style.display = 'none';
-  const ep = document.getElementById('extractingPanel');
-  ep.classList.add('visible');
-  runExtractionAnimation('el');
+  // Skip extraction — go straight to confirmation
+  showConfirmation();
 }
 
 function runExtractionAnimation(prefix) {
@@ -1595,11 +1569,64 @@ function saveToSession() {
 function prefillEmail() {
   try {
     const saved = sessionStorage.getItem('lc_email');
-    const emailField = document.getElementById('vv-email');
-    if (saved && emailField && !emailField.value) {
-      emailField.value = saved;
+    if (saved) {
+      // Store for confirmation screen
+      window._userEmail = saved;
     }
   } catch(e) {}
+}
+
+// ── SHOW CONFIRMATION (replaces old step 3 + step 4) ──
+async function showConfirmation() {
+  currentStep = 3;
+  updateDots(3); setProgress(90);
+  showStep('step3');
+
+  // Show email
+  const email = window._userEmail || sessionStorage.getItem('lc_email') || '';
+  const confirmEl = document.getElementById('confirmEmail');
+  if (confirmEl) {
+    confirmEl.textContent = email || 'your email address';
+  }
+
+  // Check founder slots and show message
+  let founderSlotsRemaining = 0;
+  if (_sbUpload) {
+    try {
+      const { data, error } = await _sbUpload.rpc('get_founder_count');
+      if (!error && typeof data === 'number') {
+        founderSlotsRemaining = 1000 - data;
+      }
+    } catch(e) {}
+  }
+
+  if (founderSlotsRemaining > 0) {
+    const msgEl = document.getElementById('founderSlotMessage');
+    const textEl = document.getElementById('founderSlotText');
+    if (msgEl && textEl) {
+      textEl.textContent = 'There are ' + founderSlotsRemaining.toLocaleString() + ' Founding Member spots remaining. Once your deal is verified, you\'ll be granted Founding Member status — including permanent Premium access and unlimited free reports.';
+      msgEl.style.display = 'block';
+    }
+  }
+
+  // Save upload submission to Supabase
+  if (_sbUpload && email) {
+    try {
+      const { error } = await _sbUpload.from('lease_submissions').insert([{
+        email: email,
+        submission_type: 'verified_upload',
+        deal_status: 'quote_check',
+        founder_eligible: founderSlotsRemaining > 0,
+        verification_status: 'pending',
+        trust_tier: 'medium',
+        report_entitlement: 'none'
+      }]);
+      if (error) console.error('[LeaseCheckr] Upload save error:', error.message);
+      else console.log('[LeaseCheckr] Upload submission saved');
+    } catch(e) { console.error('[LeaseCheckr] Upload save failed:', e); }
+  }
+
+  setProgress(100);
 }
 
 // Init
