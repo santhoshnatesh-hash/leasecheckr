@@ -2800,26 +2800,28 @@
     btn.disabled = false;
     btn.textContent = 'See Score';
 
-    // If founder, show the welcome message briefly, then auto-send report
+    // If founder, show the welcome message briefly, then show score + auto-send
     if (_isFounder) {
       document.getElementById('gateFounder').classList.add('visible');
-      // Wait a beat so they see the welcome message, then show score + auto-send
       setTimeout(() => {
         document.getElementById('emailGate').classList.remove('visible');
         document.getElementById('gateFounder').classList.remove('visible');
+        // 1. Show score first (this computes _lastGradeResult)
         showTeaser();
+        // 2. NOW save to Supabase (grade is available)
+        saveTeaserToSupabase(email);
+        // 3. Override CTA for founder
         overrideCTAForFounder();
-        // Auto-trigger report — no extra click needed for verified founders
+        // 4. Show confirmation (report auto-sent by Supabase trigger)
         requestFounderReport();
       }, 1500);
     } else {
       // Not a founder — hide gate, show score with normal pricing CTAs
       document.getElementById('emailGate').classList.remove('visible');
       showTeaser();
+      // Save teaser AFTER showTeaser so grade is available
+      saveTeaserToSupabase(email);
     }
-
-    // Save teaser to Supabase — triggers email for ALL users including founders
-    saveTeaserToSupabase(email);
   }
 
   function overrideCTAForFounder() {
@@ -2862,7 +2864,10 @@
   }
 
   async function saveTeaserToSupabase(email) {
-    if (!window._sbClient) return;
+    if (!window._sbClient) {
+      console.warn('[LeaseCheckr] Supabase not initialized — insert skipped');
+      return;
+    }
     try {
       const make = document.getElementById('fMake').value || '';
       const model = document.getElementById('fModel').value || '';
@@ -2874,7 +2879,7 @@
       const term = parseInt(termText) || 36;
       const mileage = document.querySelector('#mileagePills .pill.selected')?.textContent || '10,000';
 
-      const { error } = await window._sbClient.from('lease_submissions').insert([{
+      const row = {
         email,
         make: make || null, model: model || null, trim: trim || null,
         monthly_payment: pay || null, due_at_signing: das || null,
@@ -2894,9 +2899,19 @@
         report_entitlement: _isFounder ? 'founder_included' : 'none',
         grade: _lastGradeResult?.grade || null,
         effective_monthly: _lastGradeResult?.emc || null
-      }]);
-      if (error) console.error('Supabase teaser insert error:', error);
-    } catch(err) { console.error('Supabase save failed:', err); }
+      };
+
+      console.log('[LeaseCheckr] Inserting to Supabase:', JSON.stringify(row, null, 2));
+
+      const { data, error } = await window._sbClient.from('lease_submissions').insert([row]).select();
+      if (error) {
+        console.error('[LeaseCheckr] Supabase INSERT ERROR:', error.message, error.details, error.hint);
+      } else {
+        console.log('[LeaseCheckr] Insert success:', data);
+      }
+    } catch(err) {
+      console.error('[LeaseCheckr] Supabase save EXCEPTION:', err);
+    }
   }
 
   // Enter key on email field
