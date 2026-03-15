@@ -774,7 +774,7 @@ nav {
     <!-- Privacy promise card -->
     <div class="privacy-card">
       <div class="privacy-eyebrow">Privacy First</div>
-      <div class="privacy-headline">"Your document is read once, then gone."</div>
+      <div class="privacy-headline">"You control what we see."</div>
       <div class="privacy-points">
         <div class="privacy-point">
           <span class="privacy-check">✓</span>
@@ -865,7 +865,7 @@ nav {
 
     <div class="privacy-card">
       <div class="privacy-eyebrow">Privacy First</div>
-      <div class="privacy-headline">"Your document is read once, then gone."</div>
+      <div class="privacy-headline">"You control what we see."</div>
       <div class="privacy-points">
         <div class="privacy-point">
           <span class="privacy-check">✓</span>
@@ -873,7 +873,7 @@ nav {
         </div>
         <div class="privacy-point">
           <span class="privacy-check">✓</span>
-          Your name, address, and SSN are automatically covered before any data is read
+          We provide redaction tools — you cover your name, address, and SSN before we read anything
         </div>
         <div class="privacy-point">
           <span class="privacy-check">✓</span>
@@ -1306,28 +1306,35 @@ function showRedaction(src, canvasId, panelId) {
   const ctx = canvas.getContext('2d');
   const img = new Image();
 
-  img.onload = function() {
-    const maxW = canvas.parentElement.offsetWidth;
-    const ratio = img.height / img.width;
-    canvas.width = maxW;
-    canvas.height = maxW * ratio;
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  // Make panel visible FIRST so canvas has dimensions for measuring
+  panel.classList.add('visible');
 
-    // Default redaction zones for MVSC-1 (NJ standard lease)
-    redactions.length = 0;
-    const w = canvas.width, h = canvas.height;
-    redactions.push(
-      { x: 0.02, y: 0.06, w: 0.45, h: 0.06, label: 'Name / Address' },
-      { x: 0.55, y: 0.06, w: 0.43, h: 0.04, label: 'SSN' },
-      { x: 0.02, y: 0.88, w: 0.35, h: 0.06, label: 'Signature' }
-    );
-    drawRedactions(ctx, canvas.width, canvas.height);
-    panel.classList.add('visible');
+  img.onload = function() {
+    // Use requestAnimationFrame to ensure layout has been computed
+    requestAnimationFrame(() => {
+      const maxW = canvas.parentElement.offsetWidth || canvas.closest('.step').offsetWidth || 600;
+      const ratio = img.height / img.width;
+      canvas.width = maxW;
+      canvas.height = maxW * ratio;
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      // Default redaction zones — user can drag to add more
+      redactions.length = 0;
+      redactions.push(
+        { x: 0.02, y: 0.06, w: 0.45, h: 0.06, label: 'Name / Address' },
+        { x: 0.55, y: 0.06, w: 0.43, h: 0.04, label: 'SSN' },
+        { x: 0.02, y: 0.88, w: 0.35, h: 0.06, label: 'Signature' }
+      );
+      drawRedactions(ctx, canvas.width, canvas.height);
+    });
   };
 
   img.src = src;
 
-  // Draw interactions
+  // Draw interactions — remove old listeners first to prevent duplicates
+  canvas.removeEventListener('mousedown', startDraw);
+  canvas.removeEventListener('mousemove', duringDraw);
+  canvas.removeEventListener('mouseup', endDraw);
   canvas.addEventListener('mousedown', startDraw);
   canvas.addEventListener('mousemove', duringDraw);
   canvas.addEventListener('mouseup', endDraw);
@@ -1350,11 +1357,14 @@ function startDraw(e) {
   isDrawing = true;
 }
 
+let lastDrawPos = null;
+
 function duringDraw(e) {
   if (!isDrawing) return;
   const canvas = document.getElementById(activeCanvasId);
   const ctx = canvas.getContext('2d');
   const pos = getCanvasPos(e, canvas);
+  lastDrawPos = pos; // track for touchend which has no coordinates
   redrawCanvas();
   ctx.fillStyle = 'rgba(28,25,23,0.85)';
   ctx.fillRect(
@@ -1369,15 +1379,29 @@ function endDraw(e) {
   if (!isDrawing) return;
   isDrawing = false;
   const canvas = document.getElementById(activeCanvasId);
-  const pos = getCanvasPos(e || { clientX: 0, clientY: 0 }, canvas);
-  if (Math.abs(pos.x - drawStart.x) > 0.02) {
-    redactions.push({
-      x: Math.min(drawStart.x, pos.x),
-      y: Math.min(drawStart.y, pos.y),
-      w: Math.abs(pos.x - drawStart.x),
-      h: Math.abs(pos.y - drawStart.y),
-      label: 'Custom'
-    });
+  // Touch end doesn't provide coordinates — use last known position from duringDraw
+  if (!e || !e.clientX) {
+    // Just finalize with whatever we have from the last move
+    if (lastDrawPos && Math.abs(lastDrawPos.x - drawStart.x) > 0.02) {
+      redactions.push({
+        x: Math.min(drawStart.x, lastDrawPos.x),
+        y: Math.min(drawStart.y, lastDrawPos.y),
+        w: Math.abs(lastDrawPos.x - drawStart.x),
+        h: Math.abs(lastDrawPos.y - drawStart.y),
+        label: 'Custom'
+      });
+    }
+  } else {
+    const pos = getCanvasPos(e, canvas);
+    if (Math.abs(pos.x - drawStart.x) > 0.02) {
+      redactions.push({
+        x: Math.min(drawStart.x, pos.x),
+        y: Math.min(drawStart.y, pos.y),
+        w: Math.abs(pos.x - drawStart.x),
+        h: Math.abs(pos.y - drawStart.y),
+        label: 'Custom'
+      });
+    }
   }
   redrawCanvas();
 }
