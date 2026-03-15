@@ -785,6 +785,15 @@
       .field-row { grid-template-columns: 1fr; }
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    try {
+      window._sbClient = window.supabase.createClient(
+        'https://xqjsvlhdpdfvzixlmdxk.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxanN2bGhkcGRmdnppeGxtZHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzg2ODcsImV4cCI6MjA4ODg1NDY4N30.MT0tEDMLaBDLtZkX9xEVEkaUfPdIA9QsJrWjGDpeWsE'
+      );
+    } catch(e) { window._sbClient = null; }
+  </script>
 </head>
 <body>
 
@@ -822,7 +831,7 @@
 
     <div class="proof-row">
       <div class="proof-item">
-        <span class="proof-value" id="dealsCount">847</span>
+        <span class="proof-value" id="dealsCount">98</span>
         <span class="proof-label">Deals checked</span>
       </div>
       <div class="proof-item">
@@ -830,7 +839,7 @@
         <span class="proof-label">NJ counties</span>
       </div>
       <div class="proof-item">
-        <span class="proof-value" id="foundersCount">153</span>
+        <span class="proof-value" id="foundersCount">1</span>
         <span class="proof-label">Founding members</span>
       </div>
     </div>
@@ -842,7 +851,7 @@
           Submitting your first verified lease document? You qualify as a Founding Member — one of the first 1,000 NJ drivers helping build the benchmark.
           <br><a href="founder.html">See Founding Member benefits →</a>
         </div>
-        <div class="founder-count" id="spotsLeft">847 spots remaining</div>
+        <div class="founder-count" id="spotsLeft">999 spots remaining</div>
       </div>
     </div>
   </div>
@@ -1045,7 +1054,7 @@
           </a>
           <a href="sample-report.html" target="_blank" class="cta-secondary">View Sample Report →</a>
           <div class="cta-tertiary">
-            Or <a href="founder.html">contribute your lease and join 153 Founding Members</a> — full report free, Premium access permanent.
+            Or <a href="founder.html">contribute your lease and join <span id="tFounderCount">1</span> Founding Members</a> — full report included with verified upload.
           </div>
         </div>
       </div>
@@ -1916,10 +1925,34 @@
     }, 380);
   }
 
-  // ── COUNTERS
-  const CLAIMED = 153, TOTAL = 1000;
-  document.getElementById('foundersCount').textContent = CLAIMED;
-  document.getElementById('spotsLeft').textContent = (TOTAL - CLAIMED).toLocaleString() + ' spots remaining';
+  // ── COUNTERS (live from Supabase)
+  const TOTAL = 1000;
+  let founderCount = 1;
+
+  async function updateFounderCount() {
+    if (!window._sbClient) return;
+    try {
+      const { data, error } = await window._sbClient.rpc('get_founder_count');
+      if (!error && typeof data === 'number' && data > 0) founderCount = data;
+    } catch (e) {}
+    document.getElementById('foundersCount').textContent = founderCount;
+    document.getElementById('spotsLeft').textContent = (TOTAL - founderCount).toLocaleString() + ' spots remaining';
+    const tfc = document.getElementById('tFounderCount');
+    if (tfc) tfc.textContent = founderCount;
+  }
+  updateFounderCount();
+
+  async function updateDealsCount() {
+    const el = document.getElementById('dealsCount');
+    if (!window._sbClient || !el) return;
+    try {
+      const { count, error } = await window._sbClient
+        .from('lease_submissions')
+        .select('*', { count: 'exact', head: true });
+      if (!error && count > 0) el.textContent = count;
+    } catch (e) {}
+  }
+  updateDealsCount();
 
   // ── COUNTY BAR CHART ANIMATION
   function animateBars() {
