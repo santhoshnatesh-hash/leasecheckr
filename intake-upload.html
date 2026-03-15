@@ -176,7 +176,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:60px;display:flex;ali
     <div class="back-link" onclick="goToStep(2)">← Back</div>
     <div class="step-kicker">Step 3 of 3 · Submit</div>
     <h2 class="step-title">Almost <em>done.</em></h2>
-    <p class="step-body">Enter your email so we can send you your full report once your lease is verified (typically within 48 hours).</p>
+    <p class="step-body">Enter your email so we can send you your full report once your lease is verified (typically within 24 hours).</p>
     <div class="email-section">
       <label class="email-label" for="emailInput">Email — for your report delivery</label>
       <input class="email-input" type="email" id="emailInput" placeholder="you@email.com" oninput="checkEmail()">
@@ -185,7 +185,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:60px;display:flex;ali
     <button class="btn-primary" id="submitBtn" onclick="submitLease()" disabled>
       <span>Submit My Redacted Lease</span><span style="opacity:0.5">→</span>
     </button>
-    <div class="btn-sub">Redacted image only · Verified within 48 hours</div>
+    <div class="btn-sub">Redacted image only · Verified within 24 hours</div>
   </div>
 
   <!-- STEP 4: UPLOADING / CONFIRM -->
@@ -391,6 +391,25 @@ function checkEmail(){
 async function submitLease(){
   const email=document.getElementById('emailInput').value;
   if(!email)return;
+
+  // CHECK FOR DUPLICATE UPLOAD by same email
+  if(sb){
+    try{
+      const{data:existing,error:checkErr}=await sb.from('lease_submissions')
+        .select('id')
+        .eq('email',email)
+        .eq('submission_type','verified_upload')
+        .eq('verification_status','pending');
+      if(!checkErr && existing && existing.length>0){
+        document.getElementById('uploadingState').innerHTML='<div style="font-size:1.4rem;margin-bottom:12px">📄</div><div style="font-family:var(--f-display);font-size:20px;margin-bottom:8px">You\'ve already uploaded a document</div><div style="font-size:13px;color:var(--ink-3);margin-bottom:20px">We have a pending upload from '+email+'. Our team will verify it within 24 hours and send your report. Check your email for updates.</div><button class="btn-primary" onclick="window.location.href=\'index.html\'" style="max-width:200px;margin:0 auto">← Back to Home</button>';
+        setProgress(100);showStep('step4');
+        document.getElementById('uploadingState').style.display='block';
+        document.getElementById('confirmState').style.display='none';
+        return;
+      }
+    }catch(e){console.warn('Duplicate check failed:',e);}
+  }
+
   setProgress(85);showStep('step4');
   try{
     // Export REDACTED canvas — original pixels under black boxes are permanently gone
@@ -412,7 +431,7 @@ async function submitLease(){
     setProgress(100);
     document.getElementById('uploadingState').style.display='none';
     document.getElementById('confirmState').style.display='block';
-    document.getElementById('confirmMsg').textContent='We\u2019ll verify your document within 48 hours and send your full report to '+email+'.';
+    document.getElementById('confirmMsg').textContent='Your document has been received. We\u2019ll verify it within 24 hours. Please check your email at '+email+' for a welcome confirmation and your full report.';
   }catch(err){
     console.error('Submit error:',err);
     document.getElementById('uploadingState').innerHTML='<div style="font-size:1.4rem;margin-bottom:12px">⚠️</div><div style="font-family:var(--f-display);font-size:20px;margin-bottom:8px">Something went wrong</div><div style="font-size:13px;color:var(--ink-3);margin-bottom:20px">Please try again.</div><button class="btn-primary" onclick="goToStep(3)" style="max-width:200px;margin:0 auto">← Go Back</button>';

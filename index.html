@@ -513,13 +513,13 @@
     }
     .nc-label {
       font-family: 'DM Mono', monospace;
-      font-size: 0.57rem; letter-spacing: 0.16em; text-transform: uppercase;
-      color: var(--copper); margin-bottom: 8px;
+      font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--copper); margin-bottom: 8px; font-weight: 500;
     }
     .nc-title {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1.15rem; font-weight: 500; color: var(--ink);
-      margin-bottom: 8px; line-height: 1.2;
+      font-size: 1.3rem; font-weight: 600; color: var(--ink);
+      margin-bottom: 10px; line-height: 1.2;
     }
     .nc-desc {
       font-size: 0.79rem; font-weight: 300; line-height: 1.68; color: var(--ink-3);
@@ -667,9 +667,9 @@
 
     .compare-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      max-width: 900px;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+      max-width: 1100px;
       margin: 48px auto 0;
     }
 
@@ -682,6 +682,16 @@
     .compare-card.free-card {
       background: var(--cream);
       border: 1px solid var(--border);
+    }
+    .compare-card.mid-card {
+      background: var(--cream);
+      border: 1px solid var(--border);
+    }
+    .compare-card.mid-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--copper);
     }
     .compare-card.full-card {
       background: var(--ink);
@@ -708,6 +718,7 @@
       font-size: 1.4rem; font-weight: 500; margin-bottom: 8px;
     }
     .free-card .cc-title { color: var(--ink); }
+    .mid-card .cc-title { color: var(--ink); }
     .full-card .cc-title { color: rgba(253,250,246,0.95); }
 
     .cc-price {
@@ -715,6 +726,7 @@
       font-size: 0.7rem; letter-spacing: 0.08em; margin-bottom: 24px;
     }
     .free-card .cc-price { color: var(--ink-4); }
+    .mid-card .cc-price { color: var(--copper); }
     .full-card .cc-price { color: var(--copper-lt); }
 
     .cc-items { display: flex; flex-direction: column; gap: 0; }
@@ -724,11 +736,13 @@
       font-size: 0.81rem; line-height: 1.5;
     }
     .free-card .cc-item { border-color: var(--border); color: var(--ink-3); }
+    .mid-card .cc-item { border-color: var(--border); color: var(--ink-3); }
     .full-card .cc-item { border-color: rgba(253,250,246,0.06); color: rgba(253,250,246,0.65); }
     .cc-item:last-child { border-bottom: none; }
 
     .cc-check { font-size: 0.75rem; flex-shrink: 0; margin-top: 1px; }
     .free-card .cc-check { color: var(--sage); }
+    .mid-card .cc-check { color: var(--copper); }
     .full-card .cc-check { color: var(--copper-lt); }
     .cc-lock { font-size: 0.7rem; flex-shrink: 0; margin-top: 1px; opacity: 0.3; }
 
@@ -741,6 +755,8 @@
     }
     .free-card .cc-cta { background: var(--canvas-2); color: var(--ink); border: 1px solid var(--border-2); }
     .free-card .cc-cta:hover { background: var(--canvas); border-color: var(--ink); }
+    .mid-card .cc-cta { background: var(--ink); color: var(--canvas); border: 1px solid var(--ink); }
+    .mid-card .cc-cta:hover { background: var(--ink-2); transform: translateY(-1px); }
     .full-card .cc-cta { background: var(--copper); color: var(--canvas); }
     .full-card .cc-cta:hover { background: var(--copper-lt); transform: translateY(-1px); }
 
@@ -1478,7 +1494,22 @@
         <a href="#formPanel" class="cc-cta" onclick="document.getElementById('formPanel').scrollIntoView({behavior:'smooth'})">Check your quote free →</a>
       </div>
 
-      <div class="compare-card full-card reveal reveal-delay-1">
+      <div class="compare-card mid-card reveal reveal-delay-1">
+        <div class="cc-badge free" style="background:var(--copper-bg);color:var(--copper);border-color:rgba(168,105,46,0.2);">$9.99 · Contributor</div>
+        <div class="cc-title">Submit Your Deal</div>
+        <div class="cc-price">$9.99 one-time · contribute your signed deal data</div>
+        <div class="cc-items">
+          <div class="cc-item"><span class="cc-check">✓</span><span>Everything in the free score</span></div>
+          <div class="cc-item"><span class="cc-check">✓</span><span>Full report with all 10 sections</span></div>
+          <div class="cc-item"><span class="cc-check">✓</span><span>Money factor analysis — buy rate vs. your rate</span></div>
+          <div class="cc-item"><span class="cc-check">✓</span><span>Comparable NJ deals in your county</span></div>
+          <div class="cc-item"><span class="cc-check">✓</span><span>Your signed deal data contributes to the NJ benchmark</span></div>
+          <div class="cc-item"><span class="cc-check">✓</span><span>Negotiation scripts and action items</span></div>
+        </div>
+        <a href="submit-deal.html" class="cc-cta">Submit deal — $9.99 →</a>
+      </div>
+
+      <div class="compare-card full-card reveal reveal-delay-2">
         <div class="cc-badge full">Full Report</div>
         <div class="cc-title">Complete Analysis</div>
         <div class="cc-price">$19.99 one-time · or free with lease upload</div>
