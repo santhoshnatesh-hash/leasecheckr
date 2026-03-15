@@ -849,96 +849,122 @@ async function loadReportData() {
 
     // ════════════════════════════════
     // SECTION 06: Dealer advertised deals from dealer_comps
-    // Tiered: same make+model → same make → same county similar price tier
+    // Tiered: same model+county → same model NJ → segment+price county → segment+price NJ → hide
     // ════════════════════════════════
 
-    // Tier 1: Same make + model in any county
-    let { data: countyDealerComps } = await sb.from('dealer_comps')
-      .select('*')
-      .eq('make', make)
-      .eq('model', model)
-      .eq('is_active', true)
-      .order('monthly_payment', { ascending: true })
-      .limit(10);
+    // Simple body type mapping for segment matching in Tier 3-4
+    const BODY_MAP = {
+      'CR-V':'suv','RAV4':'suv','Tucson':'suv','Sportage':'suv','Rogue':'suv','Escape':'suv','Equinox':'suv','Forester':'suv','CX-5':'suv','Tiguan':'suv','Outlander':'suv','HR-V':'suv','Kicks':'suv','Trax':'suv','Taos':'suv','Seltos':'suv','Crosstrek':'suv','CX-30':'suv','Kona':'suv','Venue':'suv','Bronco Sport':'suv',
+      'X3':'suv','X5':'suv','X1':'suv','GLC':'suv','GLE':'suv','GLA':'suv','GLB':'suv','Q5':'suv','Q3':'suv','Q7':'suv','NX':'suv','RX':'suv','GX':'suv','XC60':'suv','XC90':'suv','XC40':'suv','RDX':'suv','MDX':'suv','GV70':'suv','GV80':'suv','Corsair':'suv','Nautilus':'suv','Aviator':'suv','XT5':'suv','XT4':'suv',
+      'Highlander':'suv','Pilot':'suv','Palisade':'suv','Telluride':'suv','Explorer':'suv','Traverse':'suv','Pathfinder':'suv','Ascent':'suv','CX-90':'suv','Atlas':'suv','Grand Cherokee':'suv','4Runner':'suv',
+      'Civic':'sedan','Accord':'sedan','Camry':'sedan','Corolla':'sedan','Altima':'sedan','Sentra':'sedan','Elantra':'sedan','Sonata':'sedan','Forte':'sedan','K5':'sedan','Jetta':'sedan','Mazda3':'sedan','Malibu':'sedan',
+      '3 Series':'sedan','C-Class':'sedan','A4':'sedan','IS':'sedan','ES':'sedan','S60':'sedan','TLX':'sedan','G70':'sedan','CT4':'sedan','CT5':'sedan',
+      'Model Y':'suv','Model 3':'sedan','Model S':'sedan','Model X':'suv',
+      'Wrangler':'suv','Bronco':'suv','Tacoma':'truck','F-150':'truck','Silverado':'truck','Sierra':'truck','1500':'truck','Tundra':'truck','Frontier':'truck','Gladiator':'truck','Maverick':'truck','Canyon':'truck',
+      'Ioniq 5':'suv','Ioniq 6':'sedan','EV6':'suv','ID.4':'suv','Mach-E':'suv','Lyriq':'suv','Ariya':'suv','EX30':'suv','iX':'suv','i4':'sedan','i5':'sedan'
+    };
 
-    let dealerMatchLevel = 'exact_model';
+    const userBody = BODY_MAP[model] || 'suv';
 
-    // Tier 2: Same make, any model
-    if (!countyDealerComps || countyDealerComps.length < 2) {
-      const { data: sameMakeComps } = await sb.from('dealer_comps')
+    // Value band for price matching
+    function getDealerValueBand(pay) {
+      if (pay < 350) return 'budget';
+      if (pay < 500) return 'mid';
+      if (pay < 700) return 'premium';
+      return 'luxury';
+    }
+    const userPriceBand = getDealerValueBand(payment);
+
+    let countyDealerComps = null;
+    let dealerMatchLevel = '';
+    let dealerMatchNote = '';
+
+    // Tier 1: Same make + model, same county
+    {
+      const { data } = await sb.from('dealer_comps')
         .select('*')
-        .eq('make', make)
+        .eq('make', make).eq('model', model).eq('county', county)
         .eq('is_active', true)
-        .order('monthly_payment', { ascending: true })
-        .limit(10);
-      if (sameMakeComps && sameMakeComps.length > (countyDealerComps || []).length) {
-        countyDealerComps = sameMakeComps;
-        dealerMatchLevel = 'same_make';
+        .order('monthly_payment', { ascending: true }).limit(10);
+      if (data && data.length >= 2) {
+        countyDealerComps = data;
+        dealerMatchLevel = 'exact_county';
+        dealerMatchNote = 'Dealer pricing for ' + make + ' ' + model + ' in ' + county + ' County.';
       }
     }
 
-    // Tier 3: Same county, similar price range (within 40% of user payment)
+    // Tier 2: Same make + model, any NJ county
     if (!countyDealerComps || countyDealerComps.length < 2) {
-      const priceLow = Math.round(payment * 0.6);
-      const priceHigh = Math.round(payment * 1.4);
-      const { data: similarPriceComps } = await sb.from('dealer_comps')
+      const { data } = await sb.from('dealer_comps')
         .select('*')
-        .eq('county', county)
+        .eq('make', make).eq('model', model)
         .eq('is_active', true)
-        .gte('monthly_payment', priceLow)
-        .lte('monthly_payment', priceHigh)
-        .order('monthly_payment', { ascending: true })
-        .limit(10);
-      if (similarPriceComps && similarPriceComps.length > (countyDealerComps || []).length) {
-        countyDealerComps = similarPriceComps;
-        dealerMatchLevel = 'similar_price';
+        .order('monthly_payment', { ascending: true }).limit(10);
+      if (data && data.length >= 2) {
+        countyDealerComps = data;
+        dealerMatchLevel = 'exact_nj';
+        dealerMatchNote = 'Dealer pricing for ' + make + ' ' + model + ' across NJ.';
       }
     }
 
-    // Tier 4: Broadest — any active deals in county
+    // Tier 3: Same segment + similar price band, same county
     if (!countyDealerComps || countyDealerComps.length < 2) {
-      const { data: allDealerComps } = await sb.from('dealer_comps')
+      const priceLow = Math.round(payment * 0.65);
+      const priceHigh = Math.round(payment * 1.35);
+      const { data } = await sb.from('dealer_comps')
+        .select('*')
+        .eq('county', county).eq('is_active', true)
+        .gte('monthly_payment', priceLow).lte('monthly_payment', priceHigh)
+        .order('monthly_payment', { ascending: true }).limit(15);
+      // Filter by body type
+      if (data && data.length > 0) {
+        const filtered = data.filter(c => (BODY_MAP[c.model] || 'suv') === userBody);
+        if (filtered.length >= 2) {
+          countyDealerComps = filtered.slice(0, 10);
+          dealerMatchLevel = 'segment_county';
+          const bodyLabel = userBody === 'sedan' ? 'sedans' : userBody === 'truck' ? 'trucks' : 'SUVs';
+          dealerMatchNote = 'Dealer pricing for ' + make + ' ' + model + ' is not yet available in ' + county + ' County. Showing comparable ' + bodyLabel + ' in a similar price range for reference.';
+        }
+      }
+    }
+
+    // Tier 4: Same segment + similar price band, any NJ county
+    if (!countyDealerComps || countyDealerComps.length < 2) {
+      const priceLow = Math.round(payment * 0.65);
+      const priceHigh = Math.round(payment * 1.35);
+      const { data } = await sb.from('dealer_comps')
         .select('*')
         .eq('is_active', true)
-        .order('monthly_payment', { ascending: true })
-        .limit(15);
-      if (allDealerComps && allDealerComps.length > (countyDealerComps || []).length) {
-        countyDealerComps = allDealerComps;
-        dealerMatchLevel = 'all_nj';
+        .gte('monthly_payment', priceLow).lte('monthly_payment', priceHigh)
+        .order('monthly_payment', { ascending: true }).limit(15);
+      if (data && data.length > 0) {
+        const filtered = data.filter(c => (BODY_MAP[c.model] || 'suv') === userBody);
+        if (filtered.length >= 2) {
+          countyDealerComps = filtered.slice(0, 10);
+          dealerMatchLevel = 'segment_nj';
+          const bodyLabel = userBody === 'sedan' ? 'sedans' : userBody === 'truck' ? 'trucks' : 'SUVs';
+          dealerMatchNote = 'Dealer pricing for ' + make + ' ' + model + ' is not yet available in NJ. Showing comparable ' + bodyLabel + ' across NJ in a similar price range for reference.';
+        }
       }
     }
 
     if (countyDealerComps && countyDealerComps.length > 0) {
       document.getElementById('secDealer').style.display = 'block';
-      const dealerSubtitles = {
-        exact_model: 'What dealers are advertising for the ' + make + ' ' + model + ' in NJ.',
-        same_make: 'What dealers are advertising for ' + make + ' vehicles — your closest comparables.',
-        similar_price: 'Dealer-advertised deals in ' + county + ' County in a similar price range.',
-        all_nj: 'Dealer-advertised deals across NJ for reference.'
-      };
-      document.getElementById('dealerSubtitle').textContent = dealerSubtitles[dealerMatchLevel] || 'What dealers are currently advertising for comparable vehicles.';
+      document.getElementById('dealerSubtitle').textContent = dealerMatchNote;
 
-      // Group by make for summary
-      const dealersByMake = {};
-      countyDealerComps.forEach(c => {
-        const key = c.make + ' ' + c.model;
-        if (!dealersByMake[key]) dealersByMake[key] = [];
-        dealersByMake[key].push(c);
-      });
-
-      // Build dealer card with advertised deals table
       const avgDealerPay = Math.round(countyDealerComps.reduce((s,c) => s + c.monthly_payment, 0) / countyDealerComps.length);
       const lowestDealer = Math.min(...countyDealerComps.map(c => c.monthly_payment));
       const highestDealer = Math.max(...countyDealerComps.map(c => c.monthly_payment));
 
-      // Same-model dealer comps
+      // Same-model dealer comps (only relevant for Tier 1-2)
       const sameModelDealer = countyDealerComps.filter(c => c.make === make && c.model === model);
       const sameModelAvg = sameModelDealer.length ? Math.round(sameModelDealer.reduce((s,c) => s + c.monthly_payment, 0) / sameModelDealer.length) : null;
 
-      const dealerCardTitle = dealerMatchLevel === 'exact_model' ? make + ' ' + model + ' Dealer Prices'
-        : dealerMatchLevel === 'same_make' ? make + ' Dealer Prices'
-        : dealerMatchLevel === 'similar_price' ? county + ' County — Similar Price Range'
-        : 'NJ Dealer Landscape';
+      const dealerCardTitle = (dealerMatchLevel === 'exact_county' || dealerMatchLevel === 'exact_nj')
+        ? make + ' ' + model + ' Dealer Prices'
+        : (dealerMatchLevel === 'segment_county')
+        ? county + ' County — Comparable ' + (userBody === 'sedan' ? 'Sedans' : userBody === 'truck' ? 'Trucks' : 'SUVs')
+        : 'NJ — Comparable ' + (userBody === 'sedan' ? 'Sedans' : userBody === 'truck' ? 'Trucks' : 'SUVs');
 
       let dealerHTML = '<div class="dlr-head">'
         + '<div class="dlr-name">' + dealerCardTitle + '</div>'
@@ -951,18 +977,25 @@ async function loadReportData() {
         + '<div><div class="dlr-stat-l">Highest Advertised</div><div class="dlr-stat-v">$' + highestDealer + '/mo</div></div>'
         + '</div>';
 
-      if (sameModelAvg) {
+      if (sameModelAvg && (dealerMatchLevel === 'exact_county' || dealerMatchLevel === 'exact_nj')) {
         dealerHTML += '<div style="padding:12px 0;border-top:1px solid var(--bg2);border-bottom:1px solid var(--bg2);margin:10px 0;">'
           + '<div style="font-family:var(--mono);font-size:0.44rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink4);margin-bottom:4px;">' + make + ' ' + model + ' Dealer Average</div>'
           + '<div style="font-family:var(--serif);font-size:1.3rem;color:var(--ink);">$' + sameModelAvg + '/mo</div>'
-          + '<div style="font-size:0.72rem;color:var(--ink4);margin-top:2px;">From ' + sameModelDealer.length + ' advertised ' + model + ' deals in area</div>'
+          + '<div style="font-size:0.72rem;color:var(--ink4);margin-top:2px;">From ' + sameModelDealer.length + ' advertised ' + model + ' deals</div>'
           + '</div>';
       }
 
-      // How user's deal compares to advertised — with negotiating range
+      // Disclaimer for Tier 3-4
+      if (dealerMatchLevel === 'segment_county' || dealerMatchLevel === 'segment_nj') {
+        dealerHTML += '<div style="padding:10px 14px;background:rgba(168,105,46,0.06);border:1px solid rgba(168,105,46,0.15);border-radius:4px;margin:12px 0;font-size:0.78rem;color:var(--ink3);line-height:1.5;">'
+          + '<strong style="color:var(--copper);">Note:</strong> These are not ' + make + ' ' + model + ' dealer prices. They are from comparable '
+          + (userBody === 'sedan' ? 'sedans' : userBody === 'truck' ? 'trucks' : 'SUVs')
+          + ' in a similar price range, provided for directional reference.'
+          + '</div>';
+      }
+
+      // Negotiating range observation
       let dealerObservation = '';
-      
-      // Build the negotiating range: best signed deal → dealer average → user's deal
       const bestSigned = verifiedDeals && verifiedDeals.length > 0 
         ? Math.min(...verifiedDeals.map(d => d.monthly_payment)) : null;
       
@@ -975,12 +1008,12 @@ async function loadReportData() {
         } else {
           dealerObservation += ' There\'s meaningful room to negotiate. The spread between the best signed deal ($' + bestSigned + ') and your price ($' + payment + ') suggests <strong>$' + (payment - bestSigned) + '/mo in potential savings</strong> — that\'s <strong>$' + ((payment - bestSigned) * term).toLocaleString() + ' over the lease</strong>.';
         }
-      } else if (payment < avgDealerPay) {
-        dealerObservation = 'Your deal at $' + payment + '/mo is <strong>below the dealer advertised average</strong> of $' + avgDealerPay + '/mo. This suggests you negotiated well relative to what dealers are publicly offering.';
-      } else if (payment < avgDealerPay * 1.05) {
-        dealerObservation = 'Your deal at $' + payment + '/mo is <strong>close to the dealer advertised average</strong> of $' + avgDealerPay + '/mo. Advertised rates are pre-negotiation starting points — there may still be room to negotiate.';
-      } else {
-        dealerObservation = 'Your deal at $' + payment + '/mo is <strong>above the dealer advertised average</strong> of $' + avgDealerPay + '/mo. This suggests the deal may include add-ons, a marked-up money factor, or unfavorable cap cost.';
+      } else if (avgDealerPay && payment < avgDealerPay) {
+        dealerObservation = 'Your deal at $' + payment + '/mo is <strong>below the dealer advertised average</strong> of $' + avgDealerPay + '/mo. This suggests you negotiated well.';
+      } else if (avgDealerPay && payment < avgDealerPay * 1.05) {
+        dealerObservation = 'Your deal at $' + payment + '/mo is <strong>close to the dealer advertised average</strong> of $' + avgDealerPay + '/mo. Advertised rates are pre-negotiation starting points — there may still be room.';
+      } else if (avgDealerPay) {
+        dealerObservation = 'Your deal at $' + payment + '/mo is <strong>above the dealer advertised average</strong> of $' + avgDealerPay + '/mo. This may indicate add-ons, a marked-up money factor, or unfavorable cap cost.';
       }
       dealerHTML += '<div class="dlr-obs">' + dealerObservation + '</div>';
 
