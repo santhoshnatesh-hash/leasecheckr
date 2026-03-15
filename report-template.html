@@ -413,7 +413,13 @@ const residual = gn('residual') || gn('res');
 const mf = parseFloat(p.get('mf')) || 0;
 
 // Grading metadata from the engine
-const grade = g('grade') || 'B';
+// URLSearchParams converts + to space (B+ → "B "), so parse grade from raw URL instead
+const grade = (function() {
+  const raw = window.location.search.match(/[?&]grade=([^&]*)/);
+  if (!raw) return 'B';
+  // raw[1] has the literal URL value: "B+" or "B%2B"
+  return decodeURIComponent(raw[1].replace(/\+/g, '%2B')).trim() || 'B';
+})();
 const confidence = g('confidence') || 'Medium';
 const isPreliminary = g('preliminary') === '1';
 const benchmarkNote = g('benchmark_note') || '';
