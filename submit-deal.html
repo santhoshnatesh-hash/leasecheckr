@@ -60,6 +60,14 @@ select.field-input{cursor:pointer;appearance:none;background-image:url("data:ima
 .field-prefix{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:0.88rem;color:var(--ink-4);pointer-events:none}
 .field.error .field-input{border-color:var(--rose)}
 .field-error{font-size:0.72rem;color:var(--rose);display:none}
+/* AUTOSUGGEST */
+.field-suggest{position:relative}
+.suggest-list{position:absolute;top:100%;left:0;right:0;z-index:50;background:#fdfaf6;border:1px solid rgba(28,25,23,0.18);border-top:none;border-radius:0 0 6px 6px;max-height:200px;overflow-y:auto;box-shadow:0 8px 24px rgba(28,25,23,0.08);display:none}
+.suggest-list.open{display:block}
+.suggest-item{padding:9px 13px;font-size:0.84rem;color:#3d3830;cursor:pointer;transition:background 0.12s}
+.suggest-item:hover,.suggest-item.active{background:rgba(168,105,46,0.06);color:#1c1917}
+.suggest-item .suggest-match{color:#a8692e;font-weight:500}
+.suggest-empty{padding:9px 13px;font-size:0.78rem;color:#a89f94;font-style:italic}
 .field.error .field-error{display:block}
 
 /* CREDIBILITY GATE */
@@ -130,13 +138,15 @@ footer a:hover{color:var(--ink)}
           <option>Acura</option><option>Audi</option><option>BMW</option><option>Buick</option><option>Cadillac</option><option>Chevrolet</option><option>Chrysler</option><option>Dodge</option><option>Ford</option><option>Genesis</option><option>GMC</option><option>Honda</option><option>Hyundai</option><option>Infiniti</option><option>Jeep</option><option>Kia</option><option>Lexus</option><option>Lincoln</option><option>Mazda</option><option>Mercedes-Benz</option><option>Nissan</option><option>Ram</option><option>Subaru</option><option>Tesla</option><option>Toyota</option><option>Volkswagen</option><option>Volvo</option>
         </select>
       </div>
-      <div class="field" id="f-model">
+      <div class="field field-suggest" id="f-model">
         <label class="field-label">Model <span class="req">*</span></label>
-        <input class="field-input" type="text" id="model" placeholder="e.g. CR-V" oninput="validateForm()">
+        <input class="field-input" type="text" id="model" placeholder="Select make first" autocomplete="off" disabled oninput="validateForm()">
+        <div class="suggest-list" id="modelSuggest"></div>
       </div>
-      <div class="field" id="f-trim">
+      <div class="field field-suggest" id="f-trim">
         <label class="field-label">Trim <span class="req">*</span></label>
-        <input class="field-input" type="text" id="trim" placeholder="e.g. EX-L AWD" oninput="validateForm()">
+        <input class="field-input" type="text" id="trim" placeholder="Select model first" autocomplete="off" disabled oninput="validateForm()">
+        <div class="suggest-list" id="trimSuggest"></div>
       </div>
       <div class="field" id="f-payment">
         <label class="field-label">Monthly Payment <span class="req">*</span></label>
@@ -275,6 +285,80 @@ const STRIPE_MANUAL_LINK='https://buy.stripe.com/test_28EcN571r98kfma7AAdby01';
     if(d.residual_value){document.getElementById('residual').value=d.residual_value}
     validateForm();
   }catch(e){}
+})();
+
+// ── VEHICLE DATA & AUTOSUGGEST ENGINE
+const VEHICLE_DATA = {
+"Acura":{"Integra":["Base","A-Spec","A-Spec Tech","Type S"],"MDX":["Base","Technology","A-Spec","Advance","Type S","Type S Advance"],"RDX":["Base","Technology","A-Spec","Advance","PMC Edition"],"TLX":["Base","Technology","A-Spec","Advance","Type S","Type S PMC"],"ADX":["Base","A-Spec","A-Spec Advance"]},
+"Audi":{"A4":["Premium","Premium Plus","Prestige"],"A5":["Premium","Premium Plus","Prestige"],"A6":["Premium","Premium Plus","Prestige"],"Q3":["Premium","Premium Plus","Prestige"],"Q5":["Premium","Premium Plus","Prestige","SQ5 Premium Plus","SQ5 Prestige"],"Q7":["Premium","Premium Plus","Prestige","SQ7 Premium Plus"],"Q8":["Premium","Premium Plus","Prestige","SQ8 Premium Plus"],"Q8 e-tron":["Premium","Premium Plus","Prestige"],"e-tron GT":["Premium Plus","Prestige","RS"]},
+"BMW":{"X1":["sDrive28i","xDrive28i"],"X3":["xDrive30i","M40i","xDrive30e"],"X5":["xDrive40i","xDrive50e","M50","M60i"],"X7":["xDrive40i","M60i"],"3 Series":["330i","330i xDrive","M340i","M340i xDrive"],"5 Series":["530i","530i xDrive","540i xDrive","i5 eDrive40","i5 M60"],"i4":["eDrive35","eDrive40","M50"],"i5":["eDrive40","M60"],"iX":["xDrive40","xDrive50","M60"],"7 Series":["740i","740i xDrive","i7 eDrive50","i7 M70"]},
+"Buick":{"Enclave":["Preferred","Essence","Avenir"],"Encore GX":["Preferred","Select","Avenir"],"Envision":["Preferred","Essence","Avenir"],"Envista":["Preferred","Sport Touring"]},
+"Cadillac":{"XT4":["Luxury","Premium Luxury","Sport"],"XT5":["Luxury","Premium Luxury","Sport"],"XT6":["Luxury","Premium Luxury","Sport"],"Lyriq":["Tech","Sport"],"Escalade":["Luxury","Premium Luxury","Sport","V"],"CT4":["Luxury","Premium Luxury","Sport","V","V Blackwing"],"CT5":["Luxury","Premium Luxury","Sport","V","V Blackwing"]},
+"Chevrolet":{"Equinox":["LS","LT","RS","Activ"],"Equinox EV":["1LT","2LT","2RS","3RS"],"Traverse":["LS","LT","RS","Z71","High Country"],"Blazer EV":["LT","RS","SS"],"Silverado":["WT","Custom","LT","RST","LT Trail Boss","ZR2","High Country"],"Tahoe":["LS","LT","RST","Z71","Premier","High Country"],"Trax":["LS","1RS","LT","2RS","Activ"],"Malibu":["LS","RS","1LT","2LT"]},
+"Chrysler":{"Pacifica":["Touring","Touring L","Limited","Pinnacle"],"300":["Touring","Touring L","S","C"]},
+"Dodge":{"Hornet":["GT","GT Plus","R/T","R/T Plus"],"Durango":["SXT","GT","R/T","Citadel","SRT"],"Charger":["SXT","GT","R/T","Scat Pack","Daytona"]},
+"Ford":{"Escape":["Base","Active","ST-Line","ST-Line Select","Platinum"],"Explorer":["Base","XLT","ST","Timberline","Platinum"],"Bronco Sport":["Base","Big Bend","Outer Banks","Badlands","Heritage"],"Bronco":["Base","Big Bend","Outer Banks","Badlands","Wildtrak","Heritage"],"Mustang Mach-E":["Select","Premium","GT"],"F-150":["XL","XLT","Lariat","King Ranch","Platinum","Tremor","Raptor","Limited"],"Edge":["SE","SEL","ST-Line","Titanium","ST"],"Maverick":["XL","XLT","Lariat","Tremor"]},
+"Genesis":{"GV70":["2.5T Standard","2.5T Advanced","2.5T Sport Prestige","3.5T Sport Prestige"],"GV80":["2.5T","2.5T Advanced","3.5T","3.5T Advanced Plus","3.5T Prestige"],"G70":["2.0T","2.0T Advanced","3.3T","Launch Edition"],"G80":["2.5T","2.5T Advanced","3.5T","Electrified"],"G90":["3.5T","3.5T E-Supercharger"],"GV60":["Advanced","Performance"],"Electrified GV70":["Advanced","Prestige"]},
+"GMC":{"Terrain":["SLE","SLT","AT4","Denali"],"Acadia":["SLE","SLT","AT4","Denali"],"Yukon":["SLE","SLT","AT4","Denali","Denali Ultimate"],"Sierra":["Pro","SLE","SLT","AT4","AT4X","Denali","Denali Ultimate"],"Canyon":["Elevation","AT4","AT4X","Denali"],"Hummer EV":["2","2X","3X","Edition 1"]},
+"Honda":{"CR-V":["LX","EX","EX-L","Sport","Sport Touring","Hybrid Sport","Hybrid EX-L","Hybrid Sport Touring"],"Civic":["LX","Sport","EX","Touring","Si","Type R"],"Accord":["LX","EX","EX-L","Sport","Sport Hybrid","Touring"],"HR-V":["LX","Sport","EX-L"],"Pilot":["LX","EX-L","Sport","TrailSport","Touring","Elite"],"Passport":["EX-L","Sport","TrailSport","Elite"],"Odyssey":["LX","EX","EX-L","Sport","Touring","Elite"],"Prologue":["EX","Touring"]},
+"Hyundai":{"Tucson":["SE","SEL","N Line","Limited","XRT"],"Palisade":["SE","SEL","XRT","Limited","Calligraphy"],"Santa Fe":["SE","SEL","XRT","Limited","Calligraphy"],"Elantra":["SE","SEL","N Line","Limited","N"],"Ioniq 5":["SE Standard","SE Long Range","SEL","Limited","N"],"Ioniq 6":["SE","SEL","Limited"],"Kona":["SE","SEL","Limited","N Line","Electric"],"Sonata":["SE","SEL","SEL Plus","Limited"]},
+"Infiniti":{"QX50":["Luxe","Sensory","Autograph"],"QX60":["Pure","Luxe","Sensory","Autograph"],"QX80":["Luxe","Sensory","Autograph"],"Q50":["Luxe","Sensory","Red Sport 400"]},
+"Jeep":{"Grand Cherokee":["Laredo","Limited","Overland","Trailhawk","Summit","SRT","Trackhawk"],"Wrangler":["Sport","Sport S","Sahara","Rubicon","Rubicon 392"],"Cherokee":["Latitude","Latitude Lux","Limited","Trailhawk"],"Compass":["Sport","Latitude","Latitude Lux","Limited","Trailhawk"],"Gladiator":["Sport","Sport S","Willys","Rubicon","Mojave","High Altitude"],"Grand Cherokee L":["Laredo","Limited","Overland","Summit"],"Wagoneer":["Series I","Series II","Series III"],"Grand Wagoneer":["Series I","Series II","Series III","Obsidian"]},
+"Kia":{"Sportage":["LX","EX","SX","SX Prestige","X-Line","X-Pro"],"Telluride":["LX","S","EX","EX X-Line","SX","SX Prestige","X-Pro"],"Sorento":["LX","S","EX","SX","SX Prestige","X-Line"],"Forte":["LX","LXS","GT-Line","GT"],"K5":["LX","LXS","GT-Line","EX","GT"],"EV6":["Light","Wind","GT-Line","GT"],"EV9":["Light","Wind","GT-Line","GT-Line AWD"],"Niro":["Wind","Wave"],"Carnival":["LX","LX Seat","EX","SX","SX Prestige"]},
+"Lexus":{"RX":["350","350h","450h+","500h"],"NX":["250","350","350h","450h+"],"TX":["350","500h","550h+"],"ES":["250","300h","350"],"IS":["300","350","500"],"GX":["Premium","Premium+","Luxury","Overtrail"],"UX":["250h"],"RZ":["300e","450e"],"LC":["500","500 Convertible","500h"]},
+"Lincoln":{"Corsair":["Standard","Reserve"],"Nautilus":["Standard","Reserve"],"Aviator":["Standard","Reserve","Black Label"],"Navigator":["Standard","Reserve","Black Label"]},
+"Mazda":{"CX-5":["S","S Select","S Preferred","S Carbon","S Premium","S Premium Plus","S Signature"],"CX-50":["S","S Select","S Preferred","S Premium","S Premium Plus","Turbo","Turbo Premium","Turbo Premium Plus"],"CX-90":["S","S Select","S Preferred","S Premium","S Premium Plus","Turbo","Turbo S","Turbo Premium Plus","PHEV"],"CX-30":["S","S Select","S Preferred","S Carbon","S Premium"],"Mazda3":["S","S Select","S Preferred","S Carbon","S Premium","Turbo","Turbo Premium Plus"],"MX-5":["Sport","Club","Grand Touring"]},
+"Mercedes-Benz":{"GLC":["300","300 4MATIC","AMG GLC 43","AMG GLC 63"],"C-Class":["C300","C300 4MATIC","AMG C43","AMG C63"],"GLE":["350","350 4MATIC","450 4MATIC","AMG GLE 53","AMG GLE 63"],"E-Class":["E350","E350 4MATIC","E450 4MATIC","AMG E53","AMG E63"],"GLA":["250","250 4MATIC","AMG GLA 35"],"GLB":["250","250 4MATIC","AMG GLB 35"],"A-Class":["A220","A220 4MATIC","AMG A35"],"S-Class":["S500","S500 4MATIC","S580","S580 4MATIC","AMG S63"],"EQE":["350+","350 4MATIC","500 4MATIC","AMG"],"EQS":["450+","450 4MATIC","580 4MATIC","AMG"],"CLA":["250","250 4MATIC","AMG CLA 35","AMG CLA 45"]},
+"Nissan":{"Rogue":["S","SV","SL","Platinum","Rock Creek"],"Altima":["S","SV","SR","SL","Platinum"],"Pathfinder":["S","SV","SL","Platinum","Rock Creek"],"Kicks":["S","SV","SR"],"Sentra":["S","SV","SR"],"Ariya":["Engage","Venture+","Evolve+","Empower+","Platinum+"],"Murano":["SV","SL","Platinum"],"Frontier":["S","SV","Pro-X","Pro-4X"]},
+"Ram":{"1500":["Tradesman","Big Horn","Laramie","Rebel","Limited","TRX","REV"],"2500":["Tradesman","Big Horn","Laramie","Limited","Power Wagon"],"ProMaster":["1500","2500","3500"]},
+"Subaru":{"Outback":["Base","Premium","Onyx","Limited","Touring","Wilderness"],"Forester":["Base","Premium","Sport","Limited","Touring"],"Crosstrek":["Base","Premium","Sport","Limited"],"Ascent":["Base","Premium","Onyx","Limited","Touring"],"Impreza":["Base","Sport","RS"],"WRX":["Base","Premium","Limited","GT"],"Solterra":["Premium","Limited","Touring"],"Legacy":["Base","Premium","Sport","Limited","Touring"],"BRZ":["Premium","Limited"]},
+"Tesla":{"Model 3":["Standard Range","Long Range","Performance"],"Model Y":["Standard Range","Long Range","Performance"],"Model S":["Base","Plaid"],"Model X":["Base","Plaid"],"Cybertruck":["AWD","Cyberbeast","Foundation"]},
+"Toyota":{"RAV4":["LE","XLE","XLE Premium","Adventure","TRD Off-Road","Limited","SE Hybrid","XLE Hybrid","XSE Hybrid","Prime SE","Prime XSE"],"Camry":["LE","SE","XLE","XSE","TRD"],"Corolla":["L","LE","SE","XLE","XSE","Hybrid LE","Hybrid SE","Hybrid XLE"],"Highlander":["L","LE","XLE","XSE","Limited","Platinum","Hybrid","Grand Highlander"],"Tacoma":["SR","SR5","TRD Sport","TRD Off-Road","Limited","TRD Pro"],"4Runner":["SR5","SR5 Premium","TRD Off-Road","TRD Off-Road Premium","TRD Pro","Limited"],"Tundra":["SR","SR5","Limited","Platinum","1794 Edition","TRD Pro","Capstone"],"bZ4X":["XLE","Limited"],"Crown":["XLE","Limited","Platinum"],"GR86":["Base","Premium"],"Supra":["2.0","3.0","3.0 Premium","A91 Edition"]},
+"Volkswagen":{"Jetta":["S","Sport","SE","SEL"],"Taos":["S","SE","SEL"],"Tiguan":["S","SE","SE R-Line","SEL","SEL R-Line"],"Atlas":["SE","SE with Technology","SEL","SEL Premium","SEL Premium R-Line"],"Atlas Cross Sport":["S","SE","SE with Technology","SEL","SEL Premium R-Line"],"ID.4":["Standard","Pro","Pro S","Pro S Plus"],"ID.Buzz":["Pro S","Pro S Plus","1st Edition"],"Golf GTI":["S","SE","Autobahn"],"Golf R":["Base"]},
+"Volvo":{"XC40":["B4 Core","B4 Plus","B4 Ultimate"],"XC60":["B5 Core","B5 Plus","B5 Ultimate","T8 Polestar"],"XC90":["B5 Core","B5 Plus","B5 Ultimate","T8 Polestar"],"S60":["B5 Core","B5 Plus","B5 Ultimate","T8 Polestar"],"S90":["B5 Plus","B5 Ultimate","T8 Polestar"],"V60":["B5 Plus","B5 Ultimate","T8 Polestar"],"V60 Cross Country":["B5 Plus","B5 Ultimate"],"EX30":["Core","Plus","Ultra"],"EX40":["Plus","Ultra"],"EX90":["Plus","Ultra"],"C40 Recharge":["Core","Plus","Ultimate"]}
+};
+
+(function(){
+  const fMake=document.getElementById('make');
+  const fModel=document.getElementById('model');
+  const fTrim=document.getElementById('trim');
+  const modelList=document.getElementById('modelSuggest');
+  const trimList=document.getElementById('trimSuggest');
+  let activeIndex=-1;
+
+  function highlightMatch(t,q){if(!q)return t;const i=t.toLowerCase().indexOf(q.toLowerCase());if(i===-1)return t;return t.substring(0,i)+'<span class="suggest-match">'+t.substring(i,i+q.length)+'</span>'+t.substring(i+q.length);}
+
+  function showSuggestions(input,listEl,options,query){
+    const filtered=query?options.filter(o=>o.toLowerCase().includes(query.toLowerCase())):options;
+    if(filtered.length===0&&query){listEl.innerHTML='<div class="suggest-empty">No matches — type freely</div>';listEl.classList.add('open');return;}
+    if(filtered.length===0){listEl.classList.remove('open');return;}
+    listEl.innerHTML=filtered.map((o,i)=>'<div class="suggest-item" data-index="'+i+'" data-value="'+o+'">'+highlightMatch(o,query)+'</div>').join('');
+    listEl.classList.add('open');activeIndex=-1;
+    listEl.querySelectorAll('.suggest-item').forEach(item=>{item.addEventListener('mousedown',function(e){e.preventDefault();input.value=this.dataset.value;listEl.classList.remove('open');input.dispatchEvent(new Event('change'));if(input===fModel)fTrim.focus();validateForm();});});
+  }
+
+  function handleKeyboard(e,input,listEl){
+    const items=listEl.querySelectorAll('.suggest-item');if(!items.length)return;
+    if(e.key==='ArrowDown'){e.preventDefault();activeIndex=Math.min(activeIndex+1,items.length-1);items.forEach((it,i)=>it.classList.toggle('active',i===activeIndex));items[activeIndex]?.scrollIntoView({block:'nearest'});}
+    else if(e.key==='ArrowUp'){e.preventDefault();activeIndex=Math.max(activeIndex-1,0);items.forEach((it,i)=>it.classList.toggle('active',i===activeIndex));items[activeIndex]?.scrollIntoView({block:'nearest'});}
+    else if(e.key==='Enter'&&activeIndex>=0){e.preventDefault();input.value=items[activeIndex].dataset.value;listEl.classList.remove('open');input.dispatchEvent(new Event('change'));if(input===fModel)fTrim.focus();validateForm();}
+    else if(e.key==='Escape'){listEl.classList.remove('open');}
+  }
+
+  fMake.addEventListener('change',function(){const make=this.value;fModel.value='';fTrim.value='';fTrim.disabled=true;fTrim.placeholder='Select model first';modelList.classList.remove('open');trimList.classList.remove('open');if(make&&VEHICLE_DATA[make]){fModel.disabled=false;fModel.placeholder='Start typing model';fModel.focus();}else{fModel.disabled=true;fModel.placeholder='Select make first';}validateForm();});
+  fModel.addEventListener('input',function(){const make=fMake.value;if(!make||!VEHICLE_DATA[make])return;showSuggestions(fModel,modelList,Object.keys(VEHICLE_DATA[make]),this.value);});
+  fModel.addEventListener('focus',function(){const make=fMake.value;if(!make||!VEHICLE_DATA[make])return;showSuggestions(fModel,modelList,Object.keys(VEHICLE_DATA[make]),this.value);});
+  fModel.addEventListener('keydown',function(e){handleKeyboard(e,fModel,modelList);});
+  fModel.addEventListener('blur',function(){setTimeout(()=>modelList.classList.remove('open'),150);});
+  fModel.addEventListener('change',function(){const make=fMake.value;const model=this.value;fTrim.value='';trimList.classList.remove('open');if(make&&model&&VEHICLE_DATA[make]&&VEHICLE_DATA[make][model]){fTrim.disabled=false;fTrim.placeholder='Start typing trim';}else if(model){fTrim.disabled=false;fTrim.placeholder='Type trim';}else{fTrim.disabled=true;fTrim.placeholder='Select model first';}validateForm();});
+  fTrim.addEventListener('input',function(){const make=fMake.value;const model=fModel.value;if(!make||!model||!VEHICLE_DATA[make]||!VEHICLE_DATA[make][model])return;showSuggestions(fTrim,trimList,VEHICLE_DATA[make][model],this.value);});
+  fTrim.addEventListener('focus',function(){const make=fMake.value;const model=fModel.value;if(!make||!model||!VEHICLE_DATA[make]||!VEHICLE_DATA[make][model])return;showSuggestions(fTrim,trimList,VEHICLE_DATA[make][model],this.value);});
+  fTrim.addEventListener('keydown',function(e){handleKeyboard(e,fTrim,trimList);});
+  fTrim.addEventListener('blur',function(){setTimeout(()=>trimList.classList.remove('open'),150);});
+
+  // Handle prefill — if model was prefilled, enable fields
+  if(fMake.value&&VEHICLE_DATA[fMake.value]){fModel.disabled=false;fModel.placeholder='Start typing model';}
+  if(fMake.value&&fModel.value){fTrim.disabled=false;fTrim.placeholder='Start typing trim';}
 })();
 
 // ── VALIDATION
