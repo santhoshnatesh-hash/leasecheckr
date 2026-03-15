@@ -7,7 +7,6 @@
   <meta name="description" content="Compare your NJ car lease quote against real local data. Find out instantly if you're getting a fair deal — before you sign.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -218,6 +217,28 @@
     .field input::placeholder { color: var(--ink-5); font-size: 0.84rem; }
     .field input:focus, .field select:focus { border-color: var(--copper); box-shadow: 0 0 0 3px rgba(168,105,46,0.07); }
 
+    /* AUTOSUGGEST */
+    .field-suggest { position: relative; }
+    .suggest-list {
+      position: absolute; top: 100%; left: 0; right: 0; z-index: 50;
+      background: var(--canvas); border: 1px solid var(--border-2); border-top: none;
+      border-radius: 0 0 3px 3px; max-height: 200px; overflow-y: auto;
+      box-shadow: 0 8px 24px rgba(28,25,23,0.08);
+      display: none;
+    }
+    .suggest-list.open { display: block; }
+    .suggest-item {
+      padding: 9px 13px; font-size: 0.84rem; color: var(--ink-2); cursor: pointer;
+      transition: background 0.12s;
+    }
+    .suggest-item:hover, .suggest-item.active {
+      background: rgba(168,105,46,0.06); color: var(--ink);
+    }
+    .suggest-item .suggest-match { color: var(--copper); font-weight: 500; }
+    .suggest-empty {
+      padding: 9px 13px; font-size: 0.78rem; color: var(--ink-4); font-style: italic;
+    }
+
     /* PILL SELECTORS */
     .pill-label { font-family: 'DM Mono', monospace; font-size: 0.57rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 6px; }
     .pill-group { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 9px; }
@@ -254,6 +275,26 @@
     .cta-btn:hover .cta-arrow { transform: translateX(3px); }
     .trust-line { text-align: center; font-family: 'DM Mono', monospace; font-size: 0.54rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-4); margin-top: 9px; }
 
+    /* ── EMAIL GATE ── */
+    .email-gate { display: none; margin-top: 18px; padding: 20px 0 0; border-top: 1px solid var(--border); }
+    .email-gate.visible { display: block; animation: egFadeUp 0.35s var(--ease) both; }
+    .email-gate-title { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 500; color: var(--ink); margin-bottom: 6px; }
+    .email-gate-sub { font-size: 0.78rem; color: var(--ink-3); margin-bottom: 14px; line-height: 1.5; }
+    .email-gate-row { display: flex; gap: 8px; }
+    .email-gate-row input { flex: 1; padding: 11px 14px; border: 1px solid var(--border-2); border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 0.84rem; background: #fff; color: var(--ink); transition: border-color 0.2s; }
+    .email-gate-row input:focus { outline: none; border-color: var(--copper); }
+    .email-gate-btn { padding: 11px 22px; background: var(--ink); color: var(--canvas); border: none; border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.04em; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+    .email-gate-btn:hover { background: var(--ink-2); }
+    .email-gate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .email-gate-error { display: none; font-size: 0.72rem; color: var(--rose); margin-top: 6px; }
+    .email-gate-note { font-family: 'DM Mono', monospace; font-size: 0.52rem; letter-spacing: 0.08em; color: var(--ink-4); margin-top: 10px; text-transform: uppercase; }
+    .email-gate-note a { color: var(--copper); text-decoration: none; border-bottom: 1px solid rgba(168,105,46,0.3); }
+    .email-gate-founder { display: none; margin-top: 12px; padding: 12px 16px; background: var(--sage-pale); border: 1px solid rgba(92,122,101,0.2); border-radius: 3px; }
+    .email-gate-founder.visible { display: block; animation: egFadeUp 0.3s var(--ease) both; }
+    .email-gate-founder-text { font-size: 0.82rem; color: var(--sage); line-height: 1.5; }
+    .email-gate-founder-text strong { color: #3d7a4e; }
+    @keyframes egFadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
     /* ── TEASER PANEL ── */
     .teaser-panel { display: none; opacity: 0; transform: translateX(18px); transition: all 0.45s var(--ease); }
     .teaser-panel.visible { display: block; opacity: 1; transform: translateX(0); }
@@ -264,6 +305,20 @@
     .grade-display { display: flex; align-items: flex-start; gap: 18px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
     .grade-letter { font-family: 'Cormorant Garamond', serif; font-size: 5.5rem; font-weight: 300; line-height: 0.85; display: block; }
     .grade-a { color: #4a8f5a; } .grade-b { color: var(--sage); } .grade-c { color: var(--copper); } .grade-d { color: var(--rose); } .grade-f { color: #8f3a2a; }
+
+    /* PRELIMINARY grade: muted, outlined feel */
+    .grade-preliminary .grade-letter { opacity: 0.65; }
+    .grade-preliminary .grade-prelim-tag { font-family: 'DM Mono', monospace; font-size: 0.5rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-4); margin-top: 4px; }
+
+    /* DIRECTIONAL: no letter, dash indicator */
+    .grade-directional .grade-letter { font-size: 3.5rem; color: var(--ink-4); }
+    .grade-directional .grade-prelim-tag { font-family: 'DM Mono', monospace; font-size: 0.5rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-4); margin-top: 4px; }
+
+    /* Confidence badge colors */
+    .conf-badge { display: inline-flex; padding: 3px 9px; border-radius: 100px; font-family: 'DM Mono', monospace; font-size: 0.52rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; margin-left: 6px; }
+    .conf-high { color: #3d7a4e; background: #e4f0e7; }
+    .conf-medium { color: #a8692e; background: #f6ecdf; }
+    .conf-limited { color: #9e968a; background: #f0ede8; }
 
     .grade-meta { display: flex; flex-direction: column; justify-content: center; gap: 8px; padding-top: 8px; }
     .verdict-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 100px; font-family: 'DM Mono', monospace; font-size: 0.63rem; letter-spacing: 0.1em; text-transform: uppercase; width: fit-content; }
@@ -298,32 +353,6 @@
     .cta-tertiary { text-align: center; font-size: 0.73rem; color: var(--ink-4); line-height: 1.6; padding-top: 2px; }
     .cta-tertiary a { color: var(--copper); text-decoration: none; border-bottom: 1px solid rgba(168,105,46,0.25); padding-bottom: 1px; }
     .cta-tertiary a:hover { border-color: var(--copper); }
-
-    /* ── EMAIL GATE ── */
-    .email-gate { display: none; margin-top: 18px; padding: 20px 0 0; border-top: 1px solid var(--border); animation: fadeUp 0.35s var(--ease) both; }
-    .email-gate.visible { display: block; }
-    .email-gate-title { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 500; color: var(--ink); margin-bottom: 6px; }
-    .email-gate-sub { font-size: 0.78rem; color: var(--ink-3); margin-bottom: 14px; line-height: 1.5; }
-    .email-gate-row { display: flex; gap: 8px; }
-    .email-gate-row input { flex: 1; padding: 11px 14px; border: 1px solid var(--border-2); border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 0.84rem; background: #fff; color: var(--ink); transition: border-color 0.2s; }
-    .email-gate-row input:focus { outline: none; border-color: var(--copper); }
-    .email-gate-btn { padding: 11px 22px; background: var(--ink); color: var(--canvas); border: none; border-radius: 3px; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.04em; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
-    .email-gate-btn:hover { background: var(--ink-2); }
-    .email-gate-error { display: none; font-size: 0.72rem; color: var(--rose); margin-top: 6px; }
-    .email-gate-note { font-family: 'DM Mono', monospace; font-size: 0.52rem; letter-spacing: 0.08em; color: var(--ink-4); margin-top: 10px; text-transform: uppercase; }
-    .email-gate-note a { color: var(--copper); text-decoration: none; border-bottom: 1px solid rgba(168,105,46,0.3); }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* ── METHODOLOGY BLOCK (in teaser) ── */
-    .methodology-block { margin-top: 16px; padding: 14px 16px; background: var(--canvas-2); border-radius: 3px; border: 1px solid var(--border); }
-    .methodology-toggle { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
-    .methodology-toggle-label { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
-    .methodology-toggle-icon { font-size: 0.7rem; color: var(--ink-4); transition: transform 0.2s; }
-    .methodology-content { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 0.74rem; color: var(--ink-3); line-height: 1.7; }
-    .methodology-content.open { display: block; }
-    .methodology-toggle.open .methodology-toggle-icon { transform: rotate(180deg); }
-    .meth-point { display: flex; gap: 8px; margin-bottom: 6px; }
-    .meth-point::before { content: '·'; color: var(--copper); font-weight: 700; flex-shrink: 0; }
 
     /* ═══════════════════════════════════
        BELOW-FOLD SECTIONS
@@ -790,6 +819,15 @@
       .field-row { grid-template-columns: 1fr; }
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    try {
+      window._sbClient = window.supabase.createClient(
+        'https://xqjsvlhdpdfvzixlmdxk.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxanN2bGhkcGRmdnppeGxtZHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzg2ODcsImV4cCI6MjA4ODg1NDY4N30.MT0tEDMLaBDLtZkX9xEVEkaUfPdIA9QsJrWjGDpeWsE'
+      );
+    } catch(e) { window._sbClient = null; }
+  </script>
 </head>
 <body>
 
@@ -827,7 +865,7 @@
 
     <div class="proof-row">
       <div class="proof-item">
-        <span class="proof-value" id="dealsCount">847</span>
+        <span class="proof-value" id="dealsCount">98</span>
         <span class="proof-label">Deals checked</span>
       </div>
       <div class="proof-item">
@@ -835,7 +873,7 @@
         <span class="proof-label">NJ counties</span>
       </div>
       <div class="proof-item">
-        <span class="proof-value" id="foundersCount">153</span>
+        <span class="proof-value" id="foundersCount">1</span>
         <span class="proof-label">Founding members</span>
       </div>
     </div>
@@ -847,7 +885,7 @@
           Submitting your first verified lease document? You qualify as a Founding Member — one of the first 1,000 NJ drivers helping build the benchmark.
           <br><a href="founder.html">See Founding Member benefits →</a>
         </div>
-        <div class="founder-count" id="spotsLeft">847 spots remaining</div>
+        <div class="founder-count" id="spotsLeft">999 spots remaining</div>
       </div>
     </div>
   </div>
@@ -886,15 +924,17 @@
               <option>Toyota</option><option>Volkswagen</option><option>Volvo</option>
             </select>
           </div>
-          <div class="field">
+          <div class="field field-suggest">
             <label class="field-label">Model</label>
-            <input type="text" id="fModel" placeholder="e.g. CR-V">
+            <input type="text" id="fModel" placeholder="Start typing model" autocomplete="off" disabled>
+            <div class="suggest-list" id="modelSuggest"></div>
           </div>
         </div>
         <div class="field-row field-full" style="margin-bottom:12px;">
-          <div class="field">
+          <div class="field field-suggest">
             <label class="field-label">Trim</label>
-            <input type="text" id="fTrim" placeholder="e.g. EX-L AWD">
+            <input type="text" id="fTrim" placeholder="Start typing trim (optional)" autocomplete="off" disabled>
+            <div class="suggest-list" id="trimSuggest"></div>
           </div>
         </div>
 
@@ -998,15 +1038,20 @@
         </button>
         <div class="trust-line">Just your email · NJ leases only · Under 60 seconds</div>
 
-        <!-- EMAIL GATE (appears after CTA click) -->
+        <!-- EMAIL GATE -->
         <div class="email-gate" id="emailGate">
           <div class="email-gate-title">Almost there — where should we send your results?</div>
           <div class="email-gate-sub">Enter your email to see your score. We'll also send a copy to your inbox.</div>
           <div class="email-gate-row">
             <input type="email" id="gateEmail" placeholder="you@email.com">
-            <button class="email-gate-btn" onclick="submitEmailGate()">See Score</button>
+            <button class="email-gate-btn" id="gateBtn" onclick="submitEmailGate()">See Score</button>
           </div>
           <div class="email-gate-error" id="gateError">Please enter a valid email address.</div>
+          <div class="email-gate-founder" id="gateFounder">
+            <div class="email-gate-founder-text">
+              <strong>Welcome back, Founding Member.</strong> Your full report is included — no payment needed.
+            </div>
+          </div>
           <div class="email-gate-note">No spam. Your data stays private. <a href="privacy.html">Privacy policy</a></div>
         </div>
       </div>
@@ -1018,8 +1063,11 @@
           <span class="teaser-vehicle-name" id="tVehicle">Vehicle</span>
         </div>
 
-        <div class="grade-display">
-          <div><span class="grade-letter grade-b" id="tGrade">B+</span></div>
+        <div class="grade-display" id="gradeDisplay">
+          <div id="gradeLetterWrap">
+            <span class="grade-letter grade-b" id="tGrade">B+</span>
+            <div class="grade-prelim-tag" id="tPrelimTag" style="display:none;"></div>
+          </div>
           <div class="grade-meta">
             <div class="verdict-badge fair" id="tBadge">
               <span class="verdict-dot"></span><span id="tVerdict">Fair Deal</span>
@@ -1030,55 +1078,38 @@
 
         <div class="payment-compare">
           <div class="pay-box">
-            <div class="pay-box-label">Your Payment</div>
+            <div class="pay-box-label">Your Effective Monthly</div>
             <div class="pay-box-value" id="tPay">$412</div>
             <div class="pay-box-delta delta-good" id="tDelta">—</div>
           </div>
           <div class="pay-box">
-            <div class="pay-box-label" id="tCountyLbl">County Average</div>
+            <div class="pay-box-label" id="tCountyLbl">Comparable Average</div>
             <div class="pay-box-value" id="tAvg">$438</div>
             <div class="pay-box-delta" style="color:var(--ink-4);" id="tComps">Verified NJ deals</div>
           </div>
         </div>
 
         <div class="confidence-line">
-          <div class="conf-dot"></div>
+          <div class="conf-dot" id="tConfDot"></div>
           <span id="tConfidence">Based on verified NJ lease submissions</span>
+          <span class="conf-badge conf-medium" id="tConfBadge" style="display:none;"></span>
         </div>
 
-        <div class="locked-hint">
+        <div class="locked-hint" id="tLockedHint">
           <span class="locked-icon">🔒</span>
-          <div class="locked-text">
+          <div class="locked-text" id="tLockedText">
             <strong>Your money factor may have been marked up.</strong> The full report shows you exactly by how much — and what it cost over the term.
           </div>
         </div>
 
         <div class="teaser-ctas">
-          <a href="access.html" class="cta-primary">
+          <a href="access.html" class="cta-primary" id="tCtaPrimary">
             <span class="cta-primary-label">Get Full Report</span>
             <span class="cta-primary-price">$19.99 or upload your lease free →</span>
           </a>
           <a href="sample-report.html" target="_blank" class="cta-secondary">View Sample Report →</a>
           <div class="cta-tertiary">
-            Or <a href="founder.html">contribute your lease and join <span id="tFounderCount">—</span> Founding Members</a> — full report free, Premium access permanent.
-          </div>
-        </div>
-
-        <!-- METHODOLOGY (expandable) -->
-        <div class="methodology-block">
-          <div class="methodology-toggle" onclick="toggleMethodology()">
-            <span class="methodology-toggle-label">How this score is built</span>
-            <span class="methodology-toggle-icon">▼</span>
-          </div>
-          <div class="methodology-content" id="methodContent">
-            <div class="meth-point">Compared against recent signed deals from NJ drivers</div>
-            <div class="meth-point">Adjusted for term, mileage, and lease structure</div>
-            <div class="meth-point">Considers monthly payment, due at signing, and available lease details</div>
-            <div class="meth-point">Confidence depends on the number and quality of comparable verified deals</div>
-            <div style="margin-top:10px;font-size:0.68rem;color:var(--ink-4);">
-              <strong style="color:var(--ink-3);">What most affects your score:</strong><br>
-              Your payment vs. comparable local range · Your due-at-signing amount · Whether key lease inputs (money factor, residual) were provided · Similarity and recency of comparable deals
-            </div>
+            Or <a href="founder.html">contribute your lease and join <span id="tFounderCount">1</span> Founding Members</a> — full report included with verified upload.
           </div>
         </div>
       </div>
@@ -1096,14 +1127,14 @@
 
     <div class="mislead-grid">
       <div class="mislead-left reveal">
-        <div class="big-stat">0.0005</div>
-        <div class="big-stat-label">Avg. money factor markup observed in NJ lease submissions</div>
+        <div class="big-stat">$67</div>
+        <div class="big-stat-label">Avg. monthly overpayment observed in NJ submissions</div>
         <p>
           Most shoppers negotiate by asking <strong>"can you get it under $400 a month?"</strong> Dealers are trained to work with that number — by adjusting the term, the mileage, or the drive-off in ways that look like a win but aren't.
         </p>
         <br>
         <p>
-          A 0.0005 money factor markup on a $40,000 vehicle adds <strong>roughly $720 over a 36-month lease</strong> — from a change that took a dealer 30 seconds to apply, and most shoppers never notice.
+          Over a 36-month lease, a $67/month overpayment is <strong>$2,412 left on the table</strong> — often from a money factor markup that took a dealer 30 seconds to apply.
         </p>
       </div>
 
@@ -1321,7 +1352,7 @@
 
     <div class="compare-grid">
       <div class="compare-card free-card reveal">
-        <div class="cc-badge free">Free · Just your email</div>
+        <div class="cc-badge free">Free · No account required</div>
         <div class="cc-title">Instant Score</div>
         <div class="cc-price">Always free</div>
         <div class="cc-items">
@@ -1423,180 +1454,13 @@
 
 
 <script>
-  // ═══════════════════════════════════════════════════
-  // SUPABASE INIT
-  // ═══════════════════════════════════════════════════
-  const SUPABASE_URL = 'https://xqjsvlhdpdfvzixlmdxk.supabase.co';
-  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxanN2bGhkcGRmdnppeGxtZHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzg2ODcsImV4cCI6MjA4ODg1NDY4N30.MT0tEDMLaBDLtZkX9xEVEkaUfPdIA9QsJrWjGDpeWsE';
-  let supabaseClient = null;
-  try {
-    if (window.supabase && window.supabase.createClient) {
-      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-    }
-  } catch(e) { console.warn('Supabase init failed:', e); }
-
-  // ═══════════════════════════════════════════════════
-  // SEED DATA — 98 verified NJ deals (inline fallback)
-  // Fields: mk=make, md=model, tr=trim, pay=payment,
-  //   das=due_at_signing, tm=term, mi=mileage, zip, co=county,
-  //   mf=money_factor, res=residual_pct, msrp, cap=cap_cost,
-  //   eff=effective_monthly (pre-computed)
-  // ═══════════════════════════════════════════════════
-  const SEED_DATA_INLINE = [
-    {mk:"Honda",md:"CR-V",tr:"EX-L",pay:412,das:2500,tm:36,mi:10000,zip:"07450",co:"bergen",mf:0.00188,res:57,msrp:37200,cap:36450,eff:481},
-    {mk:"Honda",md:"CR-V",tr:"EX",pay:389,das:2000,tm:36,mi:10000,zip:"07450",co:"bergen",mf:0.00175,res:58,msrp:35600,cap:34800,eff:445},
-    {mk:"Honda",md:"CR-V",tr:"Sport",pay:378,das:1800,tm:36,mi:10000,zip:"07040",co:"essex",mf:0.00189,res:57,msrp:34500,cap:33900,eff:428},
-    {mk:"Honda",md:"Civic",tr:"Sport",pay:312,das:1500,tm:36,mi:12000,zip:"07030",co:"hudson",mf:0.00165,res:61,msrp:28400,cap:27800,eff:354},
-    {mk:"Honda",md:"Civic",tr:"EX",pay:298,das:2000,tm:36,mi:10000,zip:"07078",co:"essex",mf:0.00172,res:62,msrp:27600,cap:26900,eff:354},
-    {mk:"Honda",md:"Accord",tr:"Sport",pay:358,das:2200,tm:36,mi:12000,zip:"07960",co:"morris",mf:0.00195,res:55,msrp:32500,cap:31800,eff:419},
-    {mk:"Honda",md:"Accord",tr:"EX-L",pay:385,das:2500,tm:36,mi:10000,zip:"08540",co:"mercer",mf:0.00189,res:54,msrp:34200,cap:33500,eff:454},
-    {mk:"Honda",md:"HR-V",tr:"EX-L",pay:325,das:1800,tm:36,mi:10000,zip:"07601",co:"bergen",mf:0.00195,res:59,msrp:28900,cap:28200,eff:375},
-    {mk:"Toyota",md:"RAV4",tr:"XLE",pay:405,das:2500,tm:36,mi:10000,zip:"07450",co:"bergen",mf:0.00180,res:58,msrp:36200,cap:35500,eff:474},
-    {mk:"Toyota",md:"RAV4",tr:"XLE Premium",pay:425,das:2800,tm:36,mi:10000,zip:"07042",co:"essex",mf:0.00185,res:57,msrp:37800,cap:37000,eff:503},
-    {mk:"Toyota",md:"RAV4",tr:"LE",pay:375,das:2000,tm:36,mi:10000,zip:"07030",co:"hudson",mf:0.00170,res:59,msrp:33500,cap:32800,eff:431},
-    {mk:"Toyota",md:"Camry",tr:"SE",pay:345,das:2000,tm:36,mi:12000,zip:"08901",co:"middlesex",mf:0.00175,res:56,msrp:31200,cap:30500,eff:401},
-    {mk:"Toyota",md:"Camry",tr:"XSE",pay:378,das:2500,tm:36,mi:10000,zip:"07960",co:"morris",mf:0.00180,res:55,msrp:33800,cap:33100,eff:447},
-    {mk:"Toyota",md:"Corolla",tr:"SE",pay:275,das:1500,tm:36,mi:12000,zip:"07304",co:"hudson",mf:0.00160,res:63,msrp:24500,cap:24000,eff:317},
-    {mk:"Toyota",md:"Highlander",tr:"XLE",pay:485,das:3000,tm:36,mi:10000,zip:"07470",co:"passaic",mf:0.00195,res:53,msrp:43500,cap:42800,eff:568},
-    {mk:"Toyota",md:"Highlander",tr:"LE",pay:445,das:2500,tm:36,mi:10000,zip:"07450",co:"bergen",mf:0.00185,res:55,msrp:40200,cap:39500,eff:514},
-    {mk:"BMW",md:"X3",tr:"xDrive30i",pay:589,das:3500,tm:36,mi:10000,zip:"07450",co:"bergen",mf:0.00205,res:52,msrp:50200,cap:48800,eff:686},
-    {mk:"BMW",md:"X3",tr:"sDrive30i",pay:545,das:3000,tm:36,mi:10000,zip:"07042",co:"essex",mf:0.00198,res:53,msrp:47800,cap:46500,eff:628},
-    {mk:"BMW",md:"3 Series",tr:"330i xDrive",pay:525,das:3000,tm:36,mi:10000,zip:"07078",co:"essex",mf:0.00210,res:51,msrp:48500,cap:47200,eff:608},
-    {mk:"BMW",md:"3 Series",tr:"330i",pay:498,das:2500,tm:36,mi:10000,zip:"07960",co:"morris",mf:0.00195,res:52,msrp:45800,cap:44500,eff:567},
-    {mk:"BMW",md:"X1",tr:"xDrive28i",pay:445,das:2500,tm:36,mi:10000,zip:"07601",co:"bergen",mf:0.00198,res:54,msrp:42200,cap:41000,eff:514},
-    {mk:"BMW",md:"iX",tr:"xDrive50",pay:1020,das:5000,tm:36,mi:10000,zip:"07078",co:"essex",mf:0.00185,res:48,msrp:87100,cap:85000,eff:1159},
-    {mk:"BMW",md:"iX",tr:"xDrive40",pay:825,das:4000,tm:36,mi:10000,zip:"07450",co:"bergen",mf:0.00195,res:50,msrp:73500,cap:71500,eff:936},
-    {mk:"BMW",md:"iX",tr:"xDrive40",pay:661,das:3500,tm:36,mi:10000,zip:"07960",co:"morris",mf:0.00180,res:51,msrp:73500,cap:69000,eff:758},
-    {mk:"Mercedes-Benz",md:"GLC",tr:"300 4MATIC",pay:565,das:3500,tm:36,mi:10000,zip:"07450",co:"bergen",mf:0.00210,res:51,msrp:49800,cap:48500,eff:662},
-    {mk:"Mercedes-Benz",md:"GLC",tr:"300",pay:535,das:3000,tm:36,mi:10000,zip:"07030",co:"hudson",mf:0.00200,res:52,msrp:47500,cap:46200,eff:618},
-    {mk:"Mercedes-Benz",md:"C-Class",tr:"C300 4MATIC",pay:545,das:3200,tm:36,mi:10000,zip:"07078",co:"essex",mf:0.00215,res:50,msrp:48200,cap:47000,eff:634},
-    {mk:"Mercedes-Benz",md:"GLE",tr:"350 4MATIC",pay:725,das:4000,tm:36,mi:10000,zip:"07960",co:"morris",mf:0.00210,res:49,msrp:64800,cap:63200,eff:836},
-    {mk:"Audi",md:"Q5",tr:"Premium Plus",pay:575,das:2800,tm:36,mi:10000,zip:"07078",co:"essex",mf:0.00198,res:52,msrp:51400,cap:50000,eff:653},
-    {mk:"Audi",md:"Q8 e-tron",tr:"Premium",pay:725,das:3500,tm:36,mi:10000,zip:"07042",co:"essex",mf:0.00175,res:48,msrp:74400,cap:71000,eff:822},
-    {mk:"Audi",md:"A4",tr:"Premium Plus",pay:495,das:2500,tm:36,mi:10000,zip:"07450",co:"bergen",mf:0.00195,res:53,msrp:46200,cap:44800,eff:564},
-    {mk:"Audi",md:"Q3",tr:"Premium",pay:425,das:2200,tm:36,mi:10000,zip:"07960",co:"morris",mf:0.00205,res:55,msrp:39800,cap:38500,eff:486},
-    {mk:"Lexus",md:"RX",tr:"350",pay:545,das:3000,tm:36,mi:10000,zip:"07450",co:"bergen",mf:0.00185,res:54,msrp:52800,cap:51500,eff:628},
-    {mk:"Lexus",md:"NX",tr:"350h",pay:475,das:2500,tm:36,mi:10000,zip:"07960",co:"morris",mf:0.00178,res:56,msrp:44200,cap:43000,eff:544},
-    {mk:"Lexus",md:"ES",tr:"350",pay:445,das:2500,tm:36,mi:10000,zip:"07030",co:"hudson",mf:0.00185,res:55,msrp:42500,cap:41200,eff:514},
-    {mk:"Hyundai",md:"Tucson",tr:"SEL",pay:345,das:2000,tm:36,mi:10000,zip:"07601",co:"bergen",mf:0.00195,res:57,msrp:32400,cap:31800,eff:401},
-    {mk:"Hyundai",md:"Tucson",tr:"Limited",pay:378,das:2500,tm:36,mi:10000,zip:"08901",co:"middlesex",mf:0.00200,res:56,msrp:35200,cap:34500,eff:447},
-    {mk:"Hyundai",md:"Palisade",tr:"SEL",pay:465,das:2800,tm:36,mi:10000,zip:"07042",co:"essex",mf:0.00195,res:53,msrp:42100,cap:41200,eff:543},
-    {mk:"Hyundai",md:"Ioniq 5",tr:"SE Long Range",pay:385,das:2000,tm:36,mi:10000,zip:"07304",co:"hudson",mf:0.00165,res:58,msrp:42700,cap:40500,eff:441},
-    {mk:"Hyundai",md:"Elantra",tr:"SEL",pay:265,das:1500,tm:36,mi:12000,zip:"07470",co:"passaic",mf:0.00180,res:62,msrp:24800,cap:24200,eff:307},
-    {mk:"Kia",md:"Sportage",tr:"EX",pay:355,das:2000,tm:36,mi:10000,zip:"07450",co:"bergen",mf:0.00185,res:57,msrp:33400,cap:32700,eff:411},
-    {mk:"Kia",md:"Telluride",tr:"EX",pay:478,das:2800,tm:36,mi:10000,zip:"07078",co:"essex",mf:0.00200,res:52,msrp:41500,cap:40800,eff:556},
-    {mk:"Kia",md:"EV6",tr:"Wind",pay:395,das:2500,tm:36,mi:10000,zip:"07042",co:"essex",mf:0.00170,res:55,msrp:43200,cap:41000,eff:464},
-    {mk:"Kia",md:"Forte",tr:"GT-Line",pay:275,das:1200,tm:36,mi:12000,zip:"08901",co:"middlesex",mf:0.00175,res:63,msrp:24400,cap:23800,eff:308},
-    {mk:"Nissan",md:"Rogue",tr:"SL",pay:385,das:2200,tm:36,mi:10000,zip:"07304",co:"hudson",mf:0.00210,res:55,msrp:36500,cap:35800,eff:446},
-    {mk:"Nissan",md:"Rogue",tr:"SV",pay:355,das:2000,tm:36,mi:10000,zip:"07960",co:"morris",mf:0.00200,res:56,msrp:33800,cap:33100,eff:411},
-    {mk:"Nissan",md:"Altima",tr:"SV",pay:315,das:1800,tm:36,mi:12000,zip:"07470",co:"passaic",mf:0.00195,res:58,msrp:29400,cap:28700,eff:365},
-    {mk:"Nissan",md:"Pathfinder",tr:"SL",pay:475,das:3000,tm:36,mi:10000,zip:"07601",co:"bergen",mf:0.00205,res:51,msrp:42800,cap:41800,eff:558},
-    {mk:"Ford",md:"Explorer",tr:"XLT",pay:445,das:2500,tm:36,mi:10000,zip:"07450",co:"bergen",mf:0.00210,res:52,msrp:41200,cap:40300,eff:514},
-    {mk:"Ford",md:"Escape",tr:"SE",pay:345,das:2000,tm:36,mi:10000,zip:"07042",co:"essex",mf:0.00195,res:57,msrp:32100,cap:31400,eff:401},
-    {mk:"Ford",md:"Bronco Sport",tr:"Big Bend",pay:365,das:2200,tm:36,mi:10000,zip:"08901",co:"middlesex",mf:0.00200,res:56,msrp:33800,cap:33100,eff:426},
-    {mk:"Ford",md:"Mustang Mach-E",tr:"Select",pay:425,das:2500,tm:36,mi:10000,zip:"07030",co:"hudson",mf:0.00175,res:53,msrp:45400,cap:43200,eff:494},
-    {mk:"Chevrolet",md:"Equinox",tr:"RS",pay:325,das:1800,tm:36,mi:10000,zip:"07601",co:"bergen",mf:0.00195,res:58,msrp:31200,cap:30500,eff:375},
-    {mk:"Chevrolet",md:"Equinox EV",tr:"2LT",pay:365,das:2000,tm:36,mi:10000,zip:"07078",co:"essex",mf:0.00165,res:55,msrp:40200,cap:38500,eff:421},
-    {mk:"Chevrolet",md:"Traverse",tr:"LT",pay:425,das:2500,tm:36,mi:10000,zip:"07960",co:"morris",mf:0.00205,res:53,msrp:39800,cap:38900,eff:494},
-    {mk:"Chevrolet",md:"Blazer EV",tr:"RS",pay:445,das:2800,tm:36,mi:10000,zip:"07450",co:"bergen",mf:0.00170,res:52,msrp:51200,cap:48500,eff:523},
-    {mk:"Subaru",md:"Outback",tr:"Premium",pay:378,das:2200,tm:36,mi:10000,zip:"07960",co:"morris",mf:0.00195,res:56,msrp:34800,cap:34000,eff:439},
-    {mk:"Subaru",md:"Forester",tr:"Premium",pay:355,das:2000,tm:36,mi:10000,zip:"07601",co:"bergen",mf:0.00185,res:58,msrp:33200,cap:32500,eff:411},
-    {mk:"Subaru",md:"Crosstrek",tr:"Premium",pay:325,das:1800,tm:36,mi:10000,zip:"07042",co:"essex",mf:0.00190,res:59,msrp:31400,cap:30700,eff:375},
-    {mk:"Volkswagen",md:"Tiguan",tr:"SE",pay:365,das:2000,tm:36,mi:10000,zip:"08901",co:"middlesex",mf:0.00195,res:56,msrp:33200,cap:32500,eff:421},
-    {mk:"Volkswagen",md:"ID.4",tr:"Pro S",pay:395,das:2500,tm:36,mi:10000,zip:"07304",co:"hudson",mf:0.00168,res:54,msrp:44500,cap:42000,eff:464},
-    {mk:"Volkswagen",md:"Atlas",tr:"SE",pay:445,das:2500,tm:36,mi:10000,zip:"07450",co:"bergen",mf:0.00205,res:52,msrp:41800,cap:40800,eff:514},
-    {mk:"Jeep",md:"Grand Cherokee",tr:"Limited",pay:498,das:3000,tm:36,mi:10000,zip:"07042",co:"essex",mf:0.00215,res:50,msrp:47800,cap:46500,eff:581},
-    {mk:"Jeep",md:"Wrangler",tr:"Sport S",pay:435,das:2500,tm:36,mi:10000,zip:"07960",co:"morris",mf:0.00220,res:62,msrp:40200,cap:39500,eff:504},
-    {mk:"Jeep",md:"Compass",tr:"Limited",pay:365,das:2000,tm:36,mi:10000,zip:"07470",co:"passaic",mf:0.00205,res:55,msrp:35800,cap:35000,eff:421},
-    {mk:"Mazda",md:"CX-5",tr:"Premium Plus",pay:385,das:2200,tm:36,mi:10000,zip:"07450",co:"bergen",mf:0.00178,res:56,msrp:36200,cap:35500,eff:446},
-    {mk:"Mazda",md:"CX-50",tr:"Turbo Premium",pay:425,das:2500,tm:36,mi:10000,zip:"07078",co:"essex",mf:0.00185,res:55,msrp:41200,cap:40200,eff:494},
-    {mk:"Mazda",md:"CX-90",tr:"Premium Plus",pay:525,das:3000,tm:36,mi:10000,zip:"08901",co:"middlesex",mf:0.00195,res:52,msrp:48200,cap:47000,eff:608},
-    {mk:"Genesis",md:"GV70",tr:"2.5T Advanced",pay:545,das:3000,tm:36,mi:10000,zip:"07450",co:"bergen",mf:0.00188,res:52,msrp:48500,cap:47200,eff:628},
-    {mk:"Genesis",md:"GV80",tr:"2.5T",pay:625,das:3500,tm:36,mi:10000,zip:"07042",co:"essex",mf:0.00195,res:50,msrp:55200,cap:53800,eff:722},
-    {mk:"Acura",md:"MDX",tr:"Technology",pay:498,das:2800,tm:36,mi:10000,zip:"07960",co:"morris",mf:0.00192,res:53,msrp:52400,cap:51000,eff:576},
-    {mk:"Acura",md:"RDX",tr:"Technology",pay:445,das:2500,tm:36,mi:10000,zip:"07304",co:"hudson",mf:0.00188,res:55,msrp:44200,cap:43000,eff:514},
-    {mk:"Acura",md:"Integra",tr:"A-Spec Tech",pay:375,das:2000,tm:36,mi:10000,zip:"07601",co:"bergen",mf:0.00195,res:57,msrp:37800,cap:36800,eff:431},
-    {mk:"Volvo",md:"XC60",tr:"B5 Plus",pay:525,das:3000,tm:36,mi:10000,zip:"07450",co:"bergen",mf:0.00198,res:52,msrp:48200,cap:47000,eff:608},
-    {mk:"Volvo",md:"XC90",tr:"B5 Plus",pay:625,das:3500,tm:36,mi:10000,zip:"07960",co:"morris",mf:0.00205,res:49,msrp:58400,cap:56800,eff:722},
-    {mk:"Volvo",md:"XC40",tr:"B5",pay:445,das:2500,tm:36,mi:10000,zip:"07042",co:"essex",mf:0.00190,res:54,msrp:41200,cap:40000,eff:514},
-    {mk:"Lincoln",md:"Corsair",tr:"Standard",pay:425,das:2500,tm:36,mi:10000,zip:"08901",co:"middlesex",mf:0.00198,res:54,msrp:39800,cap:38800,eff:494},
-    {mk:"Cadillac",md:"XT5",tr:"Premium Luxury",pay:498,das:3000,tm:36,mi:10000,zip:"07450",co:"bergen",mf:0.00205,res:51,msrp:52800,cap:51500,eff:581},
-    {mk:"Cadillac",md:"Lyriq",tr:"Tech",pay:545,das:3000,tm:36,mi:10000,zip:"07078",co:"essex",mf:0.00175,res:52,msrp:58590,cap:56000,eff:628},
-    {mk:"Infiniti",md:"QX60",tr:"Luxe",pay:498,das:2800,tm:36,mi:10000,zip:"07960",co:"morris",mf:0.00210,res:51,msrp:52100,cap:50500,eff:576},
-    {mk:"Infiniti",md:"QX50",tr:"Luxe",pay:425,das:2500,tm:36,mi:10000,zip:"07304",co:"hudson",mf:0.00205,res:53,msrp:44600,cap:43200,eff:494},
-    {mk:"Tesla",md:"Model Y",tr:"Long Range",pay:475,das:2500,tm:36,mi:10000,zip:"07450",co:"bergen",mf:null,res:52,msrp:49990,cap:49990,eff:544},
-    {mk:"Tesla",md:"Model 3",tr:"Long Range",pay:425,das:2000,tm:36,mi:10000,zip:"07042",co:"essex",mf:null,res:54,msrp:42490,cap:42490,eff:481},
-    {mk:"GMC",md:"Terrain",tr:"AT4",pay:378,das:2200,tm:36,mi:10000,zip:"07601",co:"bergen",mf:0.00200,res:55,msrp:36800,cap:36000,eff:439},
-    {mk:"Buick",md:"Envision",tr:"Avenir",pay:395,das:2500,tm:36,mi:10000,zip:"07960",co:"morris",mf:0.00195,res:54,msrp:41200,cap:40200,eff:464},
-    {mk:"Chrysler",md:"Pacifica",tr:"Limited",pay:425,das:2500,tm:36,mi:10000,zip:"07470",co:"passaic",mf:0.00210,res:50,msrp:45800,cap:44500,eff:494},
-    {mk:"Ram",md:"1500",tr:"Big Horn",pay:498,das:3000,tm:36,mi:10000,zip:"08901",co:"middlesex",mf:0.00215,res:52,msrp:47200,cap:46000,eff:581},
-    {mk:"Dodge",md:"Hornet",tr:"GT Plus",pay:345,das:2000,tm:36,mi:10000,zip:"07304",co:"hudson",mf:0.00195,res:56,msrp:34200,cap:33500,eff:401},
-    {mk:"Honda",md:"Pilot",tr:"EX-L",pay:478,das:2800,tm:36,mi:10000,zip:"07960",co:"morris",mf:0.00192,res:53,msrp:43800,cap:42800,eff:556},
-    {mk:"Toyota",md:"Tacoma",tr:"TRD Sport",pay:425,das:2500,tm:36,mi:10000,zip:"07470",co:"passaic",mf:0.00195,res:68,msrp:38500,cap:37800,eff:494},
-    {mk:"Honda",md:"CR-V",tr:"Hybrid Sport",pay:435,das:2800,tm:36,mi:10000,zip:"07042",co:"essex",mf:0.00185,res:56,msrp:38600,cap:37800,eff:513},
-    {mk:"Toyota",md:"RAV4",tr:"Hybrid XLE",pay:435,das:2800,tm:36,mi:10000,zip:"07960",co:"morris",mf:0.00175,res:57,msrp:38500,cap:37500,eff:513},
-    {mk:"BMW",md:"X5",tr:"xDrive40i",pay:725,das:4000,tm:36,mi:10000,zip:"07450",co:"bergen",mf:0.00210,res:50,msrp:67400,cap:65800,eff:836},
-    {mk:"Mercedes-Benz",md:"E-Class",tr:"E350 4MATIC",pay:645,das:3500,tm:36,mi:10000,zip:"07078",co:"essex",mf:0.00215,res:49,msrp:64200,cap:62500,eff:742},
-    {mk:"Lexus",md:"IS",tr:"300 AWD",pay:425,das:2500,tm:36,mi:10000,zip:"07601",co:"bergen",mf:0.00178,res:55,msrp:42500,cap:41200,eff:494},
-    {mk:"Hyundai",md:"Santa Fe",tr:"SEL",pay:398,das:2200,tm:36,mi:10000,zip:"07304",co:"hudson",mf:0.00190,res:55,msrp:36500,cap:35800,eff:459},
-    {mk:"Kia",md:"Sorento",tr:"SX",pay:445,das:2500,tm:36,mi:10000,zip:"07960",co:"morris",mf:0.00200,res:53,msrp:42800,cap:41800,eff:514},
-    {mk:"Subaru",md:"Ascent",tr:"Premium",pay:425,das:2500,tm:36,mi:10000,zip:"07042",co:"essex",mf:0.00195,res:53,msrp:38800,cap:37800,eff:494},
-    {mk:"Volkswagen",md:"Taos",tr:"SE",pay:315,das:1800,tm:36,mi:10000,zip:"07470",co:"passaic",mf:0.00195,res:58,msrp:29800,cap:29100,eff:365}
-  ];
-
-  let benchmarkData = SEED_DATA_INLINE;
-  console.log('LeaseCheckr: Loaded ' + benchmarkData.length + ' seed deals (inline fallback)');
-
-  // Try Supabase for live data
-  (async function loadSupabaseDeals() {
-    if (!supabaseClient) return;
-    try {
-      const { data, error } = await supabaseClient.from('lease_submissions')
-        .select('make,model,trim,monthly_payment,due_at_signing,term,annual_mileage,zip,county,money_factor,residual_pct,msrp,cap_cost')
-        .in('deal_status', ['signed_verified','signed_manual'])
-        .not('monthly_payment', 'is', null);
-      if (!error && data && data.length > 0) {
-        benchmarkData = data.map(d => ({
-          mk: d.make, md: d.model, tr: d.trim,
-          pay: d.monthly_payment, das: d.due_at_signing || 0,
-          tm: d.term || 36, mi: d.annual_mileage || 10000,
-          zip: d.zip, co: d.county,
-          mf: d.money_factor, res: d.residual_pct,
-          msrp: d.msrp, cap: d.cap_cost,
-          eff: d.monthly_payment + (d.due_at_signing || 0) / (d.term || 36)
-        }));
-        console.log('LeaseCheckr: Loaded ' + benchmarkData.length + ' deals from Supabase');
-      }
-    } catch(e) { console.warn('Supabase query failed, using seed data:', e); }
-  })();
-
-  // Load live founder count
-  (async function loadFounderCount() {
-    if (!supabaseClient) return;
-    try {
-      const { count, error } = await supabaseClient.from('lease_submissions')
-        .select('*', { count: 'exact', head: true })
-        .eq('founder_eligible', true)
-        .eq('verification_status', 'verified');
-      if (!error && count !== null) {
-        document.querySelectorAll('#foundersCount, #tFounderCount').forEach(el => el.textContent = count);
-        const spotsEl = document.getElementById('spotsLeft');
-        if (spotsEl) spotsEl.textContent = (1000 - count).toLocaleString() + ' spots remaining';
-      }
-    } catch(e) {}
-  })();
-
-  // ═══════════════════════════════════════════════════
-  // PILL SELECTOR
-  // ═══════════════════════════════════════════════════
+  // ── PILL SELECTOR
   function selectPill(el, groupId) {
     document.querySelectorAll('#' + groupId + ' .pill').forEach(p => p.classList.remove('selected'));
     el.classList.add('selected');
   }
 
-  // ═══════════════════════════════════════════════════
-  // EXPAND TOGGLE
-  // ═══════════════════════════════════════════════════
+  // ── EXPAND
   function toggleExpand() {
     const t = document.getElementById('expandToggle');
     const c = document.getElementById('expandContent');
@@ -1604,152 +1468,1276 @@
     c.classList.toggle('open');
   }
 
-  // ═══════════════════════════════════════════════════
-  // METHODOLOGY TOGGLE
-  // ═══════════════════════════════════════════════════
-  function toggleMethodology() {
-    const t = document.querySelector('.methodology-toggle');
-    const c = document.getElementById('methodContent');
-    t.classList.toggle('open');
-    c.classList.toggle('open');
-  }
+  // ═══════════════════════════════════
+  // VEHICLE DATA — Make → Model → Trim
+  // ═══════════════════════════════════
+  const VEHICLE_DATA = {
+    "Acura": {
+      "Integra": ["Base", "A-Spec", "A-Spec Tech", "Type S"],
+      "MDX": ["Base", "Technology", "A-Spec", "Advance", "Type S", "Type S Advance"],
+      "RDX": ["Base", "Technology", "A-Spec", "Advance", "PMC Edition"],
+      "TLX": ["Base", "Technology", "A-Spec", "Advance", "Type S", "Type S PMC"],
+      "ADX": ["Base", "A-Spec", "A-Spec Advance"]
+    },
+    "Audi": {
+      "A4": ["Premium", "Premium Plus", "Prestige"],
+      "A5": ["Premium", "Premium Plus", "Prestige"],
+      "A6": ["Premium", "Premium Plus", "Prestige"],
+      "Q3": ["Premium", "Premium Plus", "Prestige"],
+      "Q5": ["Premium", "Premium Plus", "Prestige", "SQ5 Premium Plus", "SQ5 Prestige"],
+      "Q7": ["Premium", "Premium Plus", "Prestige", "SQ7 Premium Plus"],
+      "Q8": ["Premium", "Premium Plus", "Prestige", "SQ8 Premium Plus"],
+      "Q8 e-tron": ["Premium", "Premium Plus", "Prestige"],
+      "e-tron GT": ["Premium Plus", "Prestige", "RS"]
+    },
+    "BMW": {
+      "X1": ["sDrive28i", "xDrive28i"],
+      "X3": ["xDrive30i", "M40i", "xDrive30e"],
+      "X5": ["xDrive40i", "xDrive50e", "M50", "M60i"],
+      "X7": ["xDrive40i", "M60i"],
+      "3 Series": ["330i", "330i xDrive", "M340i", "M340i xDrive"],
+      "5 Series": ["530i", "530i xDrive", "540i xDrive", "i5 eDrive40", "i5 M60"],
+      "i4": ["eDrive35", "eDrive40", "xDrive40", "M50"],
+      "i5": ["eDrive40", "xDrive40", "M60"],
+      "iX": ["xDrive40", "xDrive50", "M60"],
+      "i7": ["xDrive60", "M70"]
+    },
+    "Buick": {
+      "Encore GX": ["Preferred", "Essence", "Sport Touring", "Avenir"],
+      "Envista": ["Preferred", "Sport Touring", "Avenir"],
+      "Envision": ["Preferred", "Essence", "Avenir"],
+      "Enclave": ["Essence", "Premium", "Avenir"]
+    },
+    "Cadillac": {
+      "CT4": ["Luxury", "Premium Luxury", "Sport", "V-Series", "CT4-V Blackwing"],
+      "CT5": ["Luxury", "Premium Luxury", "Sport", "V-Series", "CT5-V Blackwing"],
+      "XT4": ["Luxury", "Premium Luxury", "Sport"],
+      "XT5": ["Luxury", "Premium Luxury", "Sport"],
+      "XT6": ["Luxury", "Premium Luxury", "Sport"],
+      "LYRIQ": ["Tech", "Luxury", "Sport"],
+      "Escalade": ["Luxury", "Premium Luxury", "Sport", "V-Series"],
+      "Escalade IQ": ["Luxury", "Sport"],
+      "Optiq": ["Luxury"],
+      "Vistiq": ["Luxury", "Sport"]
+    },
+    "Chevrolet": {
+      "Equinox": ["LT", "RS", "Activ"],
+      "Equinox EV": ["1LT", "2LT", "2RS", "3RS"],
+      "Blazer": ["LT", "RS", "Premier"],
+      "Traverse": ["LT", "RS", "Premier"],
+      "Tahoe": ["LS", "LT", "RST", "Z71", "Premier", "High Country"],
+      "Silverado 1500": ["WT", "Custom", "LT", "RST", "LT Trail Boss", "ZR2", "High Country"],
+      "Trax": ["LS", "1RS", "LT", "2RS"],
+      "Trailblazer": ["LS", "LT", "RS", "Activ"],
+      "Corvette": ["1LT", "2LT", "3LT", "Z06", "E-Ray"]
+    },
+    "Chrysler": {
+      "Pacifica": ["Touring", "Touring L", "Limited", "Pinnacle"],
+      "Pacifica Hybrid": ["Select", "Limited", "Pinnacle"]
+    },
+    "Dodge": {
+      "Hornet": ["GT", "R/T", "R/T Plus"],
+      "Charger": ["SXT", "GT", "R/T", "Daytona R/T", "Daytona Scat Pack"],
+      "Durango": ["SXT", "GT", "Citadel", "R/T", "SRT"]
+    },
+    "Ford": {
+      "Escape": ["Base", "Active", "Platinum"],
+      "Bronco Sport": ["Base", "Big Bend", "Outer Banks", "Badlands", "Heritage"],
+      "Bronco": ["Base", "Big Bend", "Outer Banks", "Badlands", "Wildtrak", "Raptor"],
+      "Edge": ["SE", "SEL", "Titanium", "ST"],
+      "Explorer": ["Base", "Active", "ST", "Platinum"],
+      "Expedition": ["XLT", "Limited", "King Ranch", "Platinum"],
+      "F-150": ["XL", "XLT", "Lariat", "King Ranch", "Platinum", "Limited", "Raptor", "Tremor"],
+      "F-150 Lightning": ["Flash", "XLT", "Lariat", "Platinum"],
+      "Mustang": ["EcoBoost", "GT", "Dark Horse"],
+      "Mustang Mach-E": ["Select", "Premium", "California Route 1", "GT"]
+    },
+    "Genesis": {
+      "G70": ["2.0T Standard", "2.0T Advanced", "3.3T Sport Advanced"],
+      "G80": ["2.5T Standard", "2.5T Advanced", "2.5T Prestige", "Sport"],
+      "G90": ["3.5T Standard", "3.5T Prestige", "Long Wheelbase"],
+      "GV70": ["2.5T Standard", "2.5T Advanced", "2.5T Prestige Sport"],
+      "GV80": ["2.5T Standard", "2.5T Advanced", "2.5T Prestige", "3.5T Sport Prestige"],
+      "Electrified GV70": ["Advanced", "Prestige"],
+      "Electrified G80": ["Advanced", "Prestige"],
+      "GV60": ["Standard", "Advanced", "Performance"]
+    },
+    "GMC": {
+      "Terrain": ["SLE", "SLT", "AT4", "Denali"],
+      "Acadia": ["SLE", "SLT", "AT4", "Denali"],
+      "Yukon": ["SLE", "SLT", "AT4", "Denali", "Denali Ultimate"],
+      "Sierra 1500": ["Pro", "SLE", "Elevation", "SLT", "AT4", "AT4X", "Denali", "Denali Ultimate"],
+      "Sierra EV": ["Elevation", "AT4", "Denali"],
+      "Hummer EV Pickup": ["2X", "3X", "Edition 1"],
+      "Hummer EV SUV": ["2X", "3X", "Edition 1"]
+    },
+    "Honda": {
+      "Civic": ["LX", "Sport", "EX", "Sport Touring", "Si", "Type R"],
+      "Civic Hybrid": ["Sport", "Sport Touring"],
+      "Accord": ["LX", "EX", "Sport", "EX-L", "Sport-L", "Touring"],
+      "Accord Hybrid": ["Sport", "Sport-L", "Touring"],
+      "CR-V": ["LX", "EX", "EX-L", "Sport Touring"],
+      "CR-V Hybrid": ["Sport", "Sport-L", "Sport Touring"],
+      "HR-V": ["LX", "Sport", "EX-L"],
+      "Pilot": ["LX", "EX", "EX-L", "Sport", "Touring", "TrailSport", "Elite", "Black Edition"],
+      "Ridgeline": ["Sport", "RTL", "RTL-E", "TrailSport", "Black Edition"],
+      "Prologue": ["EX", "Touring"]
+    },
+    "Hyundai": {
+      "Elantra": ["SE", "SEL", "N Line", "Limited"],
+      "Elantra Hybrid": ["Blue", "SEL", "Limited"],
+      "Sonata": ["SE", "SEL", "SEL Plus", "N Line", "Limited"],
+      "Tucson": ["SE", "SEL", "N Line", "Limited"],
+      "Tucson Hybrid": ["SEL", "Limited"],
+      "Santa Fe": ["SE", "SEL", "XRT", "Limited", "Calligraphy"],
+      "Palisade": ["SE", "SEL", "XRT", "Limited", "Calligraphy"],
+      "Kona": ["SE", "SEL", "N Line", "Limited"],
+      "Kona Electric": ["SE", "SEL", "Limited"],
+      "IONIQ 5": ["SE Standard Range", "SE Long Range", "SEL", "Limited"],
+      "IONIQ 5 N": ["N"],
+      "IONIQ 6": ["SE Standard Range", "SE Long Range", "SEL", "Limited"]
+    },
+    "Infiniti": {
+      "Q50": ["Pure", "Luxe", "Sensory", "Red Sport 400"],
+      "QX50": ["Pure", "Luxe", "Sensory", "Autograph"],
+      "QX55": ["Luxe", "Essential", "Sensory"],
+      "QX60": ["Pure", "Luxe", "Sensory", "Autograph"],
+      "QX80": ["Luxe", "Sensory", "Autograph"]
+    },
+    "Jeep": {
+      "Compass": ["Sport", "Latitude", "Latitude Lux", "Limited", "Trailhawk"],
+      "Renegade": ["Sport", "Latitude", "Limited", "Trailhawk"],
+      "Cherokee": ["Latitude", "Latitude Lux", "Limited", "Trailhawk"],
+      "Grand Cherokee": ["Laredo", "Limited", "Overland", "Summit", "Trailhawk", "4xe"],
+      "Grand Cherokee L": ["Laredo", "Limited", "Overland", "Summit"],
+      "Wrangler": ["Sport", "Sport S", "Sahara", "Rubicon", "4xe"],
+      "Wagoneer": ["Series I", "Series II", "Series III"],
+      "Wagoneer S": ["Launch Edition", "Series I", "Series II"],
+      "Grand Wagoneer": ["Series I", "Series II", "Series III", "L"]
+    },
+    "Kia": {
+      "Forte": ["FE", "LXS", "GT-Line", "GT"],
+      "K5": ["LXS", "GT-Line", "EX", "GT"],
+      "Sportage": ["LX", "EX", "X-Line", "SX Prestige"],
+      "Sportage Hybrid": ["LX", "EX", "SX Prestige"],
+      "Sorento": ["LX", "S", "EX", "SX", "SX Prestige", "X-Line"],
+      "Telluride": ["LX", "S", "EX", "SX", "SX Prestige", "X-Line", "X-Pro"],
+      "EV6": ["Light Long Range", "Wind", "GT-Line", "GT"],
+      "EV9": ["Light Long Range", "Wind", "Land", "GT-Line"],
+      "Carnival": ["LX", "EX", "SX", "SX Prestige"]
+    },
+    "Lexus": {
+      "ES": ["250", "300h", "350 F Sport"],
+      "IS": ["300", "350 F Sport", "500 F Sport Performance"],
+      "NX": ["250", "350", "350h", "450h+"],
+      "RX": ["350", "350h", "450h+", "500h F Sport Performance"],
+      "TX": ["350", "500h", "550h+ F Sport Performance"],
+      "UX": ["250h"],
+      "GX": ["550 Premium", "550 Luxury", "550 Overtrail", "550 Overtrail+"],
+      "LX": ["600 Standard", "600 Luxury", "600 F Sport"],
+      "RZ": ["300e Premium", "300e Luxury"]
+    },
+    "Lincoln": {
+      "Corsair": ["Standard", "Reserve", "Grand Touring"],
+      "Nautilus": ["Standard", "Reserve"],
+      "Aviator": ["Standard", "Reserve", "Grand Touring"],
+      "Navigator": ["Standard", "Reserve", "Black Label"]
+    },
+    "Mazda": {
+      "Mazda3": ["2.5 S", "2.5 S Select", "2.5 S Preferred", "2.5 S Carbon Edition", "2.5 Turbo", "2.5 Turbo Premium Plus"],
+      "CX-5": ["2.5 S", "2.5 S Select", "2.5 S Preferred", "2.5 S Carbon Edition", "2.5 S Premium", "2.5 Turbo", "2.5 Turbo Signature"],
+      "CX-30": ["2.5 S", "2.5 S Select", "2.5 S Preferred", "2.5 S Carbon Edition", "2.5 Turbo", "2.5 Turbo Premium Plus"],
+      "CX-50": ["2.5 S", "2.5 S Select", "2.5 S Preferred", "2.5 S Preferred Plus", "2.5 S Premium", "2.5 S Premium Plus", "2.5 Turbo", "2.5 Turbo Premium Plus"],
+      "CX-70": ["3.3 Turbo", "3.3 Turbo Premium", "3.3 Turbo Premium Plus", "PHEV Premium", "PHEV Premium Plus"],
+      "CX-90": ["3.3 Turbo", "3.3 Turbo Premium", "3.3 Turbo Premium Plus", "PHEV Premium", "PHEV Premium Plus"],
+      "MX-5 Miata": ["Sport", "Club", "Grand Touring"]
+    },
+    "Mercedes-Benz": {
+      "A-Class": ["A 220", "A 220 4MATIC", "AMG A 35"],
+      "C-Class": ["C 300", "C 300 4MATIC", "AMG C 43", "AMG C 63"],
+      "E-Class": ["E 350", "E 350 4MATIC", "E 450 4MATIC", "AMG E 53"],
+      "S-Class": ["S 500 4MATIC", "S 580 4MATIC", "AMG S 63 E"],
+      "GLA": ["GLA 250", "GLA 250 4MATIC", "AMG GLA 35"],
+      "GLB": ["GLB 250", "GLB 250 4MATIC", "AMG GLB 35"],
+      "GLC": ["GLC 300", "GLC 300 4MATIC", "AMG GLC 43", "AMG GLC 63"],
+      "GLE": ["GLE 350", "GLE 350 4MATIC", "GLE 450 4MATIC", "GLE 580 4MATIC", "AMG GLE 53", "AMG GLE 63"],
+      "GLS": ["GLS 450 4MATIC", "GLS 580 4MATIC", "AMG GLS 63"],
+      "EQB": ["EQB 250+", "EQB 300 4MATIC", "EQB 350 4MATIC"],
+      "EQE": ["EQE 350+", "EQE 350 4MATIC", "AMG EQE 43", "AMG EQE 53"],
+      "EQS": ["EQS 450+", "EQS 450 4MATIC", "EQS 580 4MATIC", "AMG EQS 53"]
+    },
+    "Nissan": {
+      "Sentra": ["S", "SV", "SR"],
+      "Altima": ["S", "SV", "SR", "SL", "Platinum"],
+      "Rogue": ["S", "SV", "SL", "Platinum"],
+      "Murano": ["SV", "SL", "Platinum"],
+      "Pathfinder": ["S", "SV", "SL", "Platinum", "Rock Creek"],
+      "Ariya": ["Engage", "Engage+", "Venture+", "Empower+", "Platinum+"],
+      "Leaf": ["S", "SV Plus"],
+      "Kicks": ["S", "SV"],
+      "Frontier": ["S", "SV", "Pro-4X", "Pro-X"],
+      "Titan": ["S", "SV", "Pro-4X", "SL", "Platinum Reserve"]
+    },
+    "Ram": {
+      "1500": ["Tradesman", "Big Horn", "Laramie", "Rebel", "Limited", "TRX", "Limited Longhorn"],
+      "1500 REV": ["Tradesman", "Big Horn", "Laramie", "Limited"]
+    },
+    "Subaru": {
+      "Impreza": ["Base", "Sport", "RS"],
+      "Crosstrek": ["Base", "Premium", "Sport", "Limited"],
+      "Forester": ["Base", "Premium", "Sport", "Limited", "Touring"],
+      "Outback": ["Base", "Premium", "Onyx Edition", "Limited", "Touring", "Wilderness"],
+      "Legacy": ["Base", "Premium", "Sport", "Limited", "Touring"],
+      "Ascent": ["Base", "Premium", "Onyx Edition", "Limited", "Touring"],
+      "Solterra": ["Premium", "Limited", "Touring"],
+      "WRX": ["Base", "Premium", "Limited", "GT"]
+    },
+    "Tesla": {
+      "Model 3": ["Standard Range", "Long Range", "Long Range AWD", "Performance"],
+      "Model Y": ["Standard Range", "Long Range", "Long Range AWD", "Performance"],
+      "Model S": ["Standard Range", "Long Range", "Plaid"],
+      "Model X": ["Standard Range", "Long Range", "Plaid"],
+      "Cybertruck": ["Rear-Wheel Drive", "All-Wheel Drive", "Cyberbeast"]
+    },
+    "Toyota": {
+      "Corolla": ["LE", "SE", "XLE", "XSE"],
+      "Corolla Hybrid": ["LE", "SE", "XLE"],
+      "Camry": ["LE", "SE", "XLE", "XSE", "TRD"],
+      "RAV4": ["LE", "XLE", "XLE Premium", "Adventure", "TRD Off-Road", "Limited"],
+      "RAV4 Hybrid": ["LE", "SE", "XLE", "XSE", "Limited"],
+      "RAV4 Prime": ["SE", "XSE"],
+      "Venza": ["LE", "XLE", "Limited"],
+      "Highlander": ["LE", "XLE", "XSE", "Limited", "Platinum"],
+      "Highlander Hybrid": ["LE", "XLE", "Limited", "Platinum"],
+      "4Runner": ["SR5", "SR5 Premium", "TRD Sport", "TRD Off-Road", "TRD Off-Road Premium", "Limited", "TRD Pro"],
+      "Tacoma": ["SR", "SR5", "TRD Sport", "TRD Off-Road", "Limited", "TRD Pro", "Trailhunter"],
+      "Tundra": ["SR", "SR5", "Limited", "Platinum", "1794 Edition", "TRD Pro", "Capstone"],
+      "bZ4X": ["XLE", "Limited"],
+      "Crown": ["XLE", "Limited", "Platinum"],
+      "GR86": ["Base", "Premium"],
+      "Supra": ["2.0", "3.0", "3.0 Premium", "A91 Edition"]
+    },
+    "Volkswagen": {
+      "Jetta": ["S", "Sport", "SE", "SEL"],
+      "Taos": ["S", "SE", "SEL"],
+      "Tiguan": ["S", "SE", "SE R-Line", "SEL", "SEL R-Line"],
+      "Atlas": ["SE", "SE with Technology", "SEL", "SEL Premium", "SEL Premium R-Line"],
+      "Atlas Cross Sport": ["S", "SE", "SE with Technology", "SEL", "SEL Premium R-Line"],
+      "ID.4": ["Standard", "Pro", "Pro S", "Pro S Plus"],
+      "ID.Buzz": ["Pro S", "Pro S Plus", "1st Edition"],
+      "Golf GTI": ["S", "SE", "Autobahn"],
+      "Golf R": ["Base"]
+    },
+    "Volvo": {
+      "XC40": ["B4 Core", "B4 Plus", "B4 Ultimate"],
+      "XC60": ["B5 Core", "B5 Plus", "B5 Ultimate", "T8 Polestar"],
+      "XC90": ["B5 Core", "B5 Plus", "B5 Ultimate", "T8 Polestar"],
+      "S60": ["B5 Core", "B5 Plus", "B5 Ultimate", "T8 Polestar"],
+      "S90": ["B5 Plus", "B5 Ultimate", "T8 Polestar"],
+      "V60": ["B5 Plus", "B5 Ultimate", "T8 Polestar"],
+      "V60 Cross Country": ["B5 Plus", "B5 Ultimate"],
+      "EX30": ["Core", "Plus", "Ultra"],
+      "EX40": ["Plus", "Ultra"],
+      "EX90": ["Plus", "Ultra"],
+      "C40 Recharge": ["Core", "Plus", "Ultimate"]
+    }
+  };
 
-  // ═══════════════════════════════════════════════════
-  // ZIP → COUNTY LOOKUP
-  // ═══════════════════════════════════════════════════
-  function getCounty(zip) {
-    if (!zip || zip.length < 3) return { county: 'nj', label: 'NJ' };
-    const p = zip.substring(0, 3);
-    if (['074','075'].includes(p)) return { county:'bergen', label:'Bergen Co.' };
-    if (['070','071'].includes(p)) return { county:'essex', label:'Essex Co.' };
-    if (['073'].includes(p))       return { county:'hudson', label:'Hudson Co.' };
-    if (['079'].includes(p))       return { county:'morris', label:'Morris Co.' };
-    if (['088','089'].includes(p)) return { county:'middlesex', label:'Middlesex Co.' };
-    if (['076','077'].includes(p)) return { county:'passaic', label:'Passaic Co.' };
-    if (['078'].includes(p))       return { county:'union', label:'Union Co.' };
-    if (['087'].includes(p))       return { county:'monmouth', label:'Monmouth Co.' };
-    if (['086','085'].includes(p)) return { county:'somerset', label:'Somerset Co.' };
-    if (['080','081','082'].includes(p)) return { county:'ocean', label:'Ocean Co.' };
-    if (['085'].includes(p))       return { county:'mercer', label:'Mercer Co.' };
-    return { county:'nj', label:'NJ' };
-  }
+  // ═══════════════════════════════════
+  // AUTOSUGGEST ENGINE
+  // ═══════════════════════════════════
+  (function() {
+    const fMake = document.getElementById('fMake');
+    const fModel = document.getElementById('fModel');
+    const fTrim = document.getElementById('fTrim');
+    const modelList = document.getElementById('modelSuggest');
+    const trimList = document.getElementById('trimSuggest');
+    let activeIndex = -1;
 
-  // ═══════════════════════════════════════════════════
-  // 5-TIER COMPARABLE MATCHING ENGINE
-  // ═══════════════════════════════════════════════════
-  function findComparables(data) {
-    const make = (data.make || '').toLowerCase();
-    const model = (data.model || '').toLowerCase();
-    const county = (data.county || '').toLowerCase();
-    const termNum = data.termNum || 36;
+    function highlightMatch(text, query) {
+      if (!query) return text;
+      const idx = text.toLowerCase().indexOf(query.toLowerCase());
+      if (idx === -1) return text;
+      return text.substring(0, idx) + '<span class="suggest-match">' + text.substring(idx, idx + query.length) + '</span>' + text.substring(idx + query.length);
+    }
 
-    // Tier 1: exact make + model + county + term
-    let comps = benchmarkData.filter(d =>
-      d.mk.toLowerCase() === make && d.md.toLowerCase() === model &&
-      d.co === county && d.tm === termNum
-    );
-    if (comps.length >= 2) return { comps, tier: 1, label: make + ' ' + model + ' deals in ' + data.countyLabel };
+    function showSuggestions(input, listEl, options, query) {
+      const filtered = query
+        ? options.filter(o => o.toLowerCase().includes(query.toLowerCase()))
+        : options;
 
-    // Tier 2: same model, any NJ county, same term
-    comps = benchmarkData.filter(d =>
-      d.mk.toLowerCase() === make && d.md.toLowerCase() === model && d.tm === termNum
-    );
-    if (comps.length >= 2) return { comps, tier: 2, label: make + ' ' + model + ' deals across NJ' };
+      if (filtered.length === 0 && query) {
+        listEl.innerHTML = '<div class="suggest-empty">No matches — type freely</div>';
+        listEl.classList.add('open');
+        return;
+      }
+      if (filtered.length === 0) { listEl.classList.remove('open'); return; }
 
-    // Tier 3: same make + county + term
-    comps = benchmarkData.filter(d =>
-      d.mk.toLowerCase() === make && d.co === county && d.tm === termNum
-    );
-    if (comps.length >= 2) return { comps, tier: 3, label: make + ' vehicles in ' + data.countyLabel };
+      listEl.innerHTML = filtered.map((o, i) =>
+        '<div class="suggest-item" data-index="' + i + '" data-value="' + o + '">' + highlightMatch(o, query) + '</div>'
+      ).join('');
+      listEl.classList.add('open');
+      activeIndex = -1;
 
-    // Tier 4: same county, any vehicle, same term
-    comps = benchmarkData.filter(d => d.co === county && d.tm === termNum);
-    if (comps.length >= 3) return { comps, tier: 4, label: 'all vehicles in ' + data.countyLabel };
+      listEl.querySelectorAll('.suggest-item').forEach(item => {
+        item.addEventListener('mousedown', function(e) {
+          e.preventDefault();
+          input.value = this.dataset.value;
+          listEl.classList.remove('open');
+          input.dispatchEvent(new Event('change'));
+          // Auto-focus next field
+          if (input === fModel) fTrim.focus();
+        });
+      });
+    }
 
-    // Tier 5: all NJ deals at this term (last resort)
-    comps = benchmarkData.filter(d => d.tm === termNum);
-    return { comps, tier: 5, label: 'all NJ deals' };
-  }
+    function handleKeyboard(e, input, listEl) {
+      const items = listEl.querySelectorAll('.suggest-item');
+      if (!items.length) return;
 
-  // ═══════════════════════════════════════════════════
-  // COMPUTE SCORE (effective monthly based)
-  // ═══════════════════════════════════════════════════
-  function computeScore(data, comps) {
-    const termNum = data.termNum || 36;
-    const payment = data.payment || 0;
-    const driveoff = data.driveoff || 0;
-    const userEff = payment + driveoff / termNum;
-
-    // Average effective monthly of comparables
-    const compEffs = comps.map(d => d.eff || (d.pay + (d.das || 0) / (d.tm || 36)));
-    const avgEff = compEffs.reduce((a, b) => a + b, 0) / compEffs.length;
-
-    const pct = ((userEff - avgEff) / avgEff) * 100;
-
-    // MF markup adjustment
-    let mfAdjust = 0;
-    if (data.mf && data.msrp) {
-      const compsWithMF = comps.filter(d => d.mf);
-      if (compsWithMF.length > 0) {
-        const avgMF = compsWithMF.reduce((a, d) => a + d.mf, 0) / compsWithMF.length;
-        const mfDiff = data.mf - avgMF;
-        if (mfDiff > 0.0003) mfAdjust = 3; // penalize significant markup
-        else if (mfDiff > 0.0001) mfAdjust = 1;
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        activeIndex = Math.min(activeIndex + 1, items.length - 1);
+        items.forEach((it, i) => it.classList.toggle('active', i === activeIndex));
+        items[activeIndex]?.scrollIntoView({ block: 'nearest' });
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        activeIndex = Math.max(activeIndex - 1, 0);
+        items.forEach((it, i) => it.classList.toggle('active', i === activeIndex));
+        items[activeIndex]?.scrollIntoView({ block: 'nearest' });
+      } else if (e.key === 'Enter' && activeIndex >= 0) {
+        e.preventDefault();
+        input.value = items[activeIndex].dataset.value;
+        listEl.classList.remove('open');
+        input.dispatchEvent(new Event('change'));
+        if (input === fModel) fTrim.focus();
+      } else if (e.key === 'Escape') {
+        listEl.classList.remove('open');
       }
     }
 
-    const finalPct = pct + mfAdjust;
-    return { pct: finalPct, userEff: Math.round(userEff), avgEff: Math.round(avgEff) };
-  }
+    // Make change → enable Model, reset Trim
+    fMake.addEventListener('change', function() {
+      const make = this.value;
+      fModel.value = '';
+      fTrim.value = '';
+      fTrim.disabled = true;
+      fTrim.placeholder = 'Select model first';
+      modelList.classList.remove('open');
+      trimList.classList.remove('open');
 
-  // ═══════════════════════════════════════════════════
-  // GRADE FROM SCORE
-  // ═══════════════════════════════════════════════════
-  function gradeFromPct(pct) {
-    if (pct <= -12) return { g:'A',  cls:'grade-a', v:'Strong Deal',              bc:'good', i:"This is one of the better deals we've seen for comparable vehicles locally. The full report shows exactly where you stand on the underlying numbers." };
-    if (pct <= -5)  return { g:'B+', cls:'grade-b', v:'Good Deal',               bc:'good', i:"You're below the comparable average. There may still be room on the money factor — the full report will show you." };
-    if (pct <= 3)   return { g:'B',  cls:'grade-b', v:'Fair Deal',               bc:'fair', i:"You're right at the comparable average. The full report shows exactly where you stand on the underlying numbers." };
-    if (pct <= 10)  return { g:'C+', cls:'grade-c', v:'Slightly Above Average',  bc:'fair', i:"You're paying a little above comparable deals. The full report shows where the gap is coming from." };
-    if (pct <= 20)  return { g:'C',  cls:'grade-c', v:'Overpaying',              bc:'poor', i:"You're meaningfully above the comparable average. The full report identifies the specific numbers driving this." };
-    return           { g:'D',  cls:'grade-d', v:'Significantly Overpaying', bc:'poor', i:"This deal is well above what other NJ drivers are paying for comparable vehicles. The full report shows you exactly where and by how much." };
-  }
+      if (make && VEHICLE_DATA[make]) {
+        fModel.disabled = false;
+        fModel.placeholder = 'Start typing model';
+        fModel.focus();
+      } else {
+        fModel.disabled = true;
+        fModel.placeholder = 'Select make first';
+      }
+    });
 
-  // ═══════════════════════════════════════════════════
-  // COLLECT FORM DATA
-  // ═══════════════════════════════════════════════════
-  function collectFormData() {
-    const termText = document.querySelector('#termPills .pill.selected')?.textContent || '36 mo';
-    const termNum = parseInt(termText) || 36;
-    const zip = document.getElementById('fZip').value || '';
-    const { county, label: countyLabel } = getCounty(zip);
+    // Model input → show suggestions
+    fModel.addEventListener('input', function() {
+      const make = fMake.value;
+      if (!make || !VEHICLE_DATA[make]) return;
+      const models = Object.keys(VEHICLE_DATA[make]);
+      showSuggestions(fModel, modelList, models, this.value);
+    });
+
+    fModel.addEventListener('focus', function() {
+      const make = fMake.value;
+      if (!make || !VEHICLE_DATA[make]) return;
+      const models = Object.keys(VEHICLE_DATA[make]);
+      showSuggestions(fModel, modelList, models, this.value);
+    });
+
+    fModel.addEventListener('keydown', function(e) { handleKeyboard(e, fModel, modelList); });
+    fModel.addEventListener('blur', function() { setTimeout(() => modelList.classList.remove('open'), 150); });
+
+    // Model change → enable Trim
+    fModel.addEventListener('change', function() {
+      const make = fMake.value;
+      const model = this.value;
+      fTrim.value = '';
+      trimList.classList.remove('open');
+
+      if (make && model && VEHICLE_DATA[make] && VEHICLE_DATA[make][model]) {
+        fTrim.disabled = false;
+        fTrim.placeholder = 'Start typing trim (optional)';
+      } else if (model) {
+        // Free-typed model not in data — still allow trim input
+        fTrim.disabled = false;
+        fTrim.placeholder = 'Type trim (optional)';
+      } else {
+        fTrim.disabled = true;
+        fTrim.placeholder = 'Select model first';
+      }
+    });
+
+    // Trim input → show suggestions
+    fTrim.addEventListener('input', function() {
+      const make = fMake.value;
+      const model = fModel.value;
+      if (!make || !model || !VEHICLE_DATA[make] || !VEHICLE_DATA[make][model]) return;
+      const trims = VEHICLE_DATA[make][model];
+      showSuggestions(fTrim, trimList, trims, this.value);
+    });
+
+    fTrim.addEventListener('focus', function() {
+      const make = fMake.value;
+      const model = fModel.value;
+      if (!make || !model || !VEHICLE_DATA[make] || !VEHICLE_DATA[make][model]) return;
+      const trims = VEHICLE_DATA[make][model];
+      showSuggestions(fTrim, trimList, trims, this.value);
+    });
+
+    fTrim.addEventListener('keydown', function(e) { handleKeyboard(e, fTrim, trimList); });
+    fTrim.addEventListener('blur', function() { setTimeout(() => trimList.classList.remove('open'), 150); });
+  })();
+
+  // ═══════════════════════════════════════════════════════════════════
+  // LEASECHECKR GRADING ENGINE v2.0
+  // Weighted median, tiered matching, phased confidence
+  // ═══════════════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════════
+  // LEASECHECKR GRADING ENGINE v2.0
+  // Production scoring module — weighted median, tiered matching,
+  // phased confidence, segment normalization
+  // ═══════════════════════════════════════════════════════════════════
+  
+  // ─────────────────────────────────────────
+  // SECTION A: VEHICLE SEGMENT + VALUE LOOKUP
+  // Loaded LIVE from Supabase vehicle_reference table
+  // No hardcoded vehicle data — single source of truth in DB
+  // ─────────────────────────────────────────
+
+  let _vehicleRef = {};  // Populated from Supabase on page load
+
+  async function loadVehicleReference() {
+    if (!window._sbClient) return;
+    try {
+      const { data, error } = await window._sbClient
+        .from('vehicle_reference')
+        .select('make, model, segment, body_class, base_msrp, value_band');
+
+      if (!error && data && data.length > 0) {
+        data.forEach(d => {
+          _vehicleRef[d.make + '|' + d.model] = {
+            segment: d.segment,
+            body: d.body_class,
+            defaultMSRP: d.base_msrp,
+            valueBand: d.value_band
+          };
+        });
+        console.log('[LeaseCheckr] Loaded ' + data.length + ' vehicle references from Supabase');
+      }
+    } catch (e) {
+      console.log('[LeaseCheckr] Vehicle reference load failed');
+    }
+  }
+  
+  
+  // ─────────────────────────────────────────
+  // SECTION B: HELPER FUNCTIONS
+  // ─────────────────────────────────────────
+  
+  // Compute Effective Monthly Cost
+  function computeEMC(monthlyPayment, dueAtSigning, termMonths) {
+    const pay = parseFloat(monthlyPayment) || 0;
+    const das = parseFloat(dueAtSigning) || 0;
+    const term = parseInt(termMonths) || 36;
+    if (pay <= 0) return 0;
+    // Subtract first payment from DAS before amortizing
+    const adjustedDriveOff = Math.max(0, das - pay);
+    return pay + (adjustedDriveOff / term);
+  }
+  
+  // Get value band from MSRP
+  function getValueBand(msrp) {
+    if (!msrp || msrp <= 0) return 'unknown';
+    if (msrp < 30000) return 'band_1';
+    if (msrp < 45000) return 'band_2';
+    if (msrp < 65000) return 'band_3';
+    return 'band_4';
+  }
+  
+  // Check if two value bands are adjacent
+  function bandsAdjacent(a, b) {
+    if (a === 'unknown' || b === 'unknown') return true; // treat unknown as compatible
+    const order = ['band_1', 'band_2', 'band_3', 'band_4'];
+    return Math.abs(order.indexOf(a) - order.indexOf(b)) <= 1;
+  }
+  
+  // Get mileage band (broader grouping for early data)
+  function getMileageBand(miles) {
+    const m = parseInt(miles) || 10000;
+    if (m <= 7500) return 'low';
+    if (m <= 12000) return 'standard';
+    return 'high';
+  }
+  
+  // Look up vehicle segment info (from live Supabase data)
+  function getVehicleInfo(make, model) {
+    const key = make + '|' + model;
+    return _vehicleRef[key] || null;
+  }
+  
+  // Get vehicle MSRP for value band (from deal data, or lookup fallback)
+  function resolveValueBand(make, model, msrp, capCost) {
+    if (msrp && msrp > 0) return getValueBand(msrp);
+    if (capCost && capCost > 0) return getValueBand(capCost);
+    const info = getVehicleInfo(make, model);
+    if (info) return getValueBand(info.defaultMSRP);
+    return 'unknown';
+  }
+  
+  // Recency weight based on deal age
+  function recencyWeight(createdAt) {
+    if (!createdAt) return 0.65;
+    const now = new Date();
+    const created = new Date(createdAt);
+    const daysDiff = Math.floor((now - created) / (1000 * 60 * 60 * 24));
+    if (daysDiff <= 90) return 1.00;
+    if (daysDiff <= 180) return 0.85;
+    if (daysDiff <= 365) return 0.65;
+    return 0.40;
+  }
+  
+  // Verification weight
+  function verificationWeight(trustTier) {
+    if (trustTier === 'high') return 1.00;
+    if (trustTier === 'medium') return 0.75;
+    return 0.50;
+  }
+  
+  // Weighted median calculation
+  function weightedMedian(values, weights) {
+    if (!values.length) return null;
+    if (values.length === 1) return values[0];
+  
+    // Create pairs and sort by value
+    const pairs = values.map((v, i) => ({ value: v, weight: weights[i] }))
+      .sort((a, b) => a.value - b.value);
+  
+    const totalWeight = pairs.reduce((s, p) => s + p.weight, 0);
+    if (totalWeight <= 0) return null;
+  
+    let cumulative = 0;
+    for (const pair of pairs) {
+      cumulative += pair.weight;
+      if (cumulative >= totalWeight / 2) return pair.value;
+    }
+    return pairs[pairs.length - 1].value;
+  }
+  
+  // Weighted percentile
+  function weightedPercentile(values, weights, percentile) {
+    if (!values.length) return null;
+    const pairs = values.map((v, i) => ({ value: v, weight: weights[i] }))
+      .sort((a, b) => a.value - b.value);
+    const totalWeight = pairs.reduce((s, p) => s + p.weight, 0);
+    if (totalWeight <= 0) return null;
+  
+    const target = totalWeight * (percentile / 100);
+    let cumulative = 0;
+    for (const pair of pairs) {
+      cumulative += pair.weight;
+      if (cumulative >= target) return pair.value;
+    }
+    return pairs[pairs.length - 1].value;
+  }
+  
+  // NJ ZIP → County mapping
+  function zipToCounty(zip) {
+    if (!zip || zip.length < 5) {
+      // Try 3-digit prefix fallback
+      if (zip && zip.length >= 3) {
+        const p = zip.substring(0, 3);
+        const prefixMap = {
+          '074': 'Bergen', '075': 'Bergen',
+          '070': 'Essex', '071': 'Essex',
+          '073': 'Hudson',
+          '079': 'Morris',
+          '076': 'Passaic',
+          '072': 'Union',
+          '078': 'Somerset',
+          '088': 'Middlesex', '089': 'Middlesex',
+          '087': 'Monmouth',
+          '086': 'Burlington',
+          '085': 'Mercer',
+          '077': 'Ocean',
+          '080': 'Camden',
+          '081': 'Camden',
+          '083': 'Atlantic',
+          '082': 'Gloucester',
+          '084': 'Cape May'
+        };
+        return prefixMap[p] || null;
+      }
+      return null;
+    }
+    // Full 5-digit ZIP lookup for accuracy where 3-digit prefix is ambiguous
+    const z = parseInt(zip);
+    // Ocean County ZIPs
+    if ([8701,8721,8722,8723,8724,8731,8732,8733,8734,8735,8738,8739,8740,8741,8742,8750,8751,8752,8753,8754,8755,8756,8757,8758,8759,8005,8006,8008,8050,8087,8092].includes(z)) return 'Ocean';
+    // Bergen
+    if (z >= 7401 && z <= 7677) return 'Bergen';
+    // Essex
+    if (z >= 7001 && z <= 7114) return 'Essex';
+    // Hudson
+    if (z >= 7002 && z <= 7399) {
+      if ([7002,7029,7030,7032,7047,7057,7086,7087,7093,7094,7096,7097,7302,7303,7304,7305,7306,7307,7310,7311].includes(z)) return 'Hudson';
+    }
+    // Morris
+    if (z >= 7801 && z <= 7999) return 'Morris';
+    // Passaic
+    if ([7424,7501,7502,7503,7504,7505,7506,7507,7508,7509,7510,7511,7512,7513,7514,7522,7524,7538,7543,7544,7601,7652].includes(z)) return 'Passaic';
+    
+    // Fall back to 3-digit prefix
+    const p = zip.substring(0, 3);
+    const prefixMap = {
+      '074': 'Bergen', '075': 'Bergen',
+      '070': 'Essex', '071': 'Essex',
+      '073': 'Hudson',
+      '079': 'Morris',
+      '076': 'Passaic',
+      '072': 'Union',
+      '078': 'Somerset',
+      '088': 'Middlesex', '089': 'Middlesex',
+      '087': 'Monmouth',
+      '086': 'Burlington',
+      '085': 'Mercer',
+      '077': 'Ocean',
+      '080': 'Camden',
+      '081': 'Camden',
+      '083': 'Atlantic',
+      '082': 'Gloucester',
+      '084': 'Cape May'
+    };
+    return prefixMap[p] || null;
+  }
+  
+  // Region grouping for broader geographic matching
+  function countyToRegion(county) {
+    const regions = {
+      'North': ['Bergen', 'Passaic', 'Hudson', 'Essex', 'Morris', 'Sussex', 'Warren'],
+      'Central': ['Middlesex', 'Somerset', 'Union', 'Monmouth', 'Mercer', 'Hunterdon'],
+      'South': ['Burlington', 'Camden', 'Gloucester', 'Atlantic', 'Ocean', 'Cape May', 'Salem', 'Cumberland']
+    };
+    for (const [region, counties] of Object.entries(regions)) {
+      if (counties.includes(county)) return region;
+    }
+    return null;
+  }
+  
+  
+  // ─────────────────────────────────────────
+  // SECTION C: CORE GRADING ENGINE
+  // ─────────────────────────────────────────
+  
+  function gradeLeaseV2(userDeal, benchmarkDeals, totalDealCount) {
+  
+    // ── Parse user deal ──
+    const userEMC = computeEMC(userDeal.payment, userDeal.das, userDeal.term);
+    const userCounty = userDeal.county || zipToCounty(userDeal.zip);
+    const userRegion = countyToRegion(userCounty);
+    const userInfo = getVehicleInfo(userDeal.make, userDeal.model);
+    const userSegment = userInfo ? userInfo.segment : null;
+    const userBody = userInfo ? userInfo.body : null;
+    const userValueBand = resolveValueBand(userDeal.make, userDeal.model, userDeal.msrp, userDeal.capcost);
+    const userMileageBand = getMileageBand(userDeal.mileage);
+    const userTerm = parseInt(userDeal.term) || 36;
+  
+    if (userEMC <= 0) {
+      return {
+        emc: 0, grade: null, verdict: 'Invalid Input', confidence: 'Limited',
+        grade_eligible: false, benchmark_note: 'Monthly payment is required.',
+        diagnostics: ['No valid payment provided'], matched_tiers_used: [],
+        tier_1_2_count: 0, tier_1_4_count: 0, total_count: 0,
+        total_similarity_weight: 0, weighted_median_emc: null,
+        weighted_p25_emc: null, weighted_p75_emc: null, diff_pct: null,
+        tier_weight_share: {}, segment_used: null, value_band_used: null,
+        comparables: [], score_drivers: [], methodology_teaser: '', methodology_full: ''
+      };
+    }
+  
+    // ── Build weighted comparable set ──
+    const comparables = [];
+  
+    for (const deal of benchmarkDeals) {
+      const dealEMC = computeEMC(deal.pay || deal.monthly_payment, deal.das || deal.due_at_signing, deal.trm || deal.term);
+      if (dealEMC <= 0) continue;
+  
+      const dealCounty = deal.co || deal.county;
+      const dealRegion = countyToRegion(dealCounty);
+      const dealTerm = parseInt(deal.trm || deal.term) || 36;
+      const dealMake = deal.mk || deal.make;
+      const dealModel = deal.md || deal.model;
+
+      // Use pre-computed segment/band from DB trigger when available
+      // Fall back to vehicle_reference lookup if DB fields are null (legacy data)
+      let dealSegment = deal.segment || null;
+      let dealBody = null;
+      let dealValueBand = deal.vband || null;
+
+      if (!dealSegment || !dealValueBand) {
+        const dealInfo = getVehicleInfo(dealMake, dealModel);
+        if (dealInfo) {
+          if (!dealSegment) dealSegment = dealInfo.segment;
+          dealBody = dealInfo.body;
+          if (!dealValueBand) dealValueBand = dealInfo.valueBand || resolveValueBand(dealMake, dealModel, deal.msrp, deal.sp || deal.cap_cost);
+        }
+      }
+      if (!dealBody) {
+        const dealInfo = getVehicleInfo(dealMake, dealModel);
+        dealBody = dealInfo ? dealInfo.body : null;
+      }
+
+      const dealMileageBand = getMileageBand(deal.mi || deal.annual_mileage);
+      const dealTrustTier = deal.tt || deal.trust_tier || 'medium';
+  
+      // Term must be within range (allow ±3 months)
+      if (Math.abs(dealTerm - userTerm) > 3) continue;
+  
+      // Mileage band must match (broader grouping)
+      if (dealMileageBand !== userMileageBand) continue;
+  
+      // ── Determine tier ──
+      let tier = null;
+      const sameModel = (dealMake === userDeal.make && dealModel === userDeal.model);
+      const sameCounty = (dealCounty === userCounty);
+      const sameRegion = (dealRegion === userRegion);
+      const sameSegment = (dealSegment && dealSegment === userSegment);
+      const sameValueBand = (dealValueBand === userValueBand);
+      const adjacentValueBand = bandsAdjacent(dealValueBand, userValueBand);
+  
+      if (sameModel && (sameCounty || sameRegion)) {
+        tier = 1;
+      } else if (sameModel) {
+        tier = 2;
+      } else if (sameSegment && sameValueBand && (sameCounty || sameRegion)) {
+        tier = 3;
+      } else if (sameSegment && sameValueBand) {
+        tier = 4;
+      } else if (sameSegment && adjacentValueBand) {
+        tier = 4; // adjacent value band still tier 4, not tier 3
+      } else if (dealBody && dealBody === userBody) {
+        tier = 5;
+      } else {
+        continue; // no match
+      }
+  
+      // ── Compute weight ──
+      const tierWeights = { 1: 1.00, 2: 0.75, 3: 0.50, 4: 0.30, 5: 0.10 };
+      const vWeight = verificationWeight(dealTrustTier);
+      const rWeight = recencyWeight(deal.created_at);
+  
+      // Value band adjustment
+      let vbAdj = 1.00;
+      if (sameValueBand) vbAdj = 1.00;
+      else if (adjacentValueBand) vbAdj = 0.85;
+      else if (dealValueBand === 'unknown' || userValueBand === 'unknown') vbAdj = 0.80;
+  
+      const finalWeight = tierWeights[tier] * vWeight * rWeight * vbAdj;
+  
+      comparables.push({
+        make: dealMake, model: dealModel, trim: deal.tr || deal.trim,
+        payment: deal.pay || deal.monthly_payment,
+        emc: Math.round(dealEMC),
+        county: dealCounty, tier, weight: finalWeight,
+        dealer: deal.dlr || deal.dealer_name
+      });
+    }
+  
+    // ── Compute tier statistics ──
+    const tier12 = comparables.filter(c => c.tier <= 2);
+    const tier14 = comparables.filter(c => c.tier <= 4);
+    const tier5only = comparables.filter(c => c.tier === 5);
+  
+    const tier12Count = tier12.length;
+    const tier14Count = tier14.length;
+    const totalCount = comparables.length;
+    const totalWeight = comparables.reduce((s, c) => s + c.weight, 0);
+  
+    const tierShareMap = {};
+    for (const c of comparables) {
+      tierShareMap[c.tier] = (tierShareMap[c.tier] || 0) + c.weight;
+    }
+    const tier14WeightShare = (totalWeight > 0)
+      ? (Object.entries(tierShareMap).filter(([t]) => parseInt(t) <= 4).reduce((s, [, w]) => s + w, 0) / totalWeight)
+      : 0;
+  
+    // ── Compute benchmark statistics ──
+    const emcValues = comparables.map(c => c.emc);
+    const emcWeights = comparables.map(c => c.weight);
+  
+    const wMedian = weightedMedian(emcValues, emcWeights);
+    const wP25 = weightedPercentile(emcValues, emcWeights, 25);
+    const wP75 = weightedPercentile(emcValues, emcWeights, 75);
+  
+    // ── Phase-aware grade eligibility ──
+    // Phase is determined by total deal count in the system
+    const dealVolume = totalDealCount || benchmarkDeals.length;
+    let phase, minTier14, minWeight;
+  
+    if (dealVolume < 200) {
+      // Phase 0: relaxed thresholds
+      phase = 0;
+      minTier14 = 2;
+      minWeight = 1.0;
+    } else if (dealVolume < 1000) {
+      // Phase 1: moderate thresholds
+      phase = 1;
+      minTier14 = 3;
+      minWeight = 2.0;
+    } else {
+      // Phase 2: full methodology
+      phase = 2;
+      minTier14 = 5;
+      minWeight = 2.75;
+    }
+  
+    const gradeEligible = (
+      (tier12Count >= 3) ||
+      (tier14Count >= minTier14 && totalWeight >= minWeight && tier14WeightShare >= 0.60)
+    );
+  
+    // ── Grade calculation ──
+    let grade = null;
+    let verdict = '';
+    let diffPct = null;
+    let isPreliminary = false;
+  
+    if (wMedian && wMedian > 0) {
+      diffPct = (userEMC - wMedian) / wMedian;
+    }
+  
+    if (gradeEligible && diffPct !== null) {
+      // Determine if this is a preliminary grade (Phase 0 with weak data)
+      isPreliminary = (phase === 0 && tier12Count < 3);
+  
+      if (diffPct <= -0.10)      { grade = 'A';  verdict = 'Excellent Deal'; }
+      else if (diffPct <= -0.04) { grade = 'B+'; verdict = 'Good Deal'; }
+      else if (diffPct <= 0.04)  { grade = 'B';  verdict = 'Fair Deal'; }
+      else if (diffPct <= 0.10)  { grade = 'C+'; verdict = 'Slightly Above Market'; }
+      else if (diffPct <= 0.18)  { grade = 'C';  verdict = 'Overpaying'; }
+      else                       { grade = 'D';  verdict = 'Significantly Overpaying'; }
+  
+      if (isPreliminary) {
+        verdict = 'Preliminary — ' + verdict;
+      }
+    } else if (diffPct !== null) {
+      // Directional read only
+      if (diffPct <= -0.05)      verdict = 'Appears below comparable range';
+      else if (diffPct <= 0.05)  verdict = 'Appears near comparable range';
+      else                       verdict = 'Appears above comparable range';
+    } else {
+      verdict = 'Not enough data to evaluate';
+    }
+  
+    // ── Confidence level ──
+    let confidence;
+    if (tier12Count >= 4 || (totalWeight >= 3.75 && tier14WeightShare >= 0.70)) {
+      confidence = 'High';
+    } else if (gradeEligible) {
+      confidence = 'Medium';
+    } else {
+      confidence = 'Limited';
+    }
+  
+    // Override: Phase 0 preliminary grades cap at Medium
+    if (isPreliminary && confidence === 'High') confidence = 'Medium';
+  
+    // ── Score drivers (green +, red −, neutral ●, missing ○) ──
+    const drivers = [];
+  
+    if (diffPct !== null) {
+      if (diffPct <= -0.10) {
+        drivers.push({ text: 'Effective monthly cost is <strong>well below</strong> comparable deals', impact: 'positive' });
+      } else if (diffPct <= 0) {
+        drivers.push({ text: 'Effective monthly cost is <strong>at or below</strong> the comparable average', impact: 'positive' });
+      } else if (diffPct <= 0.10) {
+        drivers.push({ text: 'Effective monthly cost is <strong>above</strong> comparable deals', impact: 'negative' });
+      } else {
+        drivers.push({ text: 'Effective monthly cost is <strong>significantly above</strong> comparable deals', impact: 'negative' });
+      }
+    }
+  
+    const das = parseFloat(userDeal.das) || 0;
+    if (das > 3000) {
+      drivers.push({ text: 'High due-at-signing (<strong>$' + das.toLocaleString() + '</strong>) raises effective cost by <strong>$' + Math.round((das - (userDeal.payment || 0)) / userTerm) + '/mo</strong>', impact: 'negative' });
+    } else if (das > 0 && das <= 1500) {
+      drivers.push({ text: 'Low due-at-signing keeps effective cost close to payment', impact: 'positive' });
+    } else if (das > 0) {
+      drivers.push({ text: 'Due-at-signing of <strong>$' + das.toLocaleString() + '</strong> factored into effective cost', impact: 'neutral' });
+    } else {
+      drivers.push({ text: 'No drive-off — effective cost equals payment', impact: 'positive' });
+    }
+  
+    const mf = parseFloat(userDeal.mf) || 0;
+    if (mf > 0) {
+      // Estimate buy rate
+      const buyRate = Math.max(mf - 0.0006, 0.00050);
+      const markup = mf - buyRate;
+      if (markup > 0.0004) {
+        drivers.push({ text: 'Money factor appears <strong>marked up</strong> — estimated <strong>$' + Math.round(markup * ((userDeal.msrp || 40000) + ((userDeal.msrp || 40000) * ((userDeal.residual || 55) / 100)))) + '/mo extra</strong>', impact: 'negative' });
+      } else if (markup <= 0.0001) {
+        drivers.push({ text: 'Money factor is <strong>at or near base rate</strong>', impact: 'positive' });
+      } else {
+        drivers.push({ text: 'Money factor <strong>slightly above base rate</strong>', impact: 'neutral' });
+      }
+    } else {
+      drivers.push({ text: 'Money factor <strong>not provided</strong> — limits precision', impact: 'missing' });
+    }
+  
+    if (userDeal.residual && userDeal.residual > 0) {
+      if (userDeal.residual >= 58) {
+        drivers.push({ text: 'Strong residual of <strong>' + userDeal.residual + '%</strong>', impact: 'positive' });
+      } else {
+        drivers.push({ text: 'Residual of <strong>' + userDeal.residual + '%</strong> factored in', impact: 'neutral' });
+      }
+    } else {
+      drivers.push({ text: 'Residual <strong>not provided</strong>', impact: 'missing' });
+    }
+  
+    // ── Benchmark note ──
+    let benchmarkNote = '';
+    const tiersUsed = [...new Set(comparables.map(c => c.tier))].sort();
+    const matchLabels = {
+      1: 'exact model in your county',
+      2: 'same model statewide',
+      3: 'similar segment and value locally',
+      4: 'similar segment and value statewide',
+      5: 'broad vehicle category'
+    };
+  
+    if (tier12Count >= 3) {
+      benchmarkNote = 'Compared against ' + tier12Count + ' verified ' + userDeal.model + ' deals' + (tier12.some(c => c.tier === 1) ? ' in ' + (userCounty || 'NJ') : ' across NJ');
+    } else if (tier14Count >= 2) {
+      const primary = Math.min(...tiersUsed.filter(t => t <= 4));
+      benchmarkNote = 'Compared against ' + tier14Count + ' comparable deals (' + matchLabels[primary] + ')';
+    } else if (totalCount > 0) {
+      benchmarkNote = 'Limited comparable data — directional read based on ' + totalCount + ' broader matches';
+    } else {
+      benchmarkNote = 'No comparable verified deals found for this vehicle yet';
+    }
+  
+    // ── Methodology text (user-facing) ──
+    const methodologyTeaser = generateMethodologyTeaser(tiersUsed, tier12Count, tier14Count, totalCount, confidence, userDeal.model, userCounty);
+    const methodologyFull = generateMethodologyFull(tiersUsed, tier12Count, tier14Count, totalCount, confidence, grade, isPreliminary, userDeal.model, userCounty, userSegment);
+  
+    // ── Diagnostics ──
+    const diagnostics = [];
+    if (!mf) diagnostics.push('Money factor not provided — cannot assess financing markup');
+    if (!userDeal.residual) diagnostics.push('Residual not provided — structural analysis limited');
+    if (!userDeal.msrp && !userDeal.capcost) diagnostics.push('MSRP/cap cost not provided — value band estimated from lookup');
+    if (tier12Count === 0) diagnostics.push('No exact model matches found — using segment/value comparisons');
+    if (isPreliminary) diagnostics.push('Grade is preliminary — based on a small comparison set');
+  
+    // ── Return full output ──
     return {
-      make: document.getElementById('fMake').value || '',
-      model: document.getElementById('fModel').value || '',
-      trim: document.getElementById('fTrim').value || '',
-      payment: parseFloat(document.getElementById('fPayment').value) || 0,
-      driveoff: parseFloat(document.getElementById('fDriveoff').value) || 0,
-      termText, termNum,
-      mileage: document.querySelector('#mileagePills .pill.selected')?.textContent || '10,000',
-      zip, county, countyLabel,
-      msrp: parseFloat(document.getElementById('fMsrp').value) || null,
-      capcost: parseFloat(document.getElementById('fCapcost').value) || null,
-      residual: parseFloat(document.getElementById('fResidual').value) || null,
-      mf: parseFloat(document.getElementById('fMF').value) || null,
-      dealer: document.getElementById('fDealer').value || null,
-      checkType: document.getElementById('fCheckType').value || null
+      emc: Math.round(userEMC),
+      weighted_median_emc: wMedian ? Math.round(wMedian) : null,
+      weighted_p25_emc: wP25 ? Math.round(wP25) : null,
+      weighted_p75_emc: wP75 ? Math.round(wP75) : null,
+      diff_pct: diffPct !== null ? Math.round(diffPct * 1000) / 1000 : null,
+      grade,
+      verdict,
+      confidence,
+      grade_eligible: gradeEligible,
+      is_preliminary: isPreliminary,
+      phase,
+      tier_1_2_count: tier12Count,
+      tier_1_4_count: tier14Count,
+      total_count: totalCount,
+      total_similarity_weight: Math.round(totalWeight * 100) / 100,
+      tier_weight_share: tierShareMap,
+      benchmark_note: benchmarkNote,
+      diagnostics,
+      matched_tiers_used: tiersUsed.map(t => 'tier_' + t),
+      segment_used: userSegment,
+      value_band_used: userValueBand,
+      comparables: comparables.slice(0, 8).map(c => ({
+        vehicle: [c.make, c.model, c.trim].filter(Boolean).join(' '),
+        payment: c.payment, emc: c.emc, county: c.county,
+        tier: c.tier, weight: Math.round(c.weight * 100) / 100,
+        dealer: c.dealer
+      })),
+      score_drivers: drivers,
+      methodology_teaser: methodologyTeaser,
+      methodology_full: methodologyFull,
+      county_label: userCounty ? userCounty + ' Co.' : 'NJ'
+    };
+  }
+  
+  
+  // ─────────────────────────────────────────
+  // SECTION D: METHODOLOGY TEXT GENERATION
+  // ─────────────────────────────────────────
+  
+  function generateMethodologyTeaser(tiersUsed, tier12Count, tier14Count, totalCount, confidence, model, county) {
+    if (totalCount === 0) {
+      return 'We don\'t have enough comparable signed deals for this vehicle yet. Help build the benchmark by contributing your lease.';
+    }
+  
+    let text = '';
+    const hasLocalMatches = tiersUsed.includes(1) || tiersUsed.includes(3);
+  
+    if (tier12Count >= 3 && hasLocalMatches) {
+      text = 'Compared against ' + tier12Count + ' verified ' + (model || '') + ' deals';
+      if (county) text += ' in ' + county + ' County and nearby';
+      text += '.';
+    } else if (tier12Count >= 3) {
+      text = 'Compared against ' + tier12Count + ' verified ' + (model || '') + ' deals across NJ.';
+      if (county) text += ' No ' + (model || 'model') + ' deals in ' + county + ' County yet.';
+    } else if (tier14Count >= 2) {
+      text = 'Compared against ' + tier14Count + ' similar vehicles';
+      text += hasLocalMatches ? ' in your area.' : ' across NJ.';
+      if (tier12Count > 0) text += ' Includes ' + tier12Count + ' exact ' + (model || 'model') + ' match' + (tier12Count > 1 ? 'es' : '') + '.';
+    } else {
+      text = 'Based on ' + totalCount + ' broader vehicle comparisons. More local data would improve precision.';
+    }
+  
+    if (confidence === 'Limited') {
+      text += ' This is a directional read — not a full benchmark grade.';
+    } else if (confidence === 'Medium') {
+      text += ' Confidence improves as more deals are contributed.';
+    }
+  
+    return text;
+  }
+  
+  function generateMethodologyFull(tiersUsed, tier12Count, tier14Count, totalCount, confidence, grade, isPreliminary, model, county, segment) {
+    const lines = [];
+  
+    lines.push('This score is based on your deal\'s effective monthly cost — your payment plus any upfront charges spread across the lease term.');
+  
+    if (tier12Count >= 3) {
+      lines.push('We found ' + tier12Count + ' verified signed deals on the ' + (model || 'same vehicle') + ' that closely match your lease terms. These are the strongest comparisons available.');
+    } else if (tier12Count > 0) {
+      lines.push('We found ' + tier12Count + ' exact ' + (model || 'model') + ' match' + (tier12Count > 1 ? 'es' : '') + ', plus ' + (tier14Count - tier12Count) + ' similar vehicles in the same category and price range.');
+    } else if (tier14Count > 0) {
+      const segmentFriendly = segment ? segment.replace(/_/g, ' ') : 'similar vehicles';
+      lines.push('No exact ' + (model || 'model') + ' matches were found yet. We compared against ' + tier14Count + ' deals on ' + segmentFriendly + ' in a similar price range.');
+    }
+  
+    if (tiersUsed.includes(5) && !tiersUsed.some(t => t <= 4)) {
+      lines.push('Only broad vehicle category matches were available. This limits the precision of the comparison.');
+    }
+  
+    lines.push('Closer matches — same model, same area — count more than broader comparisons. Verified signed deals count more than unverified submissions. Recent deals count more than older ones.');
+  
+    if (confidence === 'High') {
+      lines.push('We have enough strong comparable data to provide a confident grade.');
+    } else if (confidence === 'Medium') {
+      lines.push('We have reasonable comparable data, but more local signed deals would sharpen this score.');
+    } else {
+      lines.push('Comparable data is limited. This is a directional read, not a full benchmark grade. As more NJ drivers contribute deals, scores become more precise.');
+    }
+  
+    if (isPreliminary) {
+      lines.push('This grade is marked as preliminary because it\'s based on a small comparison set. The letter reflects our best current read, but may shift as more data becomes available.');
+    }
+  
+    return lines.join(' ');
+  }
+  
+  
+  // ─────────────────────────────────────────
+  // SECTION E: PRESENTATION HELPERS
+  // ─────────────────────────────────────────
+  
+  // Get grade display properties for the UI
+  function getGradeDisplay(result) {
+    const r = result;
+  
+    // Colors
+    const gradeColors = {
+      'A':  { color: '#3d7a4e', bg: '#e4f0e7', ring: 'ga' },
+      'B+': { color: '#5c7a65', bg: '#eaf0ec', ring: 'gb' },
+      'B':  { color: '#a8692e', bg: '#f6ecdf', ring: 'gb' },
+      'C+': { color: '#a8692e', bg: '#f6ecdf', ring: 'gc' },
+      'C':  { color: '#c24838', bg: '#fae6e3', ring: 'gc' },
+      'D':  { color: '#c24838', bg: '#fae6e3', ring: 'gd' }
+    };
+  
+    const gc = gradeColors[r.grade] || { color: '#9e968a', bg: '#f0ede8', ring: 'gb' };
+  
+    // Confidence badge
+    const confBadge = {
+      'High':    { color: '#3d7a4e', bg: '#e4f0e7' },
+      'Medium':  { color: '#a8692e', bg: '#f6ecdf' },
+      'Limited': { color: '#9e968a', bg: '#f0ede8' }
+    }[r.confidence] || { color: '#9e968a', bg: '#f0ede8' };
+  
+    // Score driver icons
+    const driverIcons = {
+      positive: '<span style="color:#3d7a4e;font-weight:700;font-size:1rem;flex-shrink:0;width:18px;text-align:center;">+</span>',
+      negative: '<span style="color:#c24838;font-weight:700;font-size:1rem;flex-shrink:0;width:18px;text-align:center;">−</span>',
+      neutral:  '<span style="color:#a8692e;font-size:0.85rem;flex-shrink:0;width:18px;text-align:center;">●</span>',
+      missing:  '<span style="color:#9e968a;font-size:0.85rem;flex-shrink:0;width:18px;text-align:center;">○</span>'
+    };
+  
+    return {
+      // Grade display
+      gradeText: r.grade || '—',
+      gradeColor: gc.color,
+      gradeBg: gc.bg,
+      gradeRingClass: gc.ring,
+      isPreliminary: r.is_preliminary,
+      showGrade: r.grade !== null,
+  
+      // Verdict
+      verdict: r.verdict,
+  
+      // Confidence
+      confidence: r.confidence,
+      confColor: confBadge.color,
+      confBg: confBadge.bg,
+  
+      // EMC comparison
+      userEMC: r.emc,
+      benchmarkEMC: r.weighted_median_emc,
+      diffPct: r.diff_pct,
+      countyLabel: r.county_label,
+  
+      // Comparable summary
+      benchmarkNote: r.benchmark_note,
+      totalCount: r.total_count,
+      tier12Count: r.tier_1_2_count,
+  
+      // Score drivers with icons
+      driversHTML: r.score_drivers.map(d =>
+        '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;">'
+        + driverIcons[d.impact]
+        + '<span>' + d.text + '</span></div>'
+      ).join(''),
+  
+      // Methodology
+      methodologyTeaser: r.methodology_teaser,
+      methodologyFull: r.methodology_full,
+  
+      // Top comparables for display
+      comparables: r.comparables,
+  
+      // Diagnostics
+      diagnostics: r.diagnostics
+    };
+  }
+  
+  
+  // ─────────────────────────────────────────
+  // SECTION F: EXPORTS (for use in HTML pages)
+  // ─────────────────────────────────────────
+  
+  // Make available globally for inline script use
+  if (typeof window !== 'undefined') {
+    window.LeaseCheckrEngine = {
+      gradeLeaseV2,
+      computeEMC,
+      getVehicleInfo,
+      getGradeDisplay,
+      resolveValueBand,
+      getValueBand,
+      getMileageBand,
+      zipToCounty,
+      countyToRegion,
+      _vehicleRef
     };
   }
 
+  // ═══════════════════════════════════════════════════════════════════
+  // BENCHMARK DATA LOADER — Supabase first, seed fallback
+  // ═══════════════════════════════════════════════════════════════════
+  let _benchmarkDeals = [];
+  let _totalDealCount = 0;
+
+  async function loadBenchmarkData() {
+    // Load vehicle reference first
+    await loadVehicleReference();
+
+    // Try Supabase — include pre-computed segment and value_band from DB trigger
+    if (window._sbClient) {
+      try {
+        const { data, error, count } = await window._sbClient
+          .from('lease_submissions')
+          .select('make, model, trim, monthly_payment, due_at_signing, term, annual_mileage, county, zip, money_factor, residual_pct, msrp, selling_price, trust_tier, dealer_name, created_at, deal_status, vehicle_segment, value_band', { count: 'exact' })
+          .in('deal_status', ['signed_verified', 'signed_manual'])
+          .not('monthly_payment', 'is', null);
+
+        if (!error && data && data.length > 0) {
+          _benchmarkDeals = data.map(d => ({
+            mk: d.make, md: d.model, tr: d.trim,
+            pay: d.monthly_payment, das: d.due_at_signing || 0,
+            trm: d.term || 36, mi: d.annual_mileage || 10000,
+            co: d.county, mf: d.money_factor, msrp: d.msrp,
+            sp: d.selling_price, tt: d.trust_tier || 'medium',
+            dlr: d.dealer_name, created_at: d.created_at,
+            // Pre-computed from DB trigger — no client-side recomputation needed
+            segment: d.vehicle_segment,
+            vband: d.value_band
+          }));
+          _totalDealCount = count || data.length;
+          console.log('[LeaseCheckr] Loaded ' + _benchmarkDeals.length + ' benchmark deals from Supabase');
+          return;
+        }
+      } catch (e) {
+        console.log('[LeaseCheckr] Supabase load failed');
+      }
+    }
+
+    // Fallback: load all deals if no signed/manual filter worked
+    if (window._sbClient) {
+      try {
+        const { data, error, count } = await window._sbClient
+          .from('lease_submissions')
+          .select('make, model, trim, monthly_payment, due_at_signing, term, annual_mileage, county, zip, money_factor, residual_pct, msrp, selling_price, trust_tier, dealer_name, created_at, vehicle_segment, value_band', { count: 'exact' })
+          .not('monthly_payment', 'is', null);
+
+        if (!error && data && data.length > 0) {
+          _benchmarkDeals = data.map(d => ({
+            mk: d.make, md: d.model, tr: d.trim,
+            pay: d.monthly_payment, das: d.due_at_signing || 0,
+            trm: d.term || 36, mi: d.annual_mileage || 10000,
+            co: d.county, mf: d.money_factor, msrp: d.msrp,
+            sp: d.selling_price, tt: d.trust_tier || 'medium',
+            dlr: d.dealer_name, created_at: d.created_at,
+            segment: d.vehicle_segment,
+            vband: d.value_band
+          }));
+          _totalDealCount = count || data.length;
+          console.log('[LeaseCheckr] Loaded ' + _benchmarkDeals.length + ' deals (all) from Supabase');
+          return;
+        }
+      } catch (e) {}
+    }
+
+    console.log('[LeaseCheckr] No benchmark data available');
+    _benchmarkDeals = [];
+    _totalDealCount = 0;
+  }
+
+  // Load benchmark data on page load
+  loadBenchmarkData();
+
+
+  // ═══════════════════════════════════════════════════════════════════
+  // showTeaser() — NEW ENGINE
+  // ═══════════════════════════════════════════════════════════════════
+  let _lastGradeResult = null;  // Store for Supabase save
+
   // ═══════════════════════════════════════════════════
-  // HANDLE SHOW TEASER → EMAIL GATE FLOW
+  // EMAIL GATE — validates form, shows email capture,
+  // checks founder status, then calls showTeaser()
   // ═══════════════════════════════════════════════════
-  let pendingFormData = null;
+  let _userEmail = null;
+  let _isFounder = false;
 
   function handleShowTeaser() {
-    // Validate required fields
-    const payment = document.getElementById('fPayment').value;
+    // Validate required fields first
+    const pay = parseFloat(document.getElementById('fPayment').value);
     const make = document.getElementById('fMake').value;
-    if (!payment || parseFloat(payment) <= 0) {
+    if (!pay || pay <= 0) {
       document.getElementById('fPayment').style.borderColor = 'var(--rose)';
       document.getElementById('fPayment').focus();
       return;
@@ -1759,23 +2747,22 @@
       document.getElementById('fMake').focus();
       return;
     }
-    // Reset border colors
     document.getElementById('fPayment').style.borderColor = '';
     document.getElementById('fMake').style.borderColor = '';
 
-    pendingFormData = collectFormData();
     // Show email gate
     const gate = document.getElementById('emailGate');
     gate.classList.add('visible');
     document.getElementById('gateEmail').focus();
   }
 
-  function submitEmailGate() {
+  async function submitEmailGate() {
     const emailInput = document.getElementById('gateEmail');
     const email = emailInput.value.trim();
     const errorEl = document.getElementById('gateError');
+    const btn = document.getElementById('gateBtn');
 
-    // Basic email validation
+    // Validate email
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       errorEl.style.display = 'block';
       emailInput.style.borderColor = 'var(--rose)';
@@ -1783,17 +2770,111 @@
     }
     errorEl.style.display = 'none';
     emailInput.style.borderColor = 'var(--border-2)';
+    _userEmail = email;
 
-    // Store email in sessionStorage for intake-upload pre-fill
+    // Store for intake-upload pre-fill
     try { sessionStorage.setItem('lc_email', email); } catch(e) {}
 
-    // Run scoring, save to Supabase with full metadata, then show
-    const scored = runScoring(pendingFormData);
-    saveTeaserToSupabase(pendingFormData, email, scored);
+    // Disable button while checking
+    btn.disabled = true;
+    btn.textContent = 'Checking…';
 
-    // Hide email gate and show teaser
-    document.getElementById('emailGate').classList.remove('visible');
-    showTeaser(pendingFormData, scored);
+    // Check if this email is a founder
+    _isFounder = false;
+    if (window._sbClient) {
+      try {
+        const { data, error } = await window._sbClient
+          .from('lease_submissions')
+          .select('id, founder_eligible, verification_status')
+          .eq('email', email)
+          .eq('founder_eligible', true)
+          .eq('verification_status', 'verified')
+          .limit(1);
+        if (!error && data && data.length > 0) {
+          _isFounder = true;
+        }
+      } catch(e) { console.warn('Founder check failed:', e); }
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'See Score';
+
+    // If founder, show the welcome message briefly
+    if (_isFounder) {
+      document.getElementById('gateFounder').classList.add('visible');
+      // Wait a beat so they see the message, then show score
+      setTimeout(() => {
+        document.getElementById('emailGate').classList.remove('visible');
+        document.getElementById('gateFounder').classList.remove('visible');
+        showTeaser();
+        // Override CTA to skip payment — go straight to email report
+        overrideCTAForFounder();
+      }, 1500);
+    } else {
+      // Not a founder — hide gate, show score with normal pricing CTAs
+      document.getElementById('emailGate').classList.remove('visible');
+      showTeaser();
+    }
+
+    // Save teaser to Supabase
+    saveTeaserToSupabase(email);
+  }
+
+  function overrideCTAForFounder() {
+    const ctaLink = document.getElementById('tCtaPrimary');
+    if (!ctaLink) return;
+    // Change CTA to "Email My Report" instead of pricing
+    ctaLink.innerHTML = '<span class="cta-primary-label">Email My Full Report</span>' +
+      '<span class="cta-primary-price">Founding Member · Free →</span>';
+    // Keep the existing href with params but add founder flag
+    const url = new URL(ctaLink.href, window.location.origin);
+    url.searchParams.set('founder', '1');
+    url.searchParams.set('email', _userEmail);
+    ctaLink.href = url.toString();
+
+    // Also update the tertiary CTA
+    const tertiary = document.querySelector('.cta-tertiary');
+    if (tertiary) {
+      tertiary.innerHTML = '<strong style="color:var(--sage);">You\'re a Founding Member.</strong> Your full report will be emailed to ' + _userEmail;
+    }
+  }
+
+  async function saveTeaserToSupabase(email) {
+    if (!window._sbClient) return;
+    try {
+      const make = document.getElementById('fMake').value || '';
+      const model = document.getElementById('fModel').value || '';
+      const trim = document.getElementById('fTrim').value || '';
+      const pay = parseFloat(document.getElementById('fPayment').value) || 0;
+      const das = parseFloat(document.getElementById('fDriveoff')?.value) || 0;
+      const zip = document.getElementById('fZip').value || '';
+      const termText = document.querySelector('#termPills .pill.selected')?.textContent || '36 mo';
+      const term = parseInt(termText) || 36;
+      const mileage = document.querySelector('#mileagePills .pill.selected')?.textContent || '10,000';
+
+      const { error } = await window._sbClient.from('lease_submissions').insert([{
+        email,
+        make: make || null, model: model || null, trim: trim || null,
+        monthly_payment: pay || null, due_at_signing: das || null,
+        term: term, annual_mileage: mileage || null,
+        zip: zip || null, county: zipToCounty(zip) || null,
+        msrp: parseFloat(document.getElementById('fMsrp')?.value) || null,
+        cap_cost: parseFloat(document.getElementById('fCapcost')?.value) || null,
+        residual_pct: parseFloat(document.getElementById('fResidual')?.value) || null,
+        money_factor: parseFloat(document.getElementById('fMF')?.value) || null,
+        dealer_name: document.getElementById('fDealer')?.value || null,
+        check_type: document.getElementById('fCheckType')?.value || null,
+        submission_type: 'teaser',
+        deal_status: 'quote_check',
+        founder_eligible: false,
+        verification_status: 'na',
+        trust_tier: 'low',
+        report_entitlement: _isFounder ? 'founder_included' : 'none',
+        grade: _lastGradeResult?.grade || null,
+        effective_monthly: _lastGradeResult?.emc || null
+      }]);
+      if (error) console.error('Supabase teaser insert error:', error);
+    } catch(err) { console.error('Supabase save failed:', err); }
   }
 
   // Enter key on email field
@@ -1802,130 +2883,182 @@
     if (g) g.addEventListener('keydown', function(e) { if (e.key === 'Enter') submitEmailGate(); });
   });
 
-  // ═══════════════════════════════════════════════════
-  // RUN SCORING (returns all metadata)
-  // ═══════════════════════════════════════════════════
-  function runScoring(data) {
-    const { comps, tier, label } = findComparables(data);
-    const { pct, userEff, avgEff } = computeScore(data, comps);
-    const { g, cls, v, bc, i } = gradeFromPct(pct);
+  function showTeaser() {
+    const make = document.getElementById('fMake').value || '';
+    const model = document.getElementById('fModel').value || '';
+    const trim = document.getElementById('fTrim').value || '';
+    const pay = parseFloat(document.getElementById('fPayment').value) || 0;
+    const das = parseFloat(document.getElementById('fDriveoff')?.value) || 0;
+    const zip = document.getElementById('fZip').value || '';
+    const termText = document.querySelector('#termPills .pill.selected')?.textContent || '36 mo';
+    const term = parseInt(termText) || 36;
+    const mileageText = document.querySelector('#mileagePills .pill.selected')?.textContent || '10,000';
+    const mileage = parseInt(mileageText.replace(/,/g, '')) || 10000;
+    const mf = parseFloat(document.getElementById('fMF')?.value) || 0;
+    const residual = parseFloat(document.getElementById('fResidual')?.value) || 0;
+    const msrp = parseFloat(document.getElementById('fMsrp')?.value) || 0;
+    const capcost = parseFloat(document.getElementById('fCapcost')?.value) || 0;
 
-    // Count comparables for display — EXCLUDE Tier 5 from "similar vehicles" count
-    const displayCount = (tier <= 4) ? comps.length : 0;
-
-    return { comps, tier, label, pct, userEff, avgEff, g, cls, v, bc, i: i, displayCount };
-  }
-
-  // ═══════════════════════════════════════════════════
-  // SAVE TEASER TO SUPABASE (with full grading metadata)
-  // ═══════════════════════════════════════════════════
-  async function saveTeaserToSupabase(data, email, scored) {
-    if (!supabaseClient) {
-      console.log('Supabase not configured — teaser logged locally:', { ...data, email, grade: scored.g });
+    if (!pay || pay <= 0) {
+      alert('Please enter your monthly payment.');
       return;
     }
-    try {
-      const { error } = await supabaseClient.from('lease_submissions').insert([{
-        email,
-        make: data.make || null,
-        model: data.model || null,
-        trim: data.trim || null,
-        monthly_payment: data.payment || null,
-        due_at_signing: data.driveoff || null,
-        term: data.termNum,
-        annual_mileage: data.mileage || null,
-        zip: data.zip || null,
-        county: data.county,
-        msrp: data.msrp || null,
-        cap_cost: data.capcost || null,
-        residual_pct: data.residual || null,
-        money_factor: data.mf || null,
-        dealer_name: data.dealer || null,
-        check_type: data.checkType || null,
-        submission_type: 'teaser',
-        deal_status: 'quote_check',
-        founder_eligible: false,
-        verification_status: 'na',
-        trust_tier: 'low',
-        report_entitlement: 'none',
-        grade: scored.g,
-        grade_pct: Math.round(scored.pct * 10) / 10,
-        grade_tier: scored.tier,
-        effective_monthly: scored.userEff,
-        comp_avg_effective: scored.avgEff,
-        comp_count: scored.displayCount
-      }]);
-      if (error) console.error('Supabase insert error:', error);
-      else console.log('Teaser saved to Supabase with grade:', scored.g);
-    } catch (err) { console.error('Supabase save failed:', err); }
-  }
 
-  // ═══════════════════════════════════════════════════
-  // SHOW TEASER — Display scored results
-  // ═══════════════════════════════════════════════════
-  function showTeaser(data, scored) {
-    if (!data) data = collectFormData();
-    if (!scored) scored = runScoring(data);
+    const vehicle = [make, model, trim].filter(Boolean).join(' ') || 'Your Vehicle';
 
-    const vehicle = [data.make, data.model, data.trim].filter(Boolean).join(' ') || 'Your Vehicle';
-    const diff = Math.round(scored.userEff - scored.avgEff);
+    // ── Run grading engine ──
+    const result = gradeLeaseV2({
+      make, model, trim, payment: pay, das, term, mileage, zip,
+      mf, residual, msrp, capcost
+    }, _benchmarkDeals, _totalDealCount);
 
+    _lastGradeResult = result;
+    const display = getGradeDisplay(result);
+
+    // ── Grade letter + visual tier ──
+    const gradeEl = document.getElementById('tGrade');
+    const gradeWrap = document.getElementById('gradeLetterWrap');
+    const gradeContainer = document.getElementById('gradeDisplay');
+    const prelimTag = document.getElementById('tPrelimTag');
+
+    gradeContainer.className = 'grade-display';
+
+    if (display.showGrade && !result.is_preliminary) {
+      // MATURE GRADE — full confidence
+      gradeEl.textContent = display.gradeText;
+      gradeEl.className = 'grade-letter ' + display.gradeRingClass;
+      prelimTag.style.display = 'none';
+    } else if (display.showGrade && result.is_preliminary) {
+      // PRELIMINARY GRADE — muted
+      gradeContainer.className = 'grade-display grade-preliminary';
+      gradeEl.textContent = display.gradeText;
+      gradeEl.className = 'grade-letter ' + display.gradeRingClass;
+      prelimTag.style.display = 'block';
+      prelimTag.textContent = 'Preliminary';
+    } else {
+      // DIRECTIONAL — no letter grade
+      gradeContainer.className = 'grade-display grade-directional';
+      gradeEl.textContent = '—';
+      gradeEl.className = 'grade-letter';
+      prelimTag.style.display = 'block';
+      prelimTag.textContent = 'Directional Read';
+    }
+
+    // ── Verdict badge ──
+    const badgeEl = document.getElementById('tBadge');
+    if (display.showGrade) {
+      const badgeClass = result.grade === 'A' || result.grade === 'B+' ? 'good'
+        : result.grade === 'B' || result.grade === 'C+' ? 'fair' : 'poor';
+      badgeEl.className = 'verdict-badge ' + badgeClass;
+    } else {
+      badgeEl.className = 'verdict-badge fair';
+    }
+    document.getElementById('tVerdict').textContent = display.verdict.replace('Preliminary — ', '');
+
+    // ── Interpretation ──
+    let interpText = '';
+    if (!display.showGrade) {
+      interpText = 'We don\'t have enough comparable deals for this vehicle yet. The full report provides a detailed structural analysis of your lease terms.';
+    } else if (result.is_preliminary) {
+      interpText = result.methodology_teaser;
+    } else {
+      // Mature grade — show the key insight
+      if (result.diff_pct <= -0.04) {
+        interpText = 'Your effective monthly cost is below what other NJ drivers are paying for comparable vehicles. The full report shows the complete picture.';
+      } else if (result.diff_pct <= 0.04) {
+        interpText = 'You\'re right at the market rate. The full report shows whether money factor or drive-off costs could be improved.';
+      } else {
+        interpText = 'Your effective monthly cost is above comparable deals. The full report identifies exactly what\'s driving the gap and by how much.';
+      }
+    }
+    document.getElementById('tInterp').textContent = interpText;
+
+    // ── EMC comparison boxes ──
+    document.getElementById('tPay').textContent = '$' + result.emc.toLocaleString();
     document.getElementById('tVehicle').textContent = vehicle;
-    document.getElementById('tGrade').textContent = scored.g;
-    document.getElementById('tGrade').className = 'grade-letter ' + scored.cls;
-    document.getElementById('tVerdict').textContent = scored.v;
-    document.getElementById('tBadge').className = 'verdict-badge ' + scored.bc;
-    document.getElementById('tInterp').textContent = scored.i;
 
-    // Show effective monthly, not raw payment
-    document.getElementById('tPay').textContent = '$' + scored.userEff.toLocaleString() + '/mo';
-    document.getElementById('tAvg').textContent = '$' + scored.avgEff.toLocaleString() + '/mo';
-
-    // Label changes based on tier
-    if (scored.tier <= 2) {
+    if (result.weighted_median_emc) {
+      document.getElementById('tAvg').textContent = '$' + result.weighted_median_emc.toLocaleString();
       document.getElementById('tCountyLbl').textContent = 'Comparable Average';
-    } else if (scored.tier <= 4) {
-      document.getElementById('tCountyLbl').textContent = data.countyLabel + ' Average';
+      document.getElementById('tComps').textContent = result.benchmark_note;
+
+      const emcDiff = result.emc - result.weighted_median_emc;
+      const deltaEl = document.getElementById('tDelta');
+      if (emcDiff < 0) {
+        deltaEl.textContent = '↓ $' + Math.abs(emcDiff) + '/mo below';
+        deltaEl.className = 'pay-box-delta delta-good';
+      } else if (emcDiff > 0) {
+        deltaEl.textContent = '↑ $' + emcDiff + '/mo above';
+        deltaEl.className = 'pay-box-delta delta-bad';
+      } else {
+        deltaEl.textContent = 'At the comparable average';
+        deltaEl.className = 'pay-box-delta';
+      }
     } else {
-      document.getElementById('tCountyLbl').textContent = 'NJ Average';
+      document.getElementById('tAvg').textContent = '—';
+      document.getElementById('tCountyLbl').textContent = 'Not Enough Data';
+      document.getElementById('tComps').textContent = 'Help build the benchmark';
+      document.getElementById('tDelta').textContent = 'Effective monthly cost (payment + DAS)';
+      document.getElementById('tDelta').className = 'pay-box-delta';
     }
 
-    // Confidence line — Tier 5 does NOT count as "similar vehicles"
-    let confText = 'Based on verified NJ deals';
-    if (scored.tier <= 3 && scored.displayCount > 0) {
-      confText = 'Based on ' + scored.displayCount + ' verified ' + (data.model || 'comparable') + ' deals in NJ';
-    } else if (scored.tier === 4) {
-      confText = 'Based on ' + scored.displayCount + ' verified deals in ' + data.countyLabel + ' · Limited model-specific data';
+    // ── Confidence line + badge ──
+    const confDot = document.getElementById('tConfDot');
+    const confBadge = document.getElementById('tConfBadge');
+    document.getElementById('tConfidence').textContent = result.methodology_teaser;
+
+    if (result.confidence === 'High') {
+      confDot.style.background = '#3d7a4e';
+      confBadge.className = 'conf-badge conf-high';
+      confBadge.textContent = 'High Confidence';
+      confBadge.style.display = 'inline-flex';
+    } else if (result.confidence === 'Medium') {
+      confDot.style.background = '#a8692e';
+      confBadge.className = 'conf-badge conf-medium';
+      confBadge.textContent = 'Medium';
+      confBadge.style.display = 'inline-flex';
     } else {
-      // Tier 5 — don't claim "similar vehicles"
-      confText = 'Based on verified NJ lease data · Limited comparable data for this vehicle';
+      confDot.style.background = '#9e968a';
+      confBadge.className = 'conf-badge conf-limited';
+      confBadge.textContent = 'Limited Data';
+      confBadge.style.display = 'inline-flex';
     }
-    document.getElementById('tConfidence').textContent = confText;
-    document.getElementById('tComps').textContent = 'Verified signed deals';
 
-    // Delta display (effective monthly based)
-    const deltaEl = document.getElementById('tDelta');
-    if (diff < 0) {
-      deltaEl.textContent = '↓ $' + Math.abs(diff) + '/mo below avg';
-      deltaEl.className = 'pay-box-delta delta-good';
-    } else if (diff === 0) {
-      deltaEl.textContent = 'At average';
-      deltaEl.className = 'pay-box-delta';
+    // ── Locked hint — adapt messaging ──
+    const lockedText = document.getElementById('tLockedText');
+    if (mf > 0 && result.score_drivers.some(d => d.impact === 'negative' && d.text.includes('marked up'))) {
+      lockedText.innerHTML = '<strong>Your money factor appears marked up.</strong> The full report shows you exactly by how much — and what it cost over the term.';
+    } else if (!display.showGrade) {
+      lockedText.innerHTML = '<strong>Limited comparable data available.</strong> The full report provides a structural analysis of your lease terms — payment, money factor, residual, and drive-off costs.';
+    } else if (result.diff_pct > 0.04) {
+      lockedText.innerHTML = '<strong>Your deal appears above market.</strong> The full report breaks down exactly what\'s driving the gap — and what\'s negotiable.';
     } else {
-      deltaEl.textContent = '↑ $' + diff + '/mo above avg';
-      deltaEl.className = 'pay-box-delta delta-bad';
+      lockedText.innerHTML = '<strong>Want the complete picture?</strong> The full report covers money factor markup, residual analysis, and how your deal compares to every comparable in our database.';
     }
 
-    // Show effective monthly note if DAS > 0
-    if (data.driveoff > 0) {
-      document.getElementById('tPay').title = 'Effective monthly = $' + data.payment + '/mo payment + $' + data.driveoff + ' DAS ÷ ' + data.termNum + ' months';
+    // ── Update CTA link with deal params ──
+    const ctaLink = document.getElementById('tCtaPrimary');
+    if (ctaLink) {
+      const params = new URLSearchParams({
+        make, model, trim, payment: pay, das, term, zip, mileage,
+        grade: result.grade || '', confidence: result.confidence,
+        emc: result.emc, verdict: result.verdict,
+        preliminary: result.is_preliminary ? '1' : '0',
+        benchmark_note: result.benchmark_note
+      });
+      if (mf) params.set('mf', mf);
+      if (residual) params.set('residual', residual);
+      if (msrp) params.set('msrp', msrp);
+      if (capcost) params.set('capcost', capcost);
+      ctaLink.href = 'access.html?' + params.toString();
     }
 
-    // Edit bar
+    // ── Edit bar ──
     document.getElementById('editVehicle').textContent = vehicle;
-    document.getElementById('editDetails').textContent = '$' + data.payment + '/mo · ' + data.countyLabel + ' · ' + data.termText;
+    const county = zipToCounty(zip);
+    document.getElementById('editDetails').textContent = '$' + pay + '/mo · ' + (county ? county + ' Co.' : 'NJ') + ' · ' + termText;
 
-    // Transition
+    // ── Panel transition ──
     const fp = document.getElementById('formPanel');
     const tp = document.getElementById('teaserPanel');
     const eb = document.getElementById('editBar');
@@ -1939,15 +3072,13 @@
     }, 380);
   }
 
-  // ═══════════════════════════════════════════════════
-  // SHOW FORM (edit quote)
-  // ═══════════════════════════════════════════════════
   function showForm() {
     const fp = document.getElementById('formPanel');
     const tp = document.getElementById('teaserPanel');
     const eb = document.getElementById('editBar');
     tp.classList.remove('visible');
     document.getElementById('emailGate').classList.remove('visible');
+    document.getElementById('gateFounder').classList.remove('visible');
     setTimeout(() => {
       tp.style.display = 'none';
       eb.style.display = 'none';
@@ -1955,22 +3086,36 @@
       requestAnimationFrame(() => { fp.classList.remove('hidden'); });
     }, 380);
   }
+  // ── COUNTERS (live from Supabase)
+  const TOTAL = 1000;
+  let founderCount = 1;
 
-  // ═══════════════════════════════════════════════════
-  // COUNTERS — try Supabase, fallback to defaults
-  // ═══════════════════════════════════════════════════
-  (function setDefaultCounters() {
-    const fc = document.getElementById('foundersCount');
-    const sl = document.getElementById('spotsLeft');
+  async function updateFounderCount() {
+    if (!window._sbClient) return;
+    try {
+      const { data, error } = await window._sbClient.rpc('get_founder_count');
+      if (!error && typeof data === 'number' && data > 0) founderCount = data;
+    } catch (e) {}
+    document.getElementById('foundersCount').textContent = founderCount;
+    document.getElementById('spotsLeft').textContent = (TOTAL - founderCount).toLocaleString() + ' spots remaining';
     const tfc = document.getElementById('tFounderCount');
-    if (fc && !fc.textContent.match(/\d+/)) fc.textContent = '—';
-    if (tfc && !tfc.textContent.match(/\d+/)) tfc.textContent = '—';
-    if (sl) sl.textContent = 'spots remaining';
-  })();
+    if (tfc) tfc.textContent = founderCount;
+  }
+  updateFounderCount();
 
-  // ═══════════════════════════════════════════════════
-  // COUNTY BAR CHART ANIMATION
-  // ═══════════════════════════════════════════════════
+  async function updateDealsCount() {
+    const el = document.getElementById('dealsCount');
+    if (!window._sbClient || !el) return;
+    try {
+      const { count, error } = await window._sbClient
+        .from('lease_submissions')
+        .select('*', { count: 'exact', head: true });
+      if (!error && count > 0) el.textContent = count;
+    } catch (e) {}
+  }
+  updateDealsCount();
+
+  // ── COUNTY BAR CHART ANIMATION
   function animateBars() {
     document.querySelectorAll('.county-bar').forEach(bar => {
       const w = bar.dataset.w;
@@ -1979,9 +3124,7 @@
     });
   }
 
-  // ═══════════════════════════════════════════════════
-  // SCROLL REVEAL
-  // ═══════════════════════════════════════════════════
+  // ── SCROLL REVEAL
   const revealEls = document.querySelectorAll('.reveal');
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(e => {
