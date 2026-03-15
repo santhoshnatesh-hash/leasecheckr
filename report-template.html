@@ -269,9 +269,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);-webkit-font-
 
     <div style="font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:500;color:var(--ink);margin-bottom:6px;">How LeaseCheckr Scored This Deal</div>
     <div style="width:30px;height:2px;background:var(--copper);margin-bottom:14px;"></div>
-    <div style="font-size:0.82rem;color:var(--ink3);line-height:1.8;margin-bottom:20px;">
-      This score is based on recent comparable signed deals, lease structure, and the information provided in your submission. Factors may include monthly payment, due at signing, term, mileage, and available lease details such as money factor or residual value. Confidence depends on the number and quality of comparable verified deals.
-    </div>
+    <div id="rMethodologyText" style="font-size:0.82rem;color:var(--ink3);line-height:1.8;margin-bottom:20px;"></div>
 
     <div style="height:1px;background:var(--bg3);margin:18px 0;"></div>
 
@@ -402,25 +400,30 @@ const make = g('make');
 const model = g('model');
 const trim = g('trim');
 const year = g('year') || '2025';
-const payment = gn('pay');
-const das = gn('das');
+const payment = gn('payment') || gn('pay');
+const das = gn('das') || gn('driveoff');
 const term = gn('term') || 36;
-const mileage = gn('mi') || 10000;
+const mileage = gn('mileage') || gn('mi') || 10000;
 const county = g('county') || 'NJ';
 const dealer = g('dealer');
 const signed = g('signed');
 const msrp = gn('msrp');
-const sp = gn('sp');
-const residual = gn('res');
+const sp = gn('capcost') || gn('sp');
+const residual = gn('residual') || gn('res');
 const mf = parseFloat(p.get('mf')) || 0;
+
+// Grading metadata from the engine
 const grade = g('grade') || 'B';
-const avgPay = gn('avg') || Math.round(payment * 1.06);
+const confidence = g('confidence') || 'Medium';
+const isPreliminary = g('preliminary') === '1';
+const benchmarkNote = g('benchmark_note') || '';
+const verdict = g('verdict') || '';
+const userEmc = gn('emc') || Math.round((payment * term + das) / term);
 
 const vehicle = [make, model].filter(Boolean).join(' ') || 'Your Vehicle';
 const vehicleFull = [year, make, model].filter(Boolean).join(' ');
-const eff = Math.round((payment * term + das) / term);
+const eff = userEmc || Math.round((payment * term + das) / term);
 const totalCost = payment * term + das;
-const diff = payment - avgPay;
 
 // Buy rate estimate (typical for major manufacturers)
 const buyRate = mf > 0 ? Math.max(mf - 0.0006, 0.00050) : 0.00125;
@@ -435,71 +438,100 @@ const discPct = msrp > 0 && sp > 0 ? ((1 - sp / msrp) * 100).toFixed(1) : null;
 const gradeRing = grade.startsWith('A') ? 'ga' : (grade.startsWith('B') ? 'gb' : (grade.startsWith('C') ? 'gc' : 'gd'));
 const gradeColor = grade.startsWith('A') ? 'var(--sage)' : (grade.startsWith('B') ? 'var(--copper)' : (grade.startsWith('C') ? 'var(--amber)' : 'var(--rose)'));
 
-// Verdict text
-const verdicts = {'A':'Excellent Deal','A-':'Excellent Deal','B+':'Good Deal — One Fix Makes It Great','B':'Fair Deal','B-':'Fair Deal','C+':'Slightly Above Average','C':'Overpaying','D':'Significantly Overpaying'};
-const verdict = verdicts[grade] || 'Deal Analyzed';
+// Verdict — use passed verdict, fallback to lookup
+const verdictFallback = {'A':'Excellent Deal','B+':'Good Deal','B':'Fair Deal','C+':'Slightly Above Market','C':'Overpaying','D':'Significantly Overpaying'};
+const finalVerdict = verdict || verdictFallback[grade] || 'Deal Analyzed';
 
 // Populate COVER
 document.getElementById('cvVehicle').innerHTML = vehicleFull + (trim ? '<br><em>' + trim + '</em>' : '');
 document.getElementById('cvTrim').textContent = term + ' months · ' + (mileage/1000).toFixed(0) + ',000 mi/yr · ' + county + ' County, NJ';
 document.getElementById('cvMeta').textContent = (dealer ? dealer + ' · ' : '') + (signed ? 'Signed ' + signed : '');
-document.getElementById('cvLetter').textContent = grade;
+document.getElementById('cvLetter').textContent = grade || '—';
 document.getElementById('cvRing').className = 'cv-grade-ring ' + gradeRing;
-document.getElementById('cvVerdict').textContent = verdict;
+document.getElementById('cvVerdict').textContent = finalVerdict;
 document.getElementById('cvVerdict').style.color = gradeColor;
+
+// Deal count and confidence under verdict
+const dealCountEl = document.getElementById('cvDealCount');
+if (dealCountEl) {
+  if (isPreliminary) {
+    dealCountEl.textContent = 'Preliminary · ' + confidence + ' Confidence';
+    dealCountEl.style.color = '#a8692e';
+  } else if (benchmarkNote) {
+    dealCountEl.textContent = benchmarkNote;
+  } else {
+    dealCountEl.textContent = confidence + ' Confidence';
+  }
+}
+
 document.getElementById('cvDate').textContent = 'Generated ' + new Date().toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
 
 // Populate 01 GLANCE
 document.getElementById('rPay').innerHTML = '$' + payment.toLocaleString() + '<span style="font-size:0.8rem;color:var(--ink4)">/mo</span>';
 document.getElementById('rDas').textContent = '$' + das.toLocaleString() + ' due at signing';
-document.getElementById('rAvgLabel').textContent = county + ' Co. Average';
-document.getElementById('rAvg').innerHTML = '$' + avgPay.toLocaleString() + '<span style="font-size:0.8rem;color:var(--ink4)">/mo</span>';
-document.getElementById('rAvgNote').textContent = 'Based on verified NJ deals';
+document.getElementById('rAvgLabel').textContent = benchmarkNote || 'Comparable Average';
+document.getElementById('rAvg').innerHTML = '$' + eff.toLocaleString() + '<span style="font-size:0.8rem;color:var(--ink4)">/mo eff.</span>';
+document.getElementById('rAvgNote').textContent = 'Effective monthly = payment + (DAS ÷ term)';
 document.getElementById('rEff').textContent = '$' + eff.toLocaleString();
 document.getElementById('rTotal').textContent = '$' + totalCost.toLocaleString();
 document.getElementById('rTotalNote').textContent = 'Over ' + term + ' months';
 
-const diffText = diff < 0 ? ('$' + Math.abs(diff) + ' below') : ('$' + diff + ' above');
-const savedText = diff < 0 ? ('$' + Math.abs(diff * term).toLocaleString() + ' saved') : ('$' + (diff * term).toLocaleString() + ' extra');
-
-// Effective monthly comparison is what matters
-const effDiff = eff - avgPay; // comparing effective monthly to avg
+// Narrative based on grade from the engine
 let narrativeHTML = '';
-if (das > 0 && effDiff > 0 && diff <= 0) {
-  // Key insight: payment looks good, but DAS makes the real cost higher
-  narrativeHTML = 'Your monthly payment of <em>$' + payment + '</em> appears ' + diffText + ' the ' + county + ' County average. However, once your <strong>$' + das.toLocaleString() + ' due at signing</strong> is included, your <strong>effective monthly cost is $' + eff + '</strong> — which is <strong>$' + Math.abs(Math.round(effDiff)) + '/mo above</strong> the comparable average. Over ' + term + ' months, that\'s roughly <strong>$' + Math.abs(Math.round(effDiff * term)).toLocaleString() + ' extra</strong> in total lease cost.';
-} else if (das > 0 && effDiff <= 0) {
-  // Even with DAS, still a good deal
-  narrativeHTML = 'Your monthly payment of <em>$' + payment + '</em> is ' + diffText + ' the ' + county + ' County average. Even including your <strong>$' + das.toLocaleString() + ' due at signing</strong>, your <strong>effective monthly cost of $' + eff + '</strong> is still <strong>$' + Math.abs(Math.round(effDiff)) + '/mo below</strong> the comparable average. Over ' + term + ' months, that\'s roughly <strong>$' + Math.abs(Math.round(effDiff * term)).toLocaleString() + ' saved</strong> compared to the typical deal.';
+if (das > 0) {
+  narrativeHTML = 'Your monthly payment is <em>$' + payment + '</em>, but you\'re also putting <strong>$' + das.toLocaleString() + ' down at signing</strong>. When we spread that upfront cost across ' + term + ' months, your <strong>effective monthly cost is $' + eff + '</strong>. ';
 } else {
-  // No DAS or straightforward comparison
-  narrativeHTML = 'Your effective monthly cost of <em>$' + eff + '</em> is <strong>' + diffText + ' the ' + county + ' County average</strong> for this vehicle. Over ' + term + ' months, that\'s roughly <strong>' + savedText + '</strong> compared to the typical deal.';
+  narrativeHTML = 'Your effective monthly cost is <em>$' + eff + '</em>. With no drive-off, your effective cost equals your payment. ';
 }
+
+// Add grade-based insight
+if (grade === 'A') {
+  narrativeHTML += 'That puts you <strong>well below</strong> comparable deals — this is an excellent deal by NJ standards.';
+} else if (grade === 'B+') {
+  narrativeHTML += 'That\'s <strong>below the comparable average</strong> — a good deal with potential to be great if the money factor can be improved.';
+} else if (grade === 'B') {
+  narrativeHTML += 'That\'s <strong>right at the comparable average</strong> for this vehicle — a fair deal. The sections below show whether specific terms like money factor or residual could be improved.';
+} else if (grade === 'C+') {
+  narrativeHTML += 'That\'s <strong>slightly above</strong> what comparable NJ drivers are paying. The sections below identify exactly what\'s driving the gap.';
+} else if (grade === 'C' || grade === 'D') {
+  narrativeHTML += 'That\'s <strong>meaningfully above</strong> comparable deals. The sections below break down where the gap is — and what\'s negotiable.';
+} else {
+  narrativeHTML += 'We have limited comparable data for this vehicle, so this analysis focuses on the structural terms of your lease.';
+}
+
 if (mf > 0 && markup > 0.0002) {
-  narrativeHTML += ' Additionally, your money factor suggests there\'s about <strong>$' + mfCostTotal.toLocaleString() + ' in negotiable financing markup</strong> — fixing that alone could meaningfully improve this deal.';
+  narrativeHTML += ' Additionally, your money factor suggests there\'s about <strong>$' + mfCostTotal.toLocaleString() + ' in negotiable financing markup</strong> over the term.';
 }
 document.getElementById('rNarrative').innerHTML = narrativeHTML;
 
-// Comparison bar
-const range = avgPay * 0.3;
-const low = Math.round(avgPay - range * 0.6);
-const high = Math.round(avgPay + range * 0.4);
-const youPct = Math.min(95, Math.max(5, ((payment - low) / (high - low)) * 100));
-const avgPct = Math.min(95, Math.max(5, ((avgPay - low) / (high - low)) * 100));
+// Comparison bar — use EMC as center reference
+// avgRef is estimated from the grade: if B, user is at median, so avgRef ≈ eff
+// This gets updated with real data when Supabase loads in loadReportData()
+let avgRef = Math.round(eff * (1 - (grade === 'A' ? 0.12 : grade === 'B+' ? 0.06 : grade === 'B' ? 0.01 : grade === 'C+' ? -0.07 : grade === 'C' ? -0.14 : -0.22)));
+const range = avgRef * 0.3;
+const low = Math.round(avgRef - range * 0.6);
+const high = Math.round(avgRef + range * 0.4);
+const youPct = Math.min(95, Math.max(5, ((eff - low) / (high - low)) * 100));
+const avgPct = Math.min(95, Math.max(5, ((avgRef - low) / (high - low)) * 100));
 document.getElementById('cbarYou').style.width = youPct + '%';
 document.getElementById('cbarAvg').style.width = avgPct + '%';
 document.getElementById('cbarLow').textContent = '$' + low;
-document.getElementById('cbarYouV').textContent = '$' + payment;
-document.getElementById('cbarAvgV').textContent = '$' + avgPay;
+document.getElementById('cbarYouV').textContent = '$' + eff;
+document.getElementById('cbarAvgV').textContent = '$' + avgRef;
 document.getElementById('cbarHigh').textContent = '$' + high;
 
-// Populate 02 SCORES
+// Populate 02 SCORES — use grade-based scoring, not avgPay comparisons
 const scoreItems = [];
-if (payment > 0) { const pGrade = diff <= -avgPay*0.1 ? 'A-' : diff <= 0 ? 'B+' : diff <= avgPay*0.05 ? 'B' : 'C+'; const pPct = Math.max(20, Math.min(95, 80 - (diff/avgPay*100))); const pCls = pGrade.startsWith('A') ? 'a' : pGrade.startsWith('B') ? 'b' : 'c'; scoreItems.push({name:'Monthly Payment',grade:pGrade,pct:pPct,cls:pCls}); }
+const payGradeMap = {'A':'A','B+':'B+','B':'B','C+':'C+','C':'C','D':'D'};
+const payGrade = payGradeMap[grade] || 'B';
+const payCls = payGrade.startsWith('A') ? 'a' : payGrade.startsWith('B') ? 'b' : 'c';
+const payPct = grade === 'A' ? 90 : grade === 'B+' ? 78 : grade === 'B' ? 65 : grade === 'C+' ? 50 : grade === 'C' ? 35 : 20;
+scoreItems.push({name:'Effective Monthly Cost',grade:payGrade,pct:payPct,cls:payCls});
+
 if (das >= 0) { const dGrade = das <= 1000 ? 'A' : das <= 2500 ? 'B' : 'C+'; const dPct = Math.max(20, Math.min(90, 90 - das/50)); const dCls = dGrade.startsWith('A') ? 'a' : dGrade.startsWith('B') ? 'b' : 'c'; scoreItems.push({name:'Due at Signing',grade:dGrade,pct:dPct,cls:dCls}); }
 if (mf > 0) { const mGrade = markup <= 0.0001 ? 'A' : markup <= 0.0003 ? 'B' : markup <= 0.0006 ? 'C+' : 'C'; const mPct = Math.max(20, Math.min(90, 85 - markup*100000)); const mCls = mGrade.startsWith('A') ? 'a' : mGrade.startsWith('B') ? 'b' : 'c'; scoreItems.push({name:'Money Factor',grade:mGrade,pct:mPct,cls:mCls}); }
-if (residual > 0) { const rGrade = residual >= 60 ? 'A-' : residual >= 52 ? 'B+' : 'B'; const rPct = Math.min(90, residual * 1.3); const rCls = rGrade.startsWith('A') ? 'a' : 'b'; scoreItems.push({name:'Residual Value',grade:rGrade,pct:rPct,cls:rCls}); }
-if (discPct) { const sGrade = parseFloat(discPct) >= 5 ? 'A-' : parseFloat(discPct) >= 2 ? 'B' : 'C+'; const sPct = Math.min(90, parseFloat(discPct) * 15); const sCls = sGrade.startsWith('A') ? 'a' : sGrade.startsWith('B') ? 'b' : 'c'; scoreItems.push({name:'Selling Price',grade:sGrade,pct:sPct,cls:sCls}); }
+if (residual > 0) { const rGrade = residual >= 60 ? 'A' : residual >= 52 ? 'B+' : 'B'; const rPct = Math.min(90, residual * 1.3); const rCls = rGrade.startsWith('A') ? 'a' : 'b'; scoreItems.push({name:'Residual Value',grade:rGrade,pct:rPct,cls:rCls}); }
+if (discPct) { const sGrade = parseFloat(discPct) >= 5 ? 'A' : parseFloat(discPct) >= 2 ? 'B' : 'C+'; const sPct = Math.min(90, parseFloat(discPct) * 15); const sCls = sGrade.startsWith('A') ? 'a' : sGrade.startsWith('B') ? 'b' : 'c'; scoreItems.push({name:'Selling Price',grade:sGrade,pct:sPct,cls:sCls}); }
 
 document.getElementById('rScores').innerHTML = scoreItems.map(s => 
   '<div class="sr"><div class="sc">' + s.name + '</div><div class="st"><div class="sf ' + s.cls + '" style="width:' + s.pct + '%"></div></div><div class="sg" style="color:' + (s.cls==='a'?'var(--sage)':s.cls==='b'?'var(--sage)':'var(--copper)') + '">' + s.grade + '</div></div>'
@@ -516,16 +548,17 @@ const drivers = [];
 
 // Each driver: { text, impact: 'positive' | 'negative' | 'neutral' | 'missing' }
 
-// Payment vs comparable range (use effective monthly, not raw payment)
-const effDiffForDrivers = eff - avgPay;
-if (effDiffForDrivers < -avgPay * 0.05) {
-  drivers.push({ text: 'Effective monthly cost is <strong>well below</strong> comparable deals', impact: 'positive' });
-} else if (effDiffForDrivers <= 0) {
-  drivers.push({ text: 'Effective monthly cost is <strong>at or below</strong> the comparable average', impact: 'positive' });
-} else if (effDiffForDrivers <= avgPay * 0.05) {
-  drivers.push({ text: 'Effective monthly cost is <strong>slightly above</strong> comparable deals', impact: 'negative' });
-} else {
+// Payment vs comparable range (use grade from the engine)
+if (grade === 'A' || grade === 'B+') {
+  drivers.push({ text: 'Effective monthly cost is <strong>below</strong> comparable deals', impact: 'positive' });
+} else if (grade === 'B') {
+  drivers.push({ text: 'Effective monthly cost is <strong>at or near</strong> the comparable average', impact: 'positive' });
+} else if (grade === 'C+') {
+  drivers.push({ text: 'Effective monthly cost is <strong>above</strong> comparable deals', impact: 'negative' });
+} else if (grade === 'C' || grade === 'D') {
   drivers.push({ text: 'Effective monthly cost is <strong>significantly above</strong> comparable deals', impact: 'negative' });
+} else {
+  drivers.push({ text: 'Limited comparable data — structural analysis only', impact: 'missing' });
 }
 
 // Due at signing impact
@@ -572,34 +605,49 @@ document.getElementById('rScoreDrivers').innerHTML = drivers.map(d =>
 ).join('');
 
 // ═══════════════════════════════════
-// CONFIDENCE LEVEL
+// CONFIDENCE LEVEL (from grading engine)
 // ═══════════════════════════════════
-let confLevel, confColor, confBg, confNote;
-const hasAllInputs = mf > 0 && residual > 0 && msrp > 0 && sp > 0;
-const compCount = scoreItems.length;
+let confColor, confBg, confNote;
 
-if (hasAllInputs && compCount >= 4) {
-  confLevel = 'High';
+if (confidence === 'High') {
   confColor = '#3d7a4e';
   confBg = '#e4f0e7';
-  confNote = 'All key lease inputs were provided and multiple scoring dimensions are available. This score reflects a comprehensive analysis of your deal.';
-} else if ((mf > 0 || residual > 0) && compCount >= 3) {
-  confLevel = 'Medium';
+  confNote = 'Multiple strong comparable deals were found. This score reflects a comprehensive benchmark analysis.';
+} else if (confidence === 'Medium') {
   confColor = '#a8692e';
   confBg = '#f6ecdf';
-  confNote = 'Some key lease details were provided. Providing money factor, residual, and selling price would increase confidence and precision.';
+  confNote = 'Reasonable comparable data is available. More local signed deals would sharpen this score. Contributing your lease helps build the benchmark.';
 } else {
-  confLevel = 'Limited';
   confColor = '#9e968a';
   confBg = '#f0ede8';
-  confNote = 'Score is based on payment and structure only. Key inputs like money factor and residual were not provided, which limits the depth of analysis. The grade reflects where your payment sits relative to comparables.';
+  confNote = 'Comparable data is limited. This analysis focuses on the structural terms of your lease. As more NJ drivers contribute deals, scores become more precise.';
+}
+
+if (isPreliminary) {
+  confNote = 'This grade is preliminary — based on a small comparison set. The letter reflects our best current read, but may shift as more data becomes available. ' + confNote;
 }
 
 const confBadgeEl = document.getElementById('rConfBadge');
-confBadgeEl.textContent = confLevel;
+confBadgeEl.textContent = isPreliminary ? 'Preliminary · ' + confidence : confidence;
 confBadgeEl.style.color = confColor;
 confBadgeEl.style.background = confBg;
 document.getElementById('rConfNote').textContent = confNote;
+
+// Dynamic methodology text
+const methEl = document.getElementById('rMethodologyText');
+if (methEl) {
+  let methText = 'This score is based on your deal\'s effective monthly cost — your payment plus any upfront charges spread across the lease term. ';
+  methText += 'We compared your deal against verified signed leases from NJ drivers. Closer matches — same model, same area — count more than broader comparisons. ';
+  methText += 'Verified signed deals count more than unverified submissions. Recent deals count more than older ones. ';
+  if (confidence === 'High') {
+    methText += 'We had enough strong comparable data to provide a confident grade.';
+  } else if (confidence === 'Medium') {
+    methText += 'We had reasonable comparable data, but more local signed deals would sharpen this score.';
+  } else {
+    methText += 'Comparable data was limited. As more NJ drivers contribute deals, scores become more precise.';
+  }
+  methEl.textContent = methText;
+}
 
 // Populate 03 MF
 if (mf > 0) {
