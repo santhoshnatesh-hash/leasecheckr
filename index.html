@@ -41,6 +41,7 @@
 
     body {
       font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
       background: var(--canvas);
       color: var(--ink);
       -webkit-font-smoothing: antialiased;
@@ -68,9 +69,9 @@
     .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 500; letter-spacing: 0.02em; color: var(--ink); text-decoration: none; }
     .nav-logo span { color: var(--copper); }
     .nav-right { display: flex; align-items: center; gap: 28px; }
-    .nav-link { font-size: 0.73rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); text-decoration: none; transition: color 0.2s; }
+    .nav-link { font-size: 0.8rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); text-decoration: none; transition: color 0.2s; }
     .nav-link:hover { color: var(--ink); }
-    .nav-founder { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.06em; color: var(--copper); text-decoration: none; border-bottom: 1px solid rgba(168,105,46,0.3); padding-bottom: 1px; transition: border-color 0.2s; }
+    .nav-founder { font-size: 0.78rem; font-weight: 500; letter-spacing: 0.06em; color: var(--copper); text-decoration: none; border-bottom: 1px solid rgba(168,105,46,0.3); padding-bottom: 1px; transition: border-color 0.2s; }
     .nav-founder:hover { border-color: var(--copper); }
 
     /* ── HERO SPLIT ── */
@@ -449,7 +450,7 @@
       margin-bottom: 5px;
     }
     .mp-desc {
-      font-size: 0.82rem; font-weight: 300; line-height: 1.7;
+      font-size: 0.9rem; font-weight: 300; line-height: 1.7;
       color: rgba(253,250,246,0.5);
     }
 
@@ -566,7 +567,7 @@
       font-family: 'Cormorant Garamond', serif;
       font-size: 1.08rem; font-weight: 500; color: var(--ink); margin-bottom: 5px;
     }
-    .how-step-desc { font-size: 0.81rem; font-weight: 300; line-height: 1.68; color: var(--ink-3); }
+    .how-step-desc { font-size: 0.9rem; font-weight: 300; line-height: 1.68; color: var(--ink-3); }
 
     .how-right {}
     .how-right-intro {
@@ -813,6 +814,8 @@
       footer { padding: 24px; flex-direction: column; gap: 16px; text-align: center; }
       .footer-links { flex-wrap: wrap; justify-content: center; }
       .headline { font-size: 2.1rem; }
+      /* Learn section mobile */
+      section:last-of-type > div > div:last-child { grid-template-columns: 1fr !important; }
     }
     @media (max-width: 540px) {
       .numbers-grid { grid-template-columns: 1fr; }
@@ -1127,14 +1130,14 @@
 
     <div class="mislead-grid">
       <div class="mislead-left reveal">
-        <div class="big-stat">$67</div>
-        <div class="big-stat-label">Avg. monthly overpayment observed in NJ submissions</div>
+        <div class="big-stat">0.0005</div>
+        <div class="big-stat-label">A common money factor markup applied by NJ dealers</div>
         <p>
           Most shoppers negotiate by asking <strong>"can you get it under $400 a month?"</strong> Dealers are trained to work with that number — by adjusting the term, the mileage, or the drive-off in ways that look like a win but aren't.
         </p>
         <br>
         <p>
-          Over a 36-month lease, a $67/month overpayment is <strong>$2,412 left on the table</strong> — often from a money factor markup that took a dealer 30 seconds to apply.
+          A 0.0005 money factor markup on a $40,000 vehicle adds roughly <strong>$20/month — or $720 over 36 months</strong> — from a change that took the dealer 30 seconds to apply, and most shoppers never notice.
         </p>
       </div>
 
@@ -1343,47 +1346,63 @@
 </section>
 
 
-<!-- ═══ SECTION 5: FREE vs FULL REPORT ═══ -->
+<!-- ═══ SECTION 5: THREE WAYS TO GET YOUR REPORT ═══ -->
 <section class="section-compare">
   <div class="section-inner">
     <div class="s-eyebrow" style="color:var(--copper);">What you get</div>
-    <h2 class="s-headline-light">Start free. Go deeper<br>when the deal matters.</h2>
-    <p class="s-subhead-light">Your instant score is always free. The full report is for when you're close to signing and want the complete picture.</p>
+    <h2 class="s-headline-light">Three ways to get<br>your <em>full report.</em></h2>
+    <p class="s-subhead-light">Your instant score is always free. Pay for instant access, submit your deal for a discount, or upload your lease for free access.</p>
 
-    <div class="compare-grid">
+    <div class="compare-grid" style="grid-template-columns:repeat(3,1fr);gap:20px;">
+
+      <!-- CARD 1: INSTANT ACCESS -->
       <div class="compare-card free-card reveal">
-        <div class="cc-badge free">Free · No account required</div>
-        <div class="cc-title">Instant Score</div>
-        <div class="cc-price">Always free</div>
+        <div class="cc-badge free">Instant Access</div>
+        <div class="cc-title">Pay once.<br><em>Know everything.</em></div>
+        <div class="cc-price" style="margin-bottom:16px;">$19.99 one-time</div>
         <div class="cc-items">
-          <div class="cc-item"><span class="cc-check">✓</span><span>Deal grade (A through F)</span></div>
-          <div class="cc-item"><span class="cc-check">✓</span><span>Verdict — Fair / Overpaying / Strong</span></div>
-          <div class="cc-item"><span class="cc-check">✓</span><span>Your payment vs. county average</span></div>
-          <div class="cc-item"><span class="cc-check">✓</span><span>Confidence indicator based on local data</span></div>
-          <div class="cc-item"><span class="cc-lock">🔒</span><span style="opacity:0.4;">Money factor analysis</span></div>
-          <div class="cc-item"><span class="cc-lock">🔒</span><span style="opacity:0.4;">Comparable NJ deals breakdown</span></div>
-          <div class="cc-item"><span class="cc-lock">🔒</span><span style="opacity:0.4;">Dealer pricing signals</span></div>
-          <div class="cc-item"><span class="cc-lock">🔒</span><span style="opacity:0.4;">Negotiation actions and scripts</span></div>
+          <div class="cc-item"><span class="cc-check">✓</span><span>Full deal breakdown</span></div>
+          <div class="cc-item"><span class="cc-check">✓</span><span>Money factor analysis</span></div>
+          <div class="cc-item"><span class="cc-check">✓</span><span>Comparable NJ deals</span></div>
+          <div class="cc-item"><span class="cc-check">✓</span><span>Dealer pricing signals</span></div>
+          <div class="cc-item"><span class="cc-check">✓</span><span>Downloadable PDF report</span></div>
         </div>
-        <a href="#formPanel" class="cc-cta" onclick="document.getElementById('formPanel').scrollIntoView({behavior:'smooth'})">Check your quote free →</a>
+        <a href="access.html" class="cc-cta">Pay $19.99 →</a>
+        <div style="font-family:'DM Mono',monospace;font-size:0.52rem;letter-spacing:0.08em;color:var(--ink-4);text-transform:uppercase;margin-top:8px;text-align:center;">No contribution required</div>
       </div>
 
+      <!-- CARD 2: CONTRIBUTOR DISCOUNT -->
       <div class="compare-card full-card reveal reveal-delay-1">
-        <div class="cc-badge full">Full Report</div>
-        <div class="cc-title">Complete Analysis</div>
-        <div class="cc-price">$19.99 one-time · or free with lease upload</div>
+        <div class="cc-badge full">Contributor Discount</div>
+        <div class="cc-title">Submit your deal.<br><em>Save $10.</em></div>
+        <div class="cc-price" style="margin-bottom:16px;">$9.99 per report</div>
         <div class="cc-items">
-          <div class="cc-item"><span class="cc-check">✓</span><span>Everything in the free score</span></div>
-          <div class="cc-item"><span class="cc-check">✓</span><span>Full money factor analysis — buy rate vs. your rate</span></div>
-          <div class="cc-item"><span class="cc-check">✓</span><span>Verified comparable NJ deals, same vehicle, your county</span></div>
-          <div class="cc-item"><span class="cc-check">✓</span><span>Dealer pricing signals and market context</span></div>
-          <div class="cc-item"><span class="cc-check">✓</span><span>County trend data — last 90 days</span></div>
-          <div class="cc-item"><span class="cc-check">✓</span><span>Specific negotiation moves and exact scripts to use</span></div>
-          <div class="cc-item"><span class="cc-check">✓</span><span>Pre-signing checklist — 8 items to verify before you sign</span></div>
-          <div class="cc-item"><span class="cc-check">✓</span><span>Questions to ask your dealer, verbatim</span></div>
+          <div class="cc-item"><span class="cc-check">✓</span><span>Everything in Premium</span></div>
+          <div class="cc-item"><span class="cc-check">✓</span><span>Signed deal data only</span></div>
+          <div class="cc-item"><span class="cc-check">✓</span><span>10 fields + 1 credibility check</span></div>
+          <div class="cc-item"><span class="cc-check">✓</span><span>No document upload needed</span></div>
+          <div class="cc-item"><span class="cc-check">✓</span><span>Report after payment</span></div>
         </div>
-        <a href="access.html" class="cc-cta">Get the full report →</a>
+        <a href="submit-deal.html" class="cc-cta">Submit My Deal — $9.99 →</a>
+        <div style="font-family:'DM Mono',monospace;font-size:0.52rem;letter-spacing:0.08em;color:rgba(253,250,246,0.45);text-transform:uppercase;margin-top:8px;text-align:center;">Discounted for contributing</div>
       </div>
+
+      <!-- CARD 3: FREE VIA UPLOAD -->
+      <div class="compare-card reveal reveal-delay-2" style="background:var(--canvas);border:1px solid var(--border-2);">
+        <div class="cc-badge free">Free via Upload</div>
+        <div class="cc-title">Upload your lease.<br><em>Get it free.</em></div>
+        <div class="cc-price" style="margin-bottom:16px;color:var(--ink-3);">$0 with lease upload</div>
+        <div class="cc-items">
+          <div class="cc-item"><span class="cc-check">✓</span><span>Everything in Premium — free</span></div>
+          <div class="cc-item"><span class="cc-check">✓</span><span>You control redaction</span></div>
+          <div class="cc-item"><span class="cc-check">✓</span><span>Highest trust contribution</span></div>
+          <div class="cc-item"><span class="cc-check">✓</span><span>Founder eligible</span></div>
+          <div class="cc-item"><span class="cc-check">✓</span><span>Report after verification (48hrs)</span></div>
+        </div>
+        <a href="intake-upload.html" class="cc-cta" style="background:var(--ink);color:var(--canvas);">Upload My Lease — Free →</a>
+        <div style="font-family:'DM Mono',monospace;font-size:0.52rem;letter-spacing:0.08em;color:var(--ink-4);text-transform:uppercase;margin-top:8px;text-align:center;">Requires verified NJ lease document</div>
+      </div>
+
     </div>
   </div>
 </section>
@@ -1435,6 +1454,34 @@
           <div class="county-row"><span class="county-name">Passaic</span><div class="county-bar-wrap"><div class="county-bar" data-w="95"></div></div><span class="county-val">$447</span></div>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══ SECTION 7: LEARN ═══ -->
+<section style="padding:80px 64px;background:var(--canvas);">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="s-eyebrow" style="color:var(--copper);margin-bottom:12px;">Learn</div>
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,2.5vw,2.6rem);font-weight:400;color:var(--ink);margin-bottom:12px;">Understand your lease<br>before you sign.</h2>
+    <p style="font-size:0.95rem;color:var(--ink-3);margin-bottom:40px;max-width:520px;line-height:1.6;">Short guides on the numbers that actually matter — written for people who don't work in finance.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+      <a href="blog.html#money-factor" style="text-decoration:none;padding:28px 24px;background:var(--canvas-2);border-radius:4px;border:1px solid var(--border);transition:all 0.2s;" onmouseover="this.style.borderColor='var(--copper)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--copper);margin-bottom:10px;">Guide</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--ink);margin-bottom:8px;">What is a Money Factor?</div>
+        <div style="font-size:0.82rem;color:var(--ink-3);line-height:1.5;">The hidden financing rate in every lease — and why a 0.0005 difference costs you hundreds.</div>
+      </a>
+      <a href="blog.html#due-at-signing" style="text-decoration:none;padding:28px 24px;background:var(--canvas-2);border-radius:4px;border:1px solid var(--border);transition:all 0.2s;" onmouseover="this.style.borderColor='var(--copper)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--copper);margin-bottom:10px;">Guide</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--ink);margin-bottom:8px;">Due at Signing Explained</div>
+        <div style="font-size:0.82rem;color:var(--ink-3);line-height:1.5;">Why putting more money down doesn't make a lease cheaper — and how to read the real cost.</div>
+      </a>
+      <a href="blog.html#nj-tax" style="text-decoration:none;padding:28px 24px;background:var(--canvas-2);border-radius:4px;border:1px solid var(--border);transition:all 0.2s;" onmouseover="this.style.borderColor='var(--copper)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--copper);margin-bottom:10px;">Guide</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--ink);margin-bottom:8px;">NJ Lease Tax Rules</div>
+        <div style="font-size:0.82rem;color:var(--ink-3);line-height:1.5;">New Jersey taxes leases differently than most states. Here's what it means for your monthly payment.</div>
+      </a>
     </div>
   </div>
 </section>
