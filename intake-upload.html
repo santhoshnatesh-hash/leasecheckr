@@ -215,6 +215,7 @@ try{if(window.supabase){sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KE
 
 // ── STATE
 let originalImageSrc=null;
+let originalFileHash=null;
 const redactions=[];
 let isDrawing=false;
 let drawStart={};
@@ -252,6 +253,17 @@ function handleFile(e){
   }
 
   const reader=new FileReader();
+  // Hash the original file bytes (deterministic — same file always = same hash)
+  const hashReader=new FileReader();
+  hashReader.onload=async(hev)=>{
+    try{
+      const hashBuffer=await crypto.subtle.digest('SHA-256',hev.target.result);
+      const hashArray=Array.from(new Uint8Array(hashBuffer));
+      originalFileHash=hashArray.map(b=>b.toString(16).padStart(2,'0')).join('').substring(0,32);
+    }catch(e){originalFileHash=null;}
+  };
+  hashReader.readAsArrayBuffer(file);
+
   reader.onload=(ev)=>{
     // Verify the image actually loads in the browser before proceeding
     const testImg=new Image();
@@ -274,7 +286,7 @@ function handleFile(e){
 }
 
 function resetUpload(){
-  originalImageSrc=null;redactions.length=0;
+  originalImageSrc=null;originalFileHash=null;redactions.length=0;
   document.getElementById('fileInput').value='';
   document.getElementById('uploadEmpty').style.display='';
   document.getElementById('fileInfo').style.display='none';
@@ -398,16 +410,10 @@ async function submitLease(){
     const canvas=document.getElementById('redactCanvas');
     const blob=await new Promise(r=>canvas.toBlob(r,'image/jpeg',0.9));
 
-    // Generate a simple hash of the image to detect duplicate documents
-    let docHash=null;
-    if(blob){
-      const buffer=await blob.arrayBuffer();
-      const hashBuffer=await crypto.subtle.digest('SHA-256',buffer);
-      const hashArray=Array.from(new Uint8Array(hashBuffer));
-      docHash=hashArray.map(b=>b.toString(16).padStart(2,'0')).join('').substring(0,32);
-    }
+    // Use the hash of the ORIGINAL file (computed at upload time — deterministic)
+    const docHash=originalFileHash;
 
-    // CHECK FOR DUPLICATE DOCUMENT (same image hash via RPC)
+    // CHECK FOR DUPLICATE DOCUMENT (same original file hash via RPC)
     if(sb && docHash){
       try{
         const{data:isDuplicate,error:hashErr}=await sb.rpc('check_doc_hash',{hash_value:docHash});
