@@ -2877,8 +2877,8 @@
       const zip = document.getElementById('fZip').value || '';
       const termText = document.querySelector('#termPills .pill.selected')?.textContent || '36 mo';
       const term = parseInt(termText) || 36;
-      const mileageText = document.querySelector('#mileagePills .pill.selected')?.textContent || '10000';
-      const mileage = parseInt(mileageText.replace(/,/g, '')) || 10000;
+      const mileageRaw = document.querySelector('#mileagePills .pill.selected')?.textContent || '10000';
+      const mileage = parseInt(mileageRaw.replace(/,/g, '')) || 10000;
 
       const row = {
         email,
@@ -2908,7 +2908,7 @@
       if (error) {
         console.error('[LeaseCheckr] Supabase INSERT ERROR:', error.message, error.details, error.hint);
       } else {
-        console.log('[LeaseCheckr] Insert success — triggers should fire');
+        console.log('[LeaseCheckr] Insert success — triggers firing');
       }
     } catch(err) {
       console.error('[LeaseCheckr] Supabase save EXCEPTION:', err);
