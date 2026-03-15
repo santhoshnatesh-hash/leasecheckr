@@ -419,7 +419,8 @@ async function submitLease(){
       const{error:ie}=await sb.from('lease_submissions').insert([{
         email:email,submission_type:'verified_upload',deal_status:'signed_verified',
         trust_tier:'high',verification_status:'pending',report_entitlement:'free_verified',
-        founder_eligible:true,source:'document_upload'
+        founder_eligible:true,source:'document_upload',
+        document_url:documentUrl
       }]);
       if(ie)console.error('Insert error:',ie);
     }
