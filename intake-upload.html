@@ -407,14 +407,11 @@ async function submitLease(){
       docHash=hashArray.map(b=>b.toString(16).padStart(2,'0')).join('').substring(0,32);
     }
 
-    // CHECK FOR DUPLICATE DOCUMENT (same image hash)
+    // CHECK FOR DUPLICATE DOCUMENT (same image hash via RPC)
     if(sb && docHash){
       try{
-        const{data:existing}=await sb.from('lease_submissions')
-          .select('id')
-          .eq('doc_hash',docHash)
-          .limit(1);
-        if(existing && existing.length>0){
+        const{data:isDuplicate,error:hashErr}=await sb.rpc('check_doc_hash',{hash_value:docHash});
+        if(!hashErr && isDuplicate===true){
           document.getElementById('uploadingState').innerHTML='<div style="font-size:1.4rem;margin-bottom:12px">📄</div><div style="font-family:var(--f-display);font-size:20px;margin-bottom:8px">This document has already been uploaded</div><div style="font-size:13px;color:var(--ink-3);margin-bottom:20px">It looks like this exact document was submitted before. If you have a different lease document to contribute, please upload that instead.</div><button class="btn-primary" onclick="goToStep(1)" style="max-width:240px;margin:0 auto">← Upload a Different Document</button>';
           setProgress(100);
           document.getElementById('uploadingState').style.display='block';
