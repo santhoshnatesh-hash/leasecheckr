@@ -381,10 +381,17 @@ function showDetail(id) {
     ['Created', r.created_at ? new Date(r.created_at).toLocaleString() : null],
   ];
 
+  // Add document link if it exists
+  let docLink = '';
+  if (r.document_url) {
+    const publicUrl = sb.storage.from('lease-documents').getPublicUrl(r.document_url).data.publicUrl;
+    docLink = `<div class="modal-field"><div class="modal-label">Uploaded Document</div><div class="modal-value"><a href="${publicUrl}" target="_blank" style="color:var(--copper);text-decoration:underline;">View Document →</a></div></div>`;
+  }
+
   document.getElementById('modalBody').innerHTML = fields
     .filter(([, v]) => v != null && v !== '')
     .map(([label, val]) => `<div class="modal-field"><div class="modal-label">${label}</div><div class="modal-value">${val}</div></div>`)
-    .join('');
+    .join('') + docLink;
 
   let actions = '';
   if (r.verification_status === 'pending') {
