@@ -2299,7 +2299,8 @@
   
     const gradeEligible = (
       (tier12Count >= 3) ||
-      (tier14Count >= minTier14 && totalWeight >= minWeight && tier14WeightShare >= 0.60)
+      (tier12Count >= 1 && tier14Count >= 3 && totalWeight >= 1.0) ||
+      (tier14Count >= minTier14 && totalWeight >= minWeight && tier14WeightShare >= 0.40)
     );
   
     // ── Grade calculation ──
