@@ -262,6 +262,28 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);-webkit-font-
   <p class="ss">Key dimensions that affect your total cost.</p>
   <div class="scores" id="rScores"></div>
   <div class="ins" id="rInsight"><div class="ins-i">💡</div><div class="ins-t" id="rInsightText"></div></div>
+
+  <!-- METHODOLOGY + SCORE DRIVERS + CONFIDENCE -->
+  <div style="margin-top:32px;padding:28px 24px;background:var(--bg2);border-radius:10px;border:1px solid var(--bg3);">
+
+    <div style="font-family:var(--mono);font-size:0.48rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--copper);margin-bottom:14px;">How LeaseCheckr Scored This Deal</div>
+    <div style="font-size:0.82rem;color:var(--ink3);line-height:1.8;margin-bottom:20px;">
+      This score is based on recent comparable signed deals, lease structure, and the information provided in your submission. Factors may include monthly payment, due at signing, term, mileage, and available lease details such as money factor or residual value. Confidence depends on the number and quality of comparable verified deals.
+    </div>
+
+    <div style="height:1px;background:var(--bg3);margin:18px 0;"></div>
+
+    <div style="font-family:var(--mono);font-size:0.48rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--copper);margin-bottom:12px;">What Most Affected Your Score</div>
+    <div id="rScoreDrivers" style="font-size:0.8rem;color:var(--ink2);line-height:1.85;"></div>
+
+    <div style="height:1px;background:var(--bg3);margin:18px 0;"></div>
+
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="font-family:var(--mono);font-size:0.48rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--copper);white-space:nowrap;">Confidence Level</div>
+      <div id="rConfBadge" style="font-family:var(--mono);font-size:0.52rem;letter-spacing:0.1em;text-transform:uppercase;padding:4px 12px;border-radius:100px;font-weight:500;"></div>
+    </div>
+    <div id="rConfNote" style="font-size:0.76rem;color:var(--ink4);line-height:1.7;margin-top:8px;"></div>
+  </div>
 </div>
 
 <!-- 03 MF DEEP DIVE -->
@@ -468,6 +490,88 @@ document.getElementById('rScores').innerHTML = scoreItems.map(s =>
 const worstScore = scoreItems.reduce((w, s) => (!w || 'ABCD'.indexOf(s.grade[0]) > 'ABCD'.indexOf(w.grade[0]) ? s : w), null);
 document.getElementById('rInsightText').innerHTML = worstScore ? '<strong>Your biggest opportunity is ' + worstScore.name.toLowerCase() + '.</strong> The full analysis above shows where the gap is and how to close it.' : 'Your deal scores well across all dimensions.';
 
+// ═══════════════════════════════════
+// SCORE DRIVERS (what affected the grade)
+// ═══════════════════════════════════
+const drivers = [];
+
+// Payment vs comparable range
+if (diff < 0) {
+  drivers.push('Your payment is <strong>below</strong> the comparable range — this helped your score');
+} else if (diff <= avgPay * 0.05) {
+  drivers.push('Your payment is <strong>close to</strong> the local comparable average');
+} else {
+  drivers.push('Your payment is <strong>above</strong> the local comparable range — this is the primary factor in your score');
+}
+
+// Due at signing
+if (das > 3000) {
+  drivers.push('High due-at-signing amount (<strong>$' + das.toLocaleString() + '</strong>) increases your effective monthly cost');
+} else if (das > 0) {
+  drivers.push('Due-at-signing of <strong>$' + das.toLocaleString() + '</strong> factored into effective monthly cost');
+} else {
+  drivers.push('No drive-off reported — effective monthly equals your payment');
+}
+
+// MF
+if (mf > 0 && markup > 0.0004) {
+  drivers.push('Money factor appears <strong>marked up</strong> above the typical base rate — this negatively affected your score');
+} else if (mf > 0 && markup <= 0.0001) {
+  drivers.push('Money factor is <strong>at or near the base rate</strong> — no financing penalty');
+} else if (mf > 0) {
+  drivers.push('Money factor is <strong>slightly above base rate</strong> — minor impact on score');
+} else {
+  drivers.push('Money factor was <strong>not provided</strong> — score is based on payment and structure only, reducing precision');
+}
+
+// Residual
+if (residual > 0) {
+  drivers.push('Residual value of <strong>' + residual + '%</strong> was included in the analysis');
+} else {
+  drivers.push('Residual value was <strong>not provided</strong> — limits depth of structural analysis');
+}
+
+// Comparable quality
+if (scoreItems.length >= 4) {
+  drivers.push('Strong data across <strong>' + scoreItems.length + ' scoring dimensions</strong>');
+} else {
+  drivers.push('Score based on <strong>' + scoreItems.length + ' available dimensions</strong> — providing more details improves precision');
+}
+
+document.getElementById('rScoreDrivers').innerHTML = drivers.map(d => 
+  '<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;"><span style="color:var(--copper);flex-shrink:0;margin-top:2px;">›</span><span>' + d + '</span></div>'
+).join('');
+
+// ═══════════════════════════════════
+// CONFIDENCE LEVEL
+// ═══════════════════════════════════
+let confLevel, confColor, confBg, confNote;
+const hasAllInputs = mf > 0 && residual > 0 && msrp > 0 && sp > 0;
+const compCount = scoreItems.length;
+
+if (hasAllInputs && compCount >= 4) {
+  confLevel = 'High';
+  confColor = '#3d7a4e';
+  confBg = '#e4f0e7';
+  confNote = 'All key lease inputs were provided and multiple scoring dimensions are available. This score reflects a comprehensive analysis of your deal.';
+} else if ((mf > 0 || residual > 0) && compCount >= 3) {
+  confLevel = 'Medium';
+  confColor = '#a8692e';
+  confBg = '#f6ecdf';
+  confNote = 'Some key lease details were provided. Providing money factor, residual, and selling price would increase confidence and precision.';
+} else {
+  confLevel = 'Limited';
+  confColor = '#9e968a';
+  confBg = '#f0ede8';
+  confNote = 'Score is based on payment and structure only. Key inputs like money factor and residual were not provided, which limits the depth of analysis. The grade reflects where your payment sits relative to comparables.';
+}
+
+const confBadgeEl = document.getElementById('rConfBadge');
+confBadgeEl.textContent = confLevel;
+confBadgeEl.style.color = confColor;
+confBadgeEl.style.background = confBg;
+document.getElementById('rConfNote').textContent = confNote;
+
 // Populate 03 MF
 if (mf > 0) {
   document.getElementById('rMF').textContent = mf.toString();
@@ -629,41 +733,19 @@ async function loadReportData() {
         dealerAvgRate = Math.round(dealerDeals.reduce((s,c) => s + c.monthly_payment, 0) / dealerDeals.length);
       }
 
-      // Grade calculation
-      let computedGrade = 'B';
-      let gradeLabel = 'Fair Deal';
-      if (payment < lowestVerified) {
-        computedGrade = 'A+'; gradeLabel = 'Excellent Deal';
-      } else if (payment <= avgVerifiedPay) {
-        computedGrade = 'A'; gradeLabel = 'Strong Deal';
-      } else if (payment <= avgVerifiedPay * 1.02) {
-        computedGrade = 'B'; gradeLabel = 'Fair Deal';
-      } else if (payment <= avgVerifiedPay * 1.05) {
-        computedGrade = 'C'; gradeLabel = 'Above Average';
-      } else if (payment <= highestVerified && payment <= avgVerifiedPay * 1.10) {
-        computedGrade = 'D'; gradeLabel = 'Overpaying';
-      } else if (dealerAvgRate && payment <= dealerAvgRate) {
-        computedGrade = 'E'; gradeLabel = 'At Dealer Advertised Rate';
-      } else if (dealerAvgRate && payment > dealerAvgRate) {
-        computedGrade = 'F'; gradeLabel = 'Above Dealer Advertised Rate';
-      } else {
-        computedGrade = 'D'; gradeLabel = 'Significantly Overpaying';
-      }
+      // Grade: always use the one passed from the homepage via URL parameter
+      // This ensures homepage teaser and full report always show the same grade
+      // Comparable deals are shown for context but do NOT override the grade
 
-      // If URL passed a grade, only override if we have good data
-      if (verifiedDeals.length >= 3) {
-        // Update displayed grade
-        const newGradeColor = computedGrade.startsWith('A') ? 'var(--sage)' : (computedGrade === 'B' ? 'var(--copper)' : (computedGrade === 'C' ? 'var(--amber)' : 'var(--rose)'));
-        const newRingClass = computedGrade.startsWith('A') ? 'ga' : (computedGrade === 'B' ? 'gb' : (computedGrade === 'C' ? 'gc' : 'gd'));
-        document.getElementById('cvLetter').textContent = computedGrade;
-        document.getElementById('cvRing').className = 'cv-grade-ring ' + newRingClass;
-        document.getElementById('cvVerdict').textContent = gradeLabel;
-        document.getElementById('cvVerdict').style.color = newGradeColor;
-
-        // Update avg display with real number
-        if (avgVerifiedPay > 0 && avgPay === 0) {
-          document.getElementById('rAvg').innerHTML = '$' + avgVerifiedPay + '<span style="font-size:0.8rem;color:var(--ink4)">/mo</span>';
-        }
+      // Update county average display with verified data if available
+      if (avgVerifiedPay > 0) {
+        document.getElementById('rAvg').innerHTML = '$' + avgVerifiedPay + '<span style="font-size:0.8rem;color:var(--ink4)">/mo</span>';
+        document.getElementById('rAvgNote').textContent = 'Based on ' + verifiedDeals.length + ' verified ' + (make || 'NJ') + ' deals';
+        // Recalculate diff and narrative with real avg
+        const realDiff = payment - avgVerifiedPay;
+        const realDiffText = realDiff < 0 ? ('$' + Math.abs(realDiff) + ' below') : ('$' + realDiff + ' above');
+        const realSavedText = realDiff < 0 ? ('$' + Math.abs(realDiff * term).toLocaleString() + ' saved') : ('$' + (realDiff * term).toLocaleString() + ' extra');
+        document.getElementById('rNarrative').innerHTML = 'Your monthly payment of <em>$' + payment + '</em> is <strong>' + realDiffText + ' the ' + county + ' County average</strong> for this vehicle. Over ' + term + ' months, that\'s roughly <strong>' + realSavedText + '</strong> compared to the typical deal.' + (mf > 0 && markup > 0.0002 ? ' However, your money factor suggests there\'s about $' + mfCostTotal.toLocaleString() + ' in negotiable financing markup.' : '');
       }
 
     } else {
@@ -672,20 +754,55 @@ async function loadReportData() {
     }
 
     // ════════════════════════════════
-    // SECTION 06: Dealer advertised deals from dealer_comps (by county)
-    // Always show if we have county data — not dependent on user entering dealer name
+    // SECTION 06: Dealer advertised deals from dealer_comps
+    // Tiered: same make+model → same make → same county similar price tier
     // ════════════════════════════════
 
-    // Get dealer comps for user's county
+    // Tier 1: Same make + model in any county
     let { data: countyDealerComps } = await sb.from('dealer_comps')
       .select('*')
-      .eq('county', county)
+      .eq('make', make)
+      .eq('model', model)
       .eq('is_active', true)
       .order('monthly_payment', { ascending: true })
       .limit(10);
 
-    // If not enough in county, broaden to neighboring counties
-    if (!countyDealerComps || countyDealerComps.length < 3) {
+    let dealerMatchLevel = 'exact_model';
+
+    // Tier 2: Same make, any model
+    if (!countyDealerComps || countyDealerComps.length < 2) {
+      const { data: sameMakeComps } = await sb.from('dealer_comps')
+        .select('*')
+        .eq('make', make)
+        .eq('is_active', true)
+        .order('monthly_payment', { ascending: true })
+        .limit(10);
+      if (sameMakeComps && sameMakeComps.length > (countyDealerComps || []).length) {
+        countyDealerComps = sameMakeComps;
+        dealerMatchLevel = 'same_make';
+      }
+    }
+
+    // Tier 3: Same county, similar price range (within 40% of user payment)
+    if (!countyDealerComps || countyDealerComps.length < 2) {
+      const priceLow = Math.round(payment * 0.6);
+      const priceHigh = Math.round(payment * 1.4);
+      const { data: similarPriceComps } = await sb.from('dealer_comps')
+        .select('*')
+        .eq('county', county)
+        .eq('is_active', true)
+        .gte('monthly_payment', priceLow)
+        .lte('monthly_payment', priceHigh)
+        .order('monthly_payment', { ascending: true })
+        .limit(10);
+      if (similarPriceComps && similarPriceComps.length > (countyDealerComps || []).length) {
+        countyDealerComps = similarPriceComps;
+        dealerMatchLevel = 'similar_price';
+      }
+    }
+
+    // Tier 4: Broadest — any active deals in county
+    if (!countyDealerComps || countyDealerComps.length < 2) {
       const { data: allDealerComps } = await sb.from('dealer_comps')
         .select('*')
         .eq('is_active', true)
@@ -693,12 +810,19 @@ async function loadReportData() {
         .limit(15);
       if (allDealerComps && allDealerComps.length > (countyDealerComps || []).length) {
         countyDealerComps = allDealerComps;
+        dealerMatchLevel = 'all_nj';
       }
     }
 
     if (countyDealerComps && countyDealerComps.length > 0) {
       document.getElementById('secDealer').style.display = 'block';
-      document.getElementById('dealerSubtitle').textContent = 'What dealers in ' + county + ' County and nearby are currently advertising for comparable vehicles.';
+      const dealerSubtitles = {
+        exact_model: 'What dealers are advertising for the ' + make + ' ' + model + ' in NJ.',
+        same_make: 'What dealers are advertising for ' + make + ' vehicles — your closest comparables.',
+        similar_price: 'Dealer-advertised deals in ' + county + ' County in a similar price range.',
+        all_nj: 'Dealer-advertised deals across NJ for reference.'
+      };
+      document.getElementById('dealerSubtitle').textContent = dealerSubtitles[dealerMatchLevel] || 'What dealers are currently advertising for comparable vehicles.';
 
       // Group by make for summary
       const dealersByMake = {};
@@ -717,8 +841,13 @@ async function loadReportData() {
       const sameModelDealer = countyDealerComps.filter(c => c.make === make && c.model === model);
       const sameModelAvg = sameModelDealer.length ? Math.round(sameModelDealer.reduce((s,c) => s + c.monthly_payment, 0) / sameModelDealer.length) : null;
 
+      const dealerCardTitle = dealerMatchLevel === 'exact_model' ? make + ' ' + model + ' Dealer Prices'
+        : dealerMatchLevel === 'same_make' ? make + ' Dealer Prices'
+        : dealerMatchLevel === 'similar_price' ? county + ' County — Similar Price Range'
+        : 'NJ Dealer Landscape';
+
       let dealerHTML = '<div class="dlr-head">'
-        + '<div class="dlr-name">' + county + ' County Dealer Landscape</div>'
+        + '<div class="dlr-name">' + dealerCardTitle + '</div>'
         + '<div class="dlr-badge avg">' + countyDealerComps.length + ' Advertised Deals</div>'
         + '</div>';
 
@@ -736,14 +865,28 @@ async function loadReportData() {
           + '</div>';
       }
 
-      // How user's deal compares to advertised
+      // How user's deal compares to advertised — with negotiating range
       let dealerObservation = '';
-      if (payment < avgDealerPay) {
-        dealerObservation = 'Your deal at $' + payment + '/mo is <strong>below the average dealer advertised rate</strong> of $' + avgDealerPay + '/mo in ' + county + ' County. This suggests you negotiated well relative to what dealers are publicly offering.';
+      
+      // Build the negotiating range: best signed deal → dealer average → user's deal
+      const bestSigned = verifiedDeals && verifiedDeals.length > 0 
+        ? Math.min(...verifiedDeals.map(d => d.monthly_payment)) : null;
+      
+      if (bestSigned && avgDealerPay) {
+        dealerObservation = '<strong>Your negotiating range:</strong> The best verified signed deal on a comparable vehicle is <strong>$' + bestSigned + '/mo</strong>. Dealers are currently advertising at <strong>$' + avgDealerPay + '/mo</strong>. Your deal is at <strong>$' + payment + '/mo</strong>.';
+        if (payment <= bestSigned) {
+          dealerObservation += ' You\'re at or below the best price in our benchmark — strong position.';
+        } else if (payment <= avgDealerPay) {
+          dealerObservation += ' You\'re below what dealers are publicly asking, which means you negotiated well. The gap between $' + bestSigned + ' and $' + payment + ' is where further negotiation could help.';
+        } else {
+          dealerObservation += ' There\'s meaningful room to negotiate. The spread between the best signed deal ($' + bestSigned + ') and your price ($' + payment + ') suggests <strong>$' + (payment - bestSigned) + '/mo in potential savings</strong> — that\'s <strong>$' + ((payment - bestSigned) * term).toLocaleString() + ' over the lease</strong>.';
+        }
+      } else if (payment < avgDealerPay) {
+        dealerObservation = 'Your deal at $' + payment + '/mo is <strong>below the dealer advertised average</strong> of $' + avgDealerPay + '/mo. This suggests you negotiated well relative to what dealers are publicly offering.';
       } else if (payment < avgDealerPay * 1.05) {
-        dealerObservation = 'Your deal at $' + payment + '/mo is <strong>close to the average dealer advertised rate</strong> of $' + avgDealerPay + '/mo. Dealer advertised rates are typically pre-negotiation starting points — there may still be room to negotiate down.';
+        dealerObservation = 'Your deal at $' + payment + '/mo is <strong>close to the dealer advertised average</strong> of $' + avgDealerPay + '/mo. Advertised rates are pre-negotiation starting points — there may still be room to negotiate.';
       } else {
-        dealerObservation = 'Your deal at $' + payment + '/mo is <strong>above the average dealer advertised rate</strong> of $' + avgDealerPay + '/mo. This suggests the deal terms may include add-ons, a marked-up money factor, or unfavorable cap cost. The negotiation playbook below shows how to address this.';
+        dealerObservation = 'Your deal at $' + payment + '/mo is <strong>above the dealer advertised average</strong> of $' + avgDealerPay + '/mo. This suggests the deal may include add-ons, a marked-up money factor, or unfavorable cap cost.';
       }
       dealerHTML += '<div class="dlr-obs">' + dealerObservation + '</div>';
 

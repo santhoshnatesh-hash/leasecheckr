@@ -1200,6 +1200,7 @@
               <span class="verdict-dot"></span><span id="tVerdict">Fair Deal</span>
             </div>
             <div class="grade-interp" id="tInterp">You're at the county average. The full report shows what's driving the number.</div>
+            <div id="tBasis" style="font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.08em;color:var(--ink-4);margin-top:8px;"></div>
           </div>
         </div>
 
@@ -2049,6 +2050,7 @@
       const { comps } = findComparables(data.make, data.model, county, data.termNum || 36);
       const score = computeScore(data.payment || 0, data.driveoff || 0, data.mf, data.residual, data.msrp, data.capcost, comps, data.termNum || 36);
       const grade = score ? score.grade.g : null;
+      const compAvg = score ? score.avgPay : null;
 
       const { error } = await supabaseClient.from('lease_submissions').insert([{
         email, make: data.make || null, model: data.model || null, trim: data.trim || null,
@@ -2059,6 +2061,7 @@
         residual_pct: data.residual || null, money_factor: data.mf || null,
         dealer_name: data.dealer || null, check_type: data.checkType || null,
         grade: grade,
+        notes: compAvg ? 'comp_avg:' + compAvg : null,
         submission_type: 'teaser', deal_status: 'quote_check',
         founder_eligible: false, verification_status: 'na', trust_tier: 'low', report_entitlement: 'none'
       }]);
@@ -2094,6 +2097,8 @@
       document.getElementById('tDelta').textContent = 'Insufficient data';
       document.getElementById('tDelta').className = 'pay-box-delta';
       document.getElementById('tConfidence').textContent = 'Be one of the first to contribute ' + (model || 'this vehicle') + ' data in NJ';
+      const basisElNone = document.getElementById('tBasis');
+      if (basisElNone) basisElNone.textContent = 'Not enough comparable data yet';
     } else {
       const { grade, interp, avgPay, avgEff, userEff, percentile, totalCost, compCount, mfAnalysis } = score;
       const diff = Math.round(pay - avgPay);
@@ -2118,6 +2123,17 @@
         nj_all: 'Based on ' + compCount + ' verified NJ lease deals'
       };
       document.getElementById('tConfidence').textContent = matchLabels[matchLevel] || 'Based on verified NJ lease data';
+
+      // Show match basis under grade
+      const basisLabels = {
+        exact: 'Compared to ' + compCount + ' verified ' + model + ' deals in ' + (label || 'NJ'),
+        model_nj: 'Compared to ' + compCount + ' verified ' + model + ' deals across NJ',
+        make_county: 'Compared to ' + compCount + ' verified ' + make + ' deals in ' + (label || 'NJ'),
+        county_all: 'Compared to ' + compCount + ' verified deals in ' + (label || 'NJ'),
+        nj_all: 'Compared to ' + compCount + ' verified NJ deals'
+      };
+      const basisEl = document.getElementById('tBasis');
+      if (basisEl) basisEl.textContent = basisLabels[matchLevel] || 'Based on verified NJ lease data';
 
       const deltaEl = document.getElementById('tDelta');
       if (diff < 0) { deltaEl.textContent = '↓ $' + Math.abs(diff) + '/mo below avg'; deltaEl.className = 'pay-box-delta delta-good'; }
