@@ -2877,13 +2877,14 @@
       const zip = document.getElementById('fZip').value || '';
       const termText = document.querySelector('#termPills .pill.selected')?.textContent || '36 mo';
       const term = parseInt(termText) || 36;
-      const mileage = document.querySelector('#mileagePills .pill.selected')?.textContent || '10,000';
+      const mileageText = document.querySelector('#mileagePills .pill.selected')?.textContent || '10000';
+      const mileage = parseInt(mileageText.replace(/,/g, '')) || 10000;
 
       const row = {
         email,
         make: make || null, model: model || null, trim: trim || null,
         monthly_payment: pay || null, due_at_signing: das || null,
-        term: term, annual_mileage: mileage || null,
+        term: term, annual_mileage: mileage,
         zip: zip || null, county: zipToCounty(zip) || null,
         msrp: parseFloat(document.getElementById('fMsrp')?.value) || null,
         cap_cost: parseFloat(document.getElementById('fCapcost')?.value) || null,
@@ -2903,11 +2904,11 @@
 
       console.log('[LeaseCheckr] Inserting to Supabase:', JSON.stringify(row, null, 2));
 
-      const { data, error } = await window._sbClient.from('lease_submissions').insert([row]).select();
+      const { error } = await window._sbClient.from('lease_submissions').insert([row]);
       if (error) {
         console.error('[LeaseCheckr] Supabase INSERT ERROR:', error.message, error.details, error.hint);
       } else {
-        console.log('[LeaseCheckr] Insert success:', data);
+        console.log('[LeaseCheckr] Insert success — triggers should fire');
       }
     } catch(err) {
       console.error('[LeaseCheckr] Supabase save EXCEPTION:', err);
