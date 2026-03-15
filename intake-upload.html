@@ -1172,7 +1172,8 @@ function selectMethod(method) {
   selectedMethod = method;
   document.getElementById('card-photo').classList.toggle('selected', method === 'photo');
   document.getElementById('card-upload').classList.toggle('selected', method === 'upload');
-  document.getElementById('card-manual').classList.toggle('selected', method === 'manual');
+  const manualCard = document.getElementById('card-manual');
+  if (manualCard) manualCard.classList.toggle('selected', method === 'manual');
   document.getElementById('step1btn').disabled = false;
 }
 
