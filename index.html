@@ -1870,262 +1870,34 @@
   
   // ─────────────────────────────────────────
   // SECTION A: VEHICLE SEGMENT + VALUE LOOKUP
+  // Loaded LIVE from Supabase vehicle_reference table
+  // No hardcoded vehicle data — single source of truth in DB
   // ─────────────────────────────────────────
-  
-  const VEHICLE_SEGMENTS = {
-    // Format: "Make|Model": { segment: "...", body: "...", defaultMSRP: number }
-    // segment: compact_suv_luxury, midsize_suv_mainstream, etc.
-    // body: suv, sedan, truck, van, hatchback, coupe, ev_suv
-    // defaultMSRP: approximate base MSRP for value band fallback
-  
-    // ACURA
-    "Acura|Integra":    { segment:"compact_sedan_luxury", body:"sedan", defaultMSRP:33500 },
-    "Acura|TLX":        { segment:"midsize_sedan_luxury", body:"sedan", defaultMSRP:40000 },
-    "Acura|RDX":        { segment:"compact_suv_luxury",   body:"suv",   defaultMSRP:42000 },
-    "Acura|MDX":        { segment:"midsize_suv_luxury",   body:"suv",   defaultMSRP:50000 },
-    "Acura|ADX":        { segment:"compact_suv_luxury",   body:"suv",   defaultMSRP:38000 },
-  
-    // AUDI
-    "Audi|A4":          { segment:"compact_sedan_luxury", body:"sedan", defaultMSRP:42000 },
-    "Audi|A5":          { segment:"compact_sedan_luxury", body:"coupe", defaultMSRP:46000 },
-    "Audi|A6":          { segment:"midsize_sedan_luxury", body:"sedan", defaultMSRP:58000 },
-    "Audi|Q3":          { segment:"compact_suv_luxury",   body:"suv",   defaultMSRP:40000 },
-    "Audi|Q5":          { segment:"compact_suv_luxury",   body:"suv",   defaultMSRP:46000 },
-    "Audi|Q7":          { segment:"midsize_suv_luxury",   body:"suv",   defaultMSRP:60000 },
-    "Audi|Q8":          { segment:"fullsize_suv_luxury",  body:"suv",   defaultMSRP:74000 },
-    "Audi|Q8 e-tron":   { segment:"midsize_suv_luxury",   body:"ev_suv",defaultMSRP:74000 },
-    "Audi|e-tron GT":   { segment:"fullsize_sedan_luxury", body:"sedan",defaultMSRP:106000 },
-  
-    // BMW
-    "BMW|X1":           { segment:"compact_suv_luxury",   body:"suv",   defaultMSRP:40000 },
-    "BMW|X3":           { segment:"compact_suv_luxury",   body:"suv",   defaultMSRP:48000 },
-    "BMW|X5":           { segment:"midsize_suv_luxury",   body:"suv",   defaultMSRP:64000 },
-    "BMW|X7":           { segment:"fullsize_suv_luxury",  body:"suv",   defaultMSRP:80000 },
-    "BMW|3 Series":     { segment:"compact_sedan_luxury", body:"sedan", defaultMSRP:44000 },
-    "BMW|5 Series":     { segment:"midsize_sedan_luxury", body:"sedan", defaultMSRP:56000 },
-    "BMW|i4":           { segment:"compact_sedan_luxury", body:"sedan", defaultMSRP:52000 },
-    "BMW|i5":           { segment:"midsize_sedan_luxury", body:"sedan", defaultMSRP:68000 },
-    "BMW|iX":           { segment:"midsize_suv_luxury",   body:"ev_suv",defaultMSRP:88000 },
-    "BMW|i7":           { segment:"fullsize_sedan_luxury", body:"sedan",defaultMSRP:106000 },
-  
-    // BUICK
-    "Buick|Encore GX":  { segment:"subcompact_suv_mainstream", body:"suv", defaultMSRP:28000 },
-    "Buick|Envista":    { segment:"subcompact_suv_mainstream", body:"suv", defaultMSRP:24000 },
-    "Buick|Envision":   { segment:"compact_suv_mainstream",    body:"suv", defaultMSRP:36000 },
-    "Buick|Enclave":    { segment:"midsize_suv_mainstream",    body:"suv", defaultMSRP:46000 },
-  
-    // CADILLAC
-    "Cadillac|CT4":         { segment:"compact_sedan_luxury", body:"sedan", defaultMSRP:36000 },
-    "Cadillac|CT5":         { segment:"midsize_sedan_luxury", body:"sedan", defaultMSRP:40000 },
-    "Cadillac|XT4":         { segment:"compact_suv_luxury",   body:"suv",   defaultMSRP:38000 },
-    "Cadillac|XT5":         { segment:"compact_suv_luxury",   body:"suv",   defaultMSRP:46000 },
-    "Cadillac|XT6":         { segment:"midsize_suv_luxury",   body:"suv",   defaultMSRP:52000 },
-    "Cadillac|LYRIQ":       { segment:"midsize_suv_luxury",   body:"ev_suv",defaultMSRP:60000 },
-    "Cadillac|Escalade":    { segment:"fullsize_suv_luxury",  body:"suv",   defaultMSRP:82000 },
-    "Cadillac|Escalade IQ": { segment:"fullsize_suv_luxury",  body:"ev_suv",defaultMSRP:130000 },
-    "Cadillac|Vistiq":      { segment:"midsize_suv_luxury",   body:"ev_suv",defaultMSRP:68000 },
-    "Cadillac|Optiq":       { segment:"compact_suv_luxury",   body:"ev_suv",defaultMSRP:54000 },
-  
-    // CHEVROLET
-    "Chevrolet|Trax":        { segment:"subcompact_suv_mainstream", body:"suv",   defaultMSRP:22000 },
-    "Chevrolet|Trailblazer": { segment:"subcompact_suv_mainstream", body:"suv",   defaultMSRP:24000 },
-    "Chevrolet|Equinox":     { segment:"compact_suv_mainstream",    body:"suv",   defaultMSRP:32000 },
-    "Chevrolet|Equinox EV":  { segment:"compact_suv_mainstream",    body:"ev_suv",defaultMSRP:35000 },
-    "Chevrolet|Blazer":      { segment:"midsize_suv_mainstream",    body:"suv",   defaultMSRP:38000 },
-    "Chevrolet|Traverse":    { segment:"midsize_suv_mainstream",    body:"suv",   defaultMSRP:38000 },
-    "Chevrolet|Tahoe":       { segment:"fullsize_suv_mainstream",   body:"suv",   defaultMSRP:58000 },
-    "Chevrolet|Silverado":   { segment:"fullsize_truck_mainstream", body:"truck", defaultMSRP:42000 },
-    "Chevrolet|Silverado 1500": { segment:"fullsize_truck_mainstream", body:"truck", defaultMSRP:42000 },
-  
-    // CHRYSLER
-    "Chrysler|Pacifica":        { segment:"minivan_mainstream", body:"van", defaultMSRP:40000 },
-    "Chrysler|Pacifica Hybrid": { segment:"minivan_mainstream", body:"van", defaultMSRP:52000 },
-  
-    // DODGE
-    "Dodge|Hornet":  { segment:"compact_suv_mainstream", body:"suv",   defaultMSRP:34000 },
-    "Dodge|Charger": { segment:"midsize_sedan_mainstream", body:"sedan", defaultMSRP:34000 },
-    "Dodge|Durango": { segment:"midsize_suv_mainstream", body:"suv",   defaultMSRP:40000 },
-  
-    // FORD
-    "Ford|Escape":          { segment:"compact_suv_mainstream",    body:"suv",   defaultMSRP:32000 },
-    "Ford|Bronco Sport":    { segment:"compact_suv_mainstream",    body:"suv",   defaultMSRP:32000 },
-    "Ford|Bronco":          { segment:"midsize_suv_mainstream",    body:"suv",   defaultMSRP:38000 },
-    "Ford|Explorer":        { segment:"midsize_suv_mainstream",    body:"suv",   defaultMSRP:40000 },
-    "Ford|Expedition":      { segment:"fullsize_suv_mainstream",   body:"suv",   defaultMSRP:58000 },
-    "Ford|F-150":           { segment:"fullsize_truck_mainstream", body:"truck", defaultMSRP:38000 },
-    "Ford|F-150 Lightning": { segment:"fullsize_truck_mainstream", body:"truck", defaultMSRP:52000 },
-    "Ford|Mustang Mach-E":  { segment:"compact_suv_mainstream",   body:"ev_suv",defaultMSRP:44000 },
-    "Ford|Mustang":         { segment:"sport_mainstream",          body:"coupe", defaultMSRP:32000 },
-  
-    // GENESIS
-    "Genesis|G70":              { segment:"compact_sedan_luxury", body:"sedan",  defaultMSRP:40000 },
-    "Genesis|G80":              { segment:"midsize_sedan_luxury", body:"sedan",  defaultMSRP:55000 },
-    "Genesis|G90":              { segment:"fullsize_sedan_luxury", body:"sedan", defaultMSRP:90000 },
-    "Genesis|GV70":             { segment:"compact_suv_luxury",   body:"suv",   defaultMSRP:44000 },
-    "Genesis|GV80":             { segment:"midsize_suv_luxury",   body:"suv",   defaultMSRP:55000 },
-    "Genesis|Electrified GV70": { segment:"compact_suv_luxury",   body:"ev_suv",defaultMSRP:66000 },
-    "Genesis|GV60":             { segment:"compact_suv_luxury",   body:"ev_suv",defaultMSRP:52000 },
-  
-    // GMC
-    "GMC|Terrain":     { segment:"compact_suv_mainstream",    body:"suv",   defaultMSRP:36000 },
-    "GMC|Acadia":      { segment:"midsize_suv_mainstream",    body:"suv",   defaultMSRP:40000 },
-    "GMC|Yukon":       { segment:"fullsize_suv_mainstream",   body:"suv",   defaultMSRP:62000 },
-    "GMC|Sierra 1500": { segment:"fullsize_truck_mainstream", body:"truck", defaultMSRP:42000 },
-    "GMC|Sierra EV":   { segment:"fullsize_truck_mainstream", body:"truck", defaultMSRP:60000 },
-  
-    // HONDA
-    "Honda|Civic":      { segment:"compact_sedan_mainstream", body:"sedan",     defaultMSRP:25000 },
-    "Honda|Civic Hybrid": { segment:"compact_sedan_mainstream", body:"sedan",   defaultMSRP:30000 },
-    "Honda|Accord":     { segment:"midsize_sedan_mainstream", body:"sedan",     defaultMSRP:30000 },
-    "Honda|HR-V":       { segment:"subcompact_suv_mainstream", body:"suv",      defaultMSRP:26000 },
-    "Honda|CR-V":       { segment:"compact_suv_mainstream",   body:"suv",       defaultMSRP:33000 },
-    "Honda|CR-V Hybrid": { segment:"compact_suv_mainstream",  body:"suv",       defaultMSRP:35000 },
-    "Honda|Pilot":      { segment:"midsize_suv_mainstream",   body:"suv",       defaultMSRP:40000 },
-    "Honda|Ridgeline":  { segment:"midsize_truck_mainstream", body:"truck",     defaultMSRP:42000 },
-    "Honda|Prologue":   { segment:"midsize_suv_mainstream",   body:"ev_suv",    defaultMSRP:48000 },
-  
-    // HYUNDAI
-    "Hyundai|Elantra":        { segment:"compact_sedan_mainstream", body:"sedan", defaultMSRP:24000 },
-    "Hyundai|Elantra Hybrid": { segment:"compact_sedan_mainstream", body:"sedan", defaultMSRP:26000 },
-    "Hyundai|Sonata":         { segment:"midsize_sedan_mainstream", body:"sedan", defaultMSRP:30000 },
-    "Hyundai|Kona":           { segment:"subcompact_suv_mainstream", body:"suv",  defaultMSRP:26000 },
-    "Hyundai|Tucson":         { segment:"compact_suv_mainstream",   body:"suv",   defaultMSRP:32000 },
-    "Hyundai|Santa Fe":       { segment:"midsize_suv_mainstream",   body:"suv",   defaultMSRP:36000 },
-    "Hyundai|Palisade":       { segment:"fullsize_suv_mainstream",  body:"suv",   defaultMSRP:40000 },
-    "Hyundai|IONIQ 5":        { segment:"compact_suv_mainstream",   body:"ev_suv",defaultMSRP:44000 },
-    "Hyundai|IONIQ 6":        { segment:"midsize_sedan_mainstream", body:"sedan", defaultMSRP:44000 },
-  
-    // INFINITI
-    "Infiniti|Q50":  { segment:"midsize_sedan_luxury", body:"sedan", defaultMSRP:44000 },
-    "Infiniti|QX50": { segment:"compact_suv_luxury",   body:"suv",   defaultMSRP:42000 },
-    "Infiniti|QX55": { segment:"compact_suv_luxury",   body:"suv",   defaultMSRP:48000 },
-    "Infiniti|QX60": { segment:"midsize_suv_luxury",   body:"suv",   defaultMSRP:52000 },
-    "Infiniti|QX80": { segment:"fullsize_suv_luxury",  body:"suv",   defaultMSRP:76000 },
-  
-    // JEEP
-    "Jeep|Compass":          { segment:"compact_suv_mainstream",  body:"suv", defaultMSRP:32000 },
-    "Jeep|Renegade":         { segment:"subcompact_suv_mainstream", body:"suv", defaultMSRP:28000 },
-    "Jeep|Grand Cherokee":   { segment:"midsize_suv_mainstream",  body:"suv", defaultMSRP:42000 },
-    "Jeep|Grand Cherokee L": { segment:"midsize_suv_mainstream",  body:"suv", defaultMSRP:44000 },
-    "Jeep|Wrangler":         { segment:"midsize_suv_mainstream",  body:"suv", defaultMSRP:36000 },
-    "Jeep|Wagoneer":         { segment:"fullsize_suv_luxury",     body:"suv", defaultMSRP:62000 },
-    "Jeep|Wagoneer S":       { segment:"midsize_suv_luxury",      body:"ev_suv", defaultMSRP:72000 },
-    "Jeep|Grand Wagoneer":   { segment:"fullsize_suv_luxury",     body:"suv", defaultMSRP:92000 },
-  
-    // KIA
-    "Kia|Forte":     { segment:"compact_sedan_mainstream", body:"sedan", defaultMSRP:22000 },
-    "Kia|K5":        { segment:"midsize_sedan_mainstream", body:"sedan", defaultMSRP:28000 },
-    "Kia|Sportage":  { segment:"compact_suv_mainstream",   body:"suv",   defaultMSRP:32000 },
-    "Kia|Sorento":   { segment:"midsize_suv_mainstream",   body:"suv",   defaultMSRP:36000 },
-    "Kia|Telluride": { segment:"midsize_suv_mainstream",   body:"suv",   defaultMSRP:38000 },
-    "Kia|EV6":       { segment:"compact_suv_mainstream",   body:"ev_suv",defaultMSRP:44000 },
-    "Kia|EV9":       { segment:"midsize_suv_mainstream",   body:"ev_suv",defaultMSRP:58000 },
-    "Kia|Carnival":  { segment:"minivan_mainstream",       body:"van",   defaultMSRP:36000 },
-  
-    // LEXUS
-    "Lexus|ES":  { segment:"midsize_sedan_luxury",  body:"sedan", defaultMSRP:44000 },
-    "Lexus|IS":  { segment:"compact_sedan_luxury",  body:"sedan", defaultMSRP:42000 },
-    "Lexus|NX":  { segment:"compact_suv_luxury",    body:"suv",   defaultMSRP:42000 },
-    "Lexus|RX":  { segment:"midsize_suv_luxury",    body:"suv",   defaultMSRP:50000 },
-    "Lexus|TX":  { segment:"midsize_suv_luxury",    body:"suv",   defaultMSRP:56000 },
-    "Lexus|GX":  { segment:"midsize_suv_luxury",    body:"suv",   defaultMSRP:65000 },
-    "Lexus|LX":  { segment:"fullsize_suv_luxury",   body:"suv",   defaultMSRP:92000 },
-    "Lexus|RZ":  { segment:"compact_suv_luxury",    body:"ev_suv",defaultMSRP:44000 },
-  
-    // LINCOLN
-    "Lincoln|Corsair":   { segment:"compact_suv_luxury",  body:"suv", defaultMSRP:40000 },
-    "Lincoln|Nautilus":  { segment:"midsize_suv_luxury",  body:"suv", defaultMSRP:46000 },
-    "Lincoln|Aviator":   { segment:"midsize_suv_luxury",  body:"suv", defaultMSRP:56000 },
-    "Lincoln|Navigator": { segment:"fullsize_suv_luxury", body:"suv", defaultMSRP:82000 },
-  
-    // MAZDA
-    "Mazda|Mazda3": { segment:"compact_sedan_mainstream", body:"sedan", defaultMSRP:26000 },
-    "Mazda|CX-5":   { segment:"compact_suv_mainstream",  body:"suv",   defaultMSRP:32000 },
-    "Mazda|CX-30":  { segment:"subcompact_suv_mainstream", body:"suv", defaultMSRP:28000 },
-    "Mazda|CX-50":  { segment:"compact_suv_mainstream",  body:"suv",   defaultMSRP:32000 },
-    "Mazda|CX-70":  { segment:"midsize_suv_mainstream",  body:"suv",   defaultMSRP:42000 },
-    "Mazda|CX-90":  { segment:"midsize_suv_mainstream",  body:"suv",   defaultMSRP:42000 },
-  
-    // MERCEDES-BENZ
-    "Mercedes-Benz|C-Class": { segment:"compact_sedan_luxury", body:"sedan", defaultMSRP:48000 },
-    "Mercedes-Benz|E-Class": { segment:"midsize_sedan_luxury", body:"sedan", defaultMSRP:60000 },
-    "Mercedes-Benz|S-Class": { segment:"fullsize_sedan_luxury", body:"sedan",defaultMSRP:118000 },
-    "Mercedes-Benz|GLA":     { segment:"compact_suv_luxury",   body:"suv",   defaultMSRP:42000 },
-    "Mercedes-Benz|GLB":     { segment:"compact_suv_luxury",   body:"suv",   defaultMSRP:44000 },
-    "Mercedes-Benz|GLC":     { segment:"compact_suv_luxury",   body:"suv",   defaultMSRP:48000 },
-    "Mercedes-Benz|GLE":     { segment:"midsize_suv_luxury",   body:"suv",   defaultMSRP:62000 },
-    "Mercedes-Benz|GLS":     { segment:"fullsize_suv_luxury",  body:"suv",   defaultMSRP:82000 },
-    "Mercedes-Benz|EQB":     { segment:"compact_suv_luxury",   body:"ev_suv",defaultMSRP:50000 },
-    "Mercedes-Benz|EQE":     { segment:"midsize_sedan_luxury", body:"sedan", defaultMSRP:76000 },
-    "Mercedes-Benz|EQS":     { segment:"fullsize_sedan_luxury", body:"sedan",defaultMSRP:106000 },
-  
-    // NISSAN
-    "Nissan|Sentra":     { segment:"compact_sedan_mainstream", body:"sedan", defaultMSRP:22000 },
-    "Nissan|Altima":     { segment:"midsize_sedan_mainstream", body:"sedan", defaultMSRP:28000 },
-    "Nissan|Kicks":      { segment:"subcompact_suv_mainstream", body:"suv", defaultMSRP:22000 },
-    "Nissan|Rogue":      { segment:"compact_suv_mainstream",   body:"suv",  defaultMSRP:32000 },
-    "Nissan|Murano":     { segment:"midsize_suv_mainstream",   body:"suv",  defaultMSRP:40000 },
-    "Nissan|Pathfinder": { segment:"midsize_suv_mainstream",   body:"suv",  defaultMSRP:40000 },
-    "Nissan|Ariya":      { segment:"compact_suv_mainstream",   body:"ev_suv",defaultMSRP:44000 },
-    "Nissan|Frontier":   { segment:"midsize_truck_mainstream", body:"truck", defaultMSRP:32000 },
-  
-    // RAM
-    "Ram|1500":     { segment:"fullsize_truck_mainstream", body:"truck", defaultMSRP:42000 },
-    "Ram|1500 REV": { segment:"fullsize_truck_mainstream", body:"truck", defaultMSRP:60000 },
-  
-    // SUBARU
-    "Subaru|Impreza":   { segment:"compact_sedan_mainstream", body:"sedan", defaultMSRP:24000 },
-    "Subaru|Crosstrek": { segment:"subcompact_suv_mainstream", body:"suv", defaultMSRP:30000 },
-    "Subaru|Forester":  { segment:"compact_suv_mainstream",   body:"suv",  defaultMSRP:34000 },
-    "Subaru|Outback":   { segment:"midsize_suv_mainstream",   body:"suv",  defaultMSRP:32000 },
-    "Subaru|Ascent":    { segment:"midsize_suv_mainstream",   body:"suv",  defaultMSRP:38000 },
-    "Subaru|Solterra":  { segment:"compact_suv_mainstream",   body:"ev_suv",defaultMSRP:44000 },
-  
-    // TESLA
-    "Tesla|Model 3": { segment:"compact_sedan_mainstream", body:"sedan",  defaultMSRP:42000 },
-    "Tesla|Model Y": { segment:"compact_suv_mainstream",   body:"ev_suv", defaultMSRP:48000 },
-    "Tesla|Model S": { segment:"fullsize_sedan_luxury",    body:"sedan",  defaultMSRP:80000 },
-    "Tesla|Model X": { segment:"fullsize_suv_luxury",      body:"ev_suv", defaultMSRP:88000 },
-  
-    // TOYOTA
-    "Toyota|Corolla":           { segment:"compact_sedan_mainstream", body:"sedan", defaultMSRP:24000 },
-    "Toyota|Camry":             { segment:"midsize_sedan_mainstream", body:"sedan", defaultMSRP:30000 },
-    "Toyota|RAV4":              { segment:"compact_suv_mainstream",   body:"suv",   defaultMSRP:32000 },
-    "Toyota|RAV4 Hybrid":       { segment:"compact_suv_mainstream",  body:"suv",   defaultMSRP:34000 },
-    "Toyota|RAV4 Prime":        { segment:"compact_suv_mainstream",  body:"suv",   defaultMSRP:44000 },
-    "Toyota|Highlander":        { segment:"midsize_suv_mainstream",  body:"suv",   defaultMSRP:40000 },
-    "Toyota|Highlander Hybrid": { segment:"midsize_suv_mainstream",  body:"suv",   defaultMSRP:42000 },
-    "Toyota|4Runner":           { segment:"midsize_suv_mainstream",  body:"suv",   defaultMSRP:42000 },
-    "Toyota|Tacoma":            { segment:"midsize_truck_mainstream", body:"truck", defaultMSRP:34000 },
-    "Toyota|Tundra":            { segment:"fullsize_truck_mainstream", body:"truck",defaultMSRP:42000 },
-    "Toyota|bZ4X":              { segment:"compact_suv_mainstream",  body:"ev_suv",defaultMSRP:44000 },
-    "Toyota|Crown":             { segment:"midsize_sedan_mainstream", body:"sedan", defaultMSRP:42000 },
-  
-    // VOLKSWAGEN
-    "Volkswagen|Jetta":             { segment:"compact_sedan_mainstream", body:"sedan", defaultMSRP:24000 },
-    "Volkswagen|Taos":              { segment:"subcompact_suv_mainstream", body:"suv", defaultMSRP:26000 },
-    "Volkswagen|Tiguan":            { segment:"compact_suv_mainstream",   body:"suv",  defaultMSRP:32000 },
-    "Volkswagen|Atlas":             { segment:"midsize_suv_mainstream",   body:"suv",  defaultMSRP:40000 },
-    "Volkswagen|Atlas Cross Sport": { segment:"midsize_suv_mainstream",   body:"suv",  defaultMSRP:38000 },
-    "Volkswagen|ID.4":              { segment:"compact_suv_mainstream",   body:"ev_suv",defaultMSRP:42000 },
-    "Volkswagen|ID.Buzz":           { segment:"minivan_mainstream",       body:"van",  defaultMSRP:62000 },
-  
-    // VOLVO
-    "Volvo|XC40": { segment:"compact_suv_luxury",  body:"suv",    defaultMSRP:40000 },
-    "Volvo|XC60": { segment:"compact_suv_luxury",  body:"suv",    defaultMSRP:46000 },
-    "Volvo|XC90": { segment:"midsize_suv_luxury",  body:"suv",    defaultMSRP:58000 },
-    "Volvo|S60":  { segment:"compact_sedan_luxury", body:"sedan",  defaultMSRP:42000 },
-    "Volvo|EX30": { segment:"subcompact_suv_luxury", body:"ev_suv",defaultMSRP:36000 },
-    "Volvo|EX90": { segment:"midsize_suv_luxury",  body:"ev_suv", defaultMSRP:80000 },
-  
-    // LAND ROVER / RIVIAN / PORSCHE
-    "Land Rover|Range Rover Sport": { segment:"midsize_suv_luxury", body:"suv", defaultMSRP:84000 },
-    "Land Rover|Range Rover":       { segment:"fullsize_suv_luxury", body:"suv", defaultMSRP:105000 },
-    "Rivian|R1S":                   { segment:"midsize_suv_luxury", body:"ev_suv", defaultMSRP:80000 },
-    "Rivian|R1T":                   { segment:"midsize_truck_luxury", body:"truck", defaultMSRP:75000 },
-    "Porsche|Macan":                { segment:"compact_suv_luxury", body:"suv", defaultMSRP:62000 },
-    "Porsche|Cayenne":              { segment:"midsize_suv_luxury", body:"suv", defaultMSRP:76000 },
-  };
+
+  let _vehicleRef = {};  // Populated from Supabase on page load
+
+  async function loadVehicleReference() {
+    if (!window._sbClient) return;
+    try {
+      const { data, error } = await window._sbClient
+        .from('vehicle_reference')
+        .select('make, model, segment, body_class, base_msrp, value_band');
+
+      if (!error && data && data.length > 0) {
+        data.forEach(d => {
+          _vehicleRef[d.make + '|' + d.model] = {
+            segment: d.segment,
+            body: d.body_class,
+            defaultMSRP: d.base_msrp,
+            valueBand: d.value_band
+          };
+        });
+        console.log('[LeaseCheckr] Loaded ' + data.length + ' vehicle references from Supabase');
+      }
+    } catch (e) {
+      console.log('[LeaseCheckr] Vehicle reference load failed');
+    }
+  }
   
   
   // ─────────────────────────────────────────
@@ -2167,10 +1939,10 @@
     return 'high';
   }
   
-  // Look up vehicle segment info
+  // Look up vehicle segment info (from live Supabase data)
   function getVehicleInfo(make, model) {
     const key = make + '|' + model;
-    return VEHICLE_SEGMENTS[key] || null;
+    return _vehicleRef[key] || null;
   }
   
   // Get vehicle MSRP for value band (from deal data, or lookup fallback)
@@ -2364,10 +2136,26 @@
       const dealTerm = parseInt(deal.trm || deal.term) || 36;
       const dealMake = deal.mk || deal.make;
       const dealModel = deal.md || deal.model;
-      const dealInfo = getVehicleInfo(dealMake, dealModel);
-      const dealSegment = dealInfo ? dealInfo.segment : null;
-      const dealBody = dealInfo ? dealInfo.body : null;
-      const dealValueBand = resolveValueBand(dealMake, dealModel, deal.msrp, deal.sp || deal.cap_cost);
+
+      // Use pre-computed segment/band from DB trigger when available
+      // Fall back to vehicle_reference lookup if DB fields are null (legacy data)
+      let dealSegment = deal.segment || null;
+      let dealBody = null;
+      let dealValueBand = deal.vband || null;
+
+      if (!dealSegment || !dealValueBand) {
+        const dealInfo = getVehicleInfo(dealMake, dealModel);
+        if (dealInfo) {
+          if (!dealSegment) dealSegment = dealInfo.segment;
+          dealBody = dealInfo.body;
+          if (!dealValueBand) dealValueBand = dealInfo.valueBand || resolveValueBand(dealMake, dealModel, deal.msrp, deal.sp || deal.cap_cost);
+        }
+      }
+      if (!dealBody) {
+        const dealInfo = getVehicleInfo(dealMake, dealModel);
+        dealBody = dealInfo ? dealInfo.body : null;
+      }
+
       const dealMileageBand = getMileageBand(deal.mi || deal.annual_mileage);
       const dealTrustTier = deal.tt || deal.trust_tier || 'medium';
   
@@ -2817,7 +2605,7 @@
       getMileageBand,
       zipToCounty,
       countyToRegion,
-      VEHICLE_SEGMENTS
+      _vehicleRef
     };
   }
 
@@ -2828,12 +2616,15 @@
   let _totalDealCount = 0;
 
   async function loadBenchmarkData() {
-    // Try Supabase first
+    // Load vehicle reference first
+    await loadVehicleReference();
+
+    // Try Supabase — include pre-computed segment and value_band from DB trigger
     if (window._sbClient) {
       try {
         const { data, error, count } = await window._sbClient
           .from('lease_submissions')
-          .select('make, model, trim, monthly_payment, due_at_signing, term, annual_mileage, county, zip, money_factor, residual_pct, msrp, selling_price, trust_tier, dealer_name, created_at, deal_status', { count: 'exact' })
+          .select('make, model, trim, monthly_payment, due_at_signing, term, annual_mileage, county, zip, money_factor, residual_pct, msrp, selling_price, trust_tier, dealer_name, created_at, deal_status, vehicle_segment, value_band', { count: 'exact' })
           .in('deal_status', ['signed_verified', 'signed_manual'])
           .not('monthly_payment', 'is', null);
 
@@ -2844,23 +2635,26 @@
             trm: d.term || 36, mi: d.annual_mileage || 10000,
             co: d.county, mf: d.money_factor, msrp: d.msrp,
             sp: d.selling_price, tt: d.trust_tier || 'medium',
-            dlr: d.dealer_name, created_at: d.created_at
+            dlr: d.dealer_name, created_at: d.created_at,
+            // Pre-computed from DB trigger — no client-side recomputation needed
+            segment: d.vehicle_segment,
+            vband: d.value_band
           }));
           _totalDealCount = count || data.length;
           console.log('[LeaseCheckr] Loaded ' + _benchmarkDeals.length + ' benchmark deals from Supabase');
           return;
         }
       } catch (e) {
-        console.log('[LeaseCheckr] Supabase load failed, using seed data');
+        console.log('[LeaseCheckr] Supabase load failed');
       }
     }
 
-    // Fallback: try to load seed deals (submission_type = 'seed')
+    // Fallback: load all deals if no signed/manual filter worked
     if (window._sbClient) {
       try {
         const { data, error, count } = await window._sbClient
           .from('lease_submissions')
-          .select('make, model, trim, monthly_payment, due_at_signing, term, annual_mileage, county, zip, money_factor, residual_pct, msrp, selling_price, trust_tier, dealer_name, created_at', { count: 'exact' })
+          .select('make, model, trim, monthly_payment, due_at_signing, term, annual_mileage, county, zip, money_factor, residual_pct, msrp, selling_price, trust_tier, dealer_name, created_at, vehicle_segment, value_band', { count: 'exact' })
           .not('monthly_payment', 'is', null);
 
         if (!error && data && data.length > 0) {
@@ -2870,7 +2664,9 @@
             trm: d.term || 36, mi: d.annual_mileage || 10000,
             co: d.county, mf: d.money_factor, msrp: d.msrp,
             sp: d.selling_price, tt: d.trust_tier || 'medium',
-            dlr: d.dealer_name, created_at: d.created_at
+            dlr: d.dealer_name, created_at: d.created_at,
+            segment: d.vehicle_segment,
+            vband: d.value_band
           }));
           _totalDealCount = count || data.length;
           console.log('[LeaseCheckr] Loaded ' + _benchmarkDeals.length + ' deals (all) from Supabase');
