@@ -43,7 +43,7 @@
     .spots-text{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;color:var(--copper);}
 
     /* ── CARD — premium polish ── */
-    .card-section{display:flex;justify-content:center;padding:0 64px 80px;animation:fadeUp 0.7s var(--ease) 0.26s both;}
+    .card-section{display:flex;flex-direction:column;align-items:center;padding:0 64px 80px;animation:fadeUp 0.7s var(--ease) 0.26s both;}
 
     .member-card{
       width:400px;
@@ -340,6 +340,14 @@
       <div class="card-est">03/26<br>New Jersey</div>
     </div>
   </div>
+
+  <div style="text-align:center;margin-top:36px;">
+    <a href="intake-upload.html" class="cta-main">
+      <span>Claim Your Founding Member Spot</span>
+      <span class="cta-main-arrow">→</span>
+    </a>
+    <div class="cta-support">Upload your NJ lease · Free full report included</div>
+  </div>
 </div>
 
 <div class="content-section">
@@ -468,15 +476,14 @@
       // SOLD OUT STATE
       spotsEl.textContent='All 1,000 spots have been claimed';
       document.body.classList.add('sold-out');
-      // Update CTA
-      const cta=document.querySelector('.cta-main');
-      if(cta){
+      // Update ALL CTAs
+      document.querySelectorAll('.cta-main').forEach(cta => {
         cta.innerHTML='<span>All Founding Member Spots Claimed</span>';
         cta.href='access.html';
-      }
-      const ctaSub=document.querySelector('.cta-support');
-      if(ctaSub)ctaSub.textContent='You can still get your full report by uploading your lease or paying $19.99';
-      // Update hero subhead
+      });
+      document.querySelectorAll('.cta-support').forEach(sub => {
+        sub.textContent='You can still get your full report by uploading your lease or paying $19.99';
+      });
       const sub=document.querySelector('.hero-subhead');
       if(sub)sub.textContent='All 1,000 Founding Member spots have been claimed. Thank you to every driver who helped build the benchmark. You can still upload your lease for a free report or purchase full access.';
     }else{
