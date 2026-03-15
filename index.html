@@ -2899,7 +2899,8 @@
         trust_tier: _isFounder ? 'high' : 'low',
         report_entitlement: _isFounder ? 'founder_included' : 'none',
         grade: _lastGradeResult?.grade || null,
-        effective_monthly: _lastGradeResult?.emc || null
+        effective_monthly: _lastGradeResult?.emc || null,
+        comp_avg_effective: _lastGradeResult?.weighted_median_emc || null
       };
 
       console.log('[LeaseCheckr] Inserting to Supabase:', JSON.stringify(row, null, 2));
