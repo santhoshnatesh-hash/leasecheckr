@@ -765,6 +765,17 @@ nav {
       <div class="trust-item"><div class="trust-dot"></div>Completely free</div>
     </div>
 
+    <!-- Email capture (shown only if no email in sessionStorage) -->
+    <div id="emailCapture" style="display:none;margin-bottom:16px;">
+      <div style="font-family:'DM Mono',monospace;font-size:0.52rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-3);margin-bottom:8px;">Where should we send your report?</div>
+      <input type="email" id="captureEmail" placeholder="you@email.com" style="
+        width:100%;padding:13px 16px;border:1px solid rgba(28,25,23,0.18);
+        border-radius:3px;font-family:'DM Sans',sans-serif;font-size:0.88rem;
+        background:#fff;color:var(--ink);transition:border-color 0.2s;
+      " onfocus="this.style.borderColor='#a8692e'" onblur="this.style.borderColor='rgba(28,25,23,0.18)'">
+      <div id="captureEmailError" style="display:none;font-size:0.72rem;color:#a85a4a;margin-top:6px;">Please enter a valid email address.</div>
+    </div>
+
     <button class="btn-primary" id="step1btn" onclick="goToStep2()" disabled>
       <span>Continue</span>
       <span style="opacity:0.5">→</span>
@@ -1570,11 +1581,42 @@ function prefillEmail() {
   try {
     const saved = sessionStorage.getItem('lc_email');
     if (saved) {
-      // Store for confirmation screen
       window._userEmail = saved;
+    } else {
+      // No email yet — show the email capture field on step 1
+      const capture = document.getElementById('emailCapture');
+      if (capture) capture.style.display = 'block';
     }
   } catch(e) {}
 }
+
+// Override goToStep2 to validate email first
+const _originalGoToStep2 = goToStep2;
+goToStep2 = function() {
+  if (!selectedMethod) return;
+
+  // Check if we need email
+  const capture = document.getElementById('emailCapture');
+  if (capture && capture.style.display !== 'none') {
+    const input = document.getElementById('captureEmail');
+    const error = document.getElementById('captureEmailError');
+    const email = (input.value || '').trim();
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      error.style.display = 'block';
+      input.style.borderColor = '#a85a4a';
+      input.focus();
+      return;
+    }
+    error.style.display = 'none';
+    input.style.borderColor = '';
+    // Save to sessionStorage
+    sessionStorage.setItem('lc_email', email);
+    window._userEmail = email;
+  }
+
+  _originalGoToStep2();
+};
 
 // ── SHOW CONFIRMATION (replaces old step 3 + step 4) ──
 async function showConfirmation() {
