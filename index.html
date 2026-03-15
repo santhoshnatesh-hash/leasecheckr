@@ -2780,16 +2780,15 @@
     btn.disabled = true;
     btn.textContent = 'Checking…';
 
-    // Check if this email is a founder
+    // Check if this email is a founder (from founders table — single source of truth)
     _isFounder = false;
     if (window._sbClient) {
       try {
         const { data, error } = await window._sbClient
-          .from('lease_submissions')
-          .select('id, founder_eligible, verification_status')
+          .from('founders')
+          .select('id, founder_number, status')
           .eq('email', email)
-          .eq('founder_eligible', true)
-          .eq('verification_status', 'verified')
+          .eq('status', 'active')
           .limit(1);
         if (!error && data && data.length > 0) {
           _isFounder = true;
