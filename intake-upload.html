@@ -410,23 +410,6 @@ async function submitLease(){
     const canvas=document.getElementById('redactCanvas');
     const blob=await new Promise(r=>canvas.toBlob(r,'image/jpeg',0.9));
 
-    // Use the hash of the ORIGINAL file (computed at upload time — deterministic)
-    const docHash=originalFileHash;
-
-    // CHECK FOR DUPLICATE DOCUMENT (same original file hash via RPC)
-    if(sb && docHash){
-      try{
-        const{data:isDuplicate,error:hashErr}=await sb.rpc('check_doc_hash',{hash_value:docHash});
-        if(!hashErr && isDuplicate===true){
-          document.getElementById('uploadingState').innerHTML='<div style="font-size:1.4rem;margin-bottom:12px">📄</div><div style="font-family:var(--f-display);font-size:20px;margin-bottom:8px">This document has already been uploaded</div><div style="font-size:13px;color:var(--ink-3);margin-bottom:20px">It looks like this exact document was submitted before. If you have a different lease document to contribute, please upload that instead.</div><button class="btn-primary" onclick="goToStep(1)" style="max-width:240px;margin:0 auto">← Upload a Different Document</button>';
-          setProgress(100);
-          document.getElementById('uploadingState').style.display='block';
-          document.getElementById('confirmState').style.display='none';
-          return;
-        }
-      }catch(e){console.warn('Duplicate check skipped:',e);}
-    }
-
     let documentUrl=null;
     if(sb&&blob){
       const fileName=Date.now()+'_'+Math.random().toString(36).substring(7)+'.jpg';
@@ -436,8 +419,7 @@ async function submitLease(){
       const{error:ie}=await sb.from('lease_submissions').insert([{
         email:email,submission_type:'verified_upload',deal_status:'signed_verified',
         trust_tier:'high',verification_status:'pending',report_entitlement:'free_verified',
-        founder_eligible:true,source:'document_upload',
-        doc_hash:docHash
+        founder_eligible:true,source:'document_upload'
       }]);
       if(ie)console.error('Insert error:',ie);
     }
