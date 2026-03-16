@@ -849,105 +849,166 @@ async function loadReportData() {
 
     // ════════════════════════════════
     // SECTION 06: Dealer advertised deals from dealer_comps
-    // Tiered: same model+county → same model NJ → segment+price county → segment+price NJ → hide
+    // 5-tier: exact model+county → exact model NJ → same make county → competitors county → competitors NJ → hide
     // ════════════════════════════════
 
-    // Simple body type mapping for segment matching in Tier 3-4
+    // Competitor mapping: which makes cross-shop with each other
+    const COMPETITOR_MAP = {
+      // Luxury
+      'Audi': ['BMW', 'Mercedes-Benz', 'Lexus', 'Genesis', 'Volvo', 'Infiniti', 'Cadillac', 'Lincoln', 'Acura'],
+      'BMW': ['Audi', 'Mercedes-Benz', 'Lexus', 'Genesis', 'Volvo', 'Infiniti', 'Cadillac', 'Acura'],
+      'Mercedes-Benz': ['BMW', 'Audi', 'Lexus', 'Genesis', 'Volvo', 'Infiniti', 'Cadillac', 'Lincoln'],
+      'Lexus': ['BMW', 'Audi', 'Mercedes-Benz', 'Genesis', 'Volvo', 'Infiniti', 'Acura', 'Lincoln'],
+      'Genesis': ['BMW', 'Audi', 'Mercedes-Benz', 'Lexus', 'Volvo', 'Acura', 'Infiniti'],
+      'Volvo': ['BMW', 'Audi', 'Mercedes-Benz', 'Lexus', 'Genesis', 'Acura'],
+      'Infiniti': ['Lexus', 'Acura', 'BMW', 'Audi', 'Genesis', 'Cadillac'],
+      'Cadillac': ['Lincoln', 'BMW', 'Audi', 'Mercedes-Benz', 'Lexus', 'Genesis', 'Infiniti'],
+      'Lincoln': ['Cadillac', 'Lexus', 'Volvo', 'Acura', 'Genesis', 'Infiniti'],
+      'Acura': ['Lexus', 'Infiniti', 'Volvo', 'Genesis', 'BMW', 'Audi'],
+      // Mainstream
+      'Honda': ['Toyota', 'Hyundai', 'Kia', 'Mazda', 'Subaru', 'Nissan', 'Volkswagen'],
+      'Toyota': ['Honda', 'Hyundai', 'Kia', 'Mazda', 'Subaru', 'Nissan', 'Volkswagen'],
+      'Hyundai': ['Kia', 'Honda', 'Toyota', 'Mazda', 'Nissan', 'Subaru', 'Volkswagen'],
+      'Kia': ['Hyundai', 'Honda', 'Toyota', 'Mazda', 'Nissan', 'Subaru', 'Volkswagen'],
+      'Mazda': ['Honda', 'Toyota', 'Hyundai', 'Kia', 'Subaru', 'Volkswagen', 'Nissan'],
+      'Subaru': ['Honda', 'Toyota', 'Mazda', 'Hyundai', 'Kia', 'Nissan', 'Volkswagen'],
+      'Nissan': ['Honda', 'Toyota', 'Hyundai', 'Kia', 'Mazda', 'Subaru', 'Volkswagen'],
+      'Volkswagen': ['Honda', 'Toyota', 'Mazda', 'Hyundai', 'Kia', 'Subaru', 'Nissan'],
+      // American
+      'Ford': ['Chevrolet', 'Jeep', 'Toyota', 'Honda', 'GMC', 'Dodge', 'Ram', 'Hyundai', 'Kia'],
+      'Chevrolet': ['Ford', 'Toyota', 'Honda', 'GMC', 'Jeep', 'Hyundai', 'Kia', 'Nissan'],
+      'Jeep': ['Ford', 'Toyota', 'Chevrolet', 'Dodge', 'Subaru', 'Kia', 'Hyundai'],
+      'GMC': ['Chevrolet', 'Ford', 'Toyota', 'Jeep', 'Ram'],
+      'Dodge': ['Jeep', 'Ford', 'Chevrolet', 'Kia', 'Hyundai'],
+      'Ram': ['Ford', 'Chevrolet', 'GMC', 'Toyota'],
+      'Buick': ['Chevrolet', 'Honda', 'Toyota', 'Mazda', 'Hyundai', 'Subaru', 'Acura'],
+      'Chrysler': ['Honda', 'Toyota', 'Kia', 'Hyundai'],
+      // EV
+      'Tesla': ['BMW', 'Mercedes-Benz', 'Audi', 'Hyundai', 'Kia', 'Ford', 'Volkswagen', 'Volvo']
+    };
+
+    // Body type mapping for same-segment filtering
     const BODY_MAP = {
       'CR-V':'suv','RAV4':'suv','Tucson':'suv','Sportage':'suv','Rogue':'suv','Escape':'suv','Equinox':'suv','Forester':'suv','CX-5':'suv','Tiguan':'suv','Outlander':'suv','HR-V':'suv','Kicks':'suv','Trax':'suv','Taos':'suv','Seltos':'suv','Crosstrek':'suv','CX-30':'suv','Kona':'suv','Venue':'suv','Bronco Sport':'suv',
-      'X3':'suv','X5':'suv','X1':'suv','GLC':'suv','GLE':'suv','GLA':'suv','GLB':'suv','Q5':'suv','Q3':'suv','Q7':'suv','NX':'suv','RX':'suv','GX':'suv','XC60':'suv','XC90':'suv','XC40':'suv','RDX':'suv','MDX':'suv','GV70':'suv','GV80':'suv','Corsair':'suv','Nautilus':'suv','Aviator':'suv','XT5':'suv','XT4':'suv',
-      'Highlander':'suv','Pilot':'suv','Palisade':'suv','Telluride':'suv','Explorer':'suv','Traverse':'suv','Pathfinder':'suv','Ascent':'suv','CX-90':'suv','Atlas':'suv','Grand Cherokee':'suv','4Runner':'suv',
-      'Civic':'sedan','Accord':'sedan','Camry':'sedan','Corolla':'sedan','Altima':'sedan','Sentra':'sedan','Elantra':'sedan','Sonata':'sedan','Forte':'sedan','K5':'sedan','Jetta':'sedan','Mazda3':'sedan','Malibu':'sedan',
-      '3 Series':'sedan','C-Class':'sedan','A4':'sedan','IS':'sedan','ES':'sedan','S60':'sedan','TLX':'sedan','G70':'sedan','CT4':'sedan','CT5':'sedan',
-      'Model Y':'suv','Model 3':'sedan','Model S':'sedan','Model X':'suv',
-      'Wrangler':'suv','Bronco':'suv','Tacoma':'truck','F-150':'truck','Silverado':'truck','Sierra':'truck','1500':'truck','Tundra':'truck','Frontier':'truck','Gladiator':'truck','Maverick':'truck','Canyon':'truck',
-      'Ioniq 5':'suv','Ioniq 6':'sedan','EV6':'suv','ID.4':'suv','Mach-E':'suv','Lyriq':'suv','Ariya':'suv','EX30':'suv','iX':'suv','i4':'sedan','i5':'sedan'
+      'X3':'suv','X5':'suv','X1':'suv','GLC':'suv','GLE':'suv','GLA':'suv','GLB':'suv','Q5':'suv','Q3':'suv','Q7':'suv','Q8':'suv','NX':'suv','RX':'suv','GX':'suv','TX':'suv','XC60':'suv','XC90':'suv','XC40':'suv','RDX':'suv','MDX':'suv','GV70':'suv','GV80':'suv','Corsair':'suv','Nautilus':'suv','Aviator':'suv','Navigator':'suv','XT5':'suv','XT4':'suv','XT6':'suv','Lyriq':'suv','Escalade':'suv','QX50':'suv','QX60':'suv','QX80':'suv',
+      'Highlander':'suv','Pilot':'suv','Palisade':'suv','Telluride':'suv','Explorer':'suv','Traverse':'suv','Pathfinder':'suv','Ascent':'suv','CX-90':'suv','CX-50':'suv','Atlas':'suv','Atlas Cross Sport':'suv','Grand Cherokee':'suv','Grand Cherokee L':'suv','4Runner':'suv','Wrangler':'suv','Bronco':'suv','Terrain':'suv','Acadia':'suv','Yukon':'suv','Tahoe':'suv','Durango':'suv','Santa Fe':'suv','Enclave':'suv','Envision':'suv','Encore GX':'suv','Envista':'suv','Sorento':'suv','EV9':'suv',
+      'Hornet':'suv','Compass':'suv','Gladiator':'truck',
+      'Civic':'sedan','Accord':'sedan','Camry':'sedan','Corolla':'sedan','Altima':'sedan','Sentra':'sedan','Elantra':'sedan','Sonata':'sedan','Forte':'sedan','K5':'sedan','Jetta':'sedan','Mazda3':'sedan','Malibu':'sedan','Crown':'sedan',
+      '3 Series':'sedan','5 Series':'sedan','7 Series':'sedan','C-Class':'sedan','E-Class':'sedan','S-Class':'sedan','A4':'sedan','A6':'sedan','IS':'sedan','ES':'sedan','S60':'sedan','S90':'sedan','TLX':'sedan','Integra':'sedan','G70':'sedan','G80':'sedan','G90':'sedan','CT4':'sedan','CT5':'sedan','Q50':'sedan','CLA':'sedan',
+      'Model Y':'suv','Model 3':'sedan','Model S':'sedan','Model X':'suv','Cybertruck':'truck',
+      'Tacoma':'truck','F-150':'truck','Silverado':'truck','Sierra':'truck','1500':'truck','Tundra':'truck','Frontier':'truck','Maverick':'truck','Canyon':'truck',
+      'Ioniq 5':'suv','Ioniq 6':'sedan','EV6':'suv','ID.4':'suv','ID.Buzz':'suv','Mustang Mach-E':'suv','Mach-E':'suv','Lyriq':'suv','Ariya':'suv','EX30':'suv','EX40':'suv','EX90':'suv','C40 Recharge':'suv','iX':'suv','i4':'sedan','i5':'sedan','i7':'sedan','e-tron GT':'sedan','EQE':'sedan','EQS':'sedan','Blazer EV':'suv','Equinox EV':'suv','Prologue':'suv','bZ4X':'suv','Solterra':'suv','Electrified GV70':'suv','GV60':'suv',
+      'Pacifica':'suv','Carnival':'suv','Odyssey':'suv',
+      'Golf GTI':'sedan','Golf R':'sedan','WRX':'sedan','BRZ':'sedan','GR86':'sedan','Supra':'sedan','MX-5':'sedan'
     };
 
     const userBody = BODY_MAP[model] || 'suv';
-
-    // Value band for price matching
-    function getDealerValueBand(pay) {
-      if (pay < 350) return 'budget';
-      if (pay < 500) return 'mid';
-      if (pay < 700) return 'premium';
-      return 'luxury';
-    }
-    const userPriceBand = getDealerValueBand(payment);
+    const competitors = COMPETITOR_MAP[make] || [];
 
     let countyDealerComps = null;
     let dealerMatchLevel = '';
     let dealerMatchNote = '';
 
-    // Tier 1: Same make + model, same county
+    // Tier 1: Same make + model, same county (threshold: 1)
     {
       const { data } = await sb.from('dealer_comps')
         .select('*')
         .eq('make', make).eq('model', model).eq('county', county)
         .eq('is_active', true)
         .order('monthly_payment', { ascending: true }).limit(10);
-      if (data && data.length >= 2) {
+      if (data && data.length >= 1) {
         countyDealerComps = data;
         dealerMatchLevel = 'exact_county';
-        dealerMatchNote = 'Dealer pricing for ' + make + ' ' + model + ' in ' + county + ' County.';
+        dealerMatchNote = 'What dealers in ' + county + ' County are advertising for the ' + make + ' ' + model + '.';
       }
     }
 
-    // Tier 2: Same make + model, any NJ county
-    if (!countyDealerComps || countyDealerComps.length < 2) {
+    // Tier 2: Same make + model, any NJ county (threshold: 1)
+    if (!countyDealerComps || countyDealerComps.length < 1) {
       const { data } = await sb.from('dealer_comps')
         .select('*')
         .eq('make', make).eq('model', model)
         .eq('is_active', true)
         .order('monthly_payment', { ascending: true }).limit(10);
-      if (data && data.length >= 2) {
+      if (data && data.length >= 1) {
         countyDealerComps = data;
         dealerMatchLevel = 'exact_nj';
-        dealerMatchNote = 'Dealer pricing for ' + make + ' ' + model + ' across NJ.';
+        dealerMatchNote = 'What NJ dealers are advertising for the ' + make + ' ' + model + '.';
       }
     }
 
-    // Tier 3: Same segment + similar price band, same county
-    if (!countyDealerComps || countyDealerComps.length < 2) {
-      const priceLow = Math.round(payment * 0.65);
-      const priceHigh = Math.round(payment * 1.35);
+    // Tier 3: Same make, different models, same county + same body type (threshold: 2)
+    if (!countyDealerComps || countyDealerComps.length < 1) {
       const { data } = await sb.from('dealer_comps')
         .select('*')
-        .eq('county', county).eq('is_active', true)
-        .gte('monthly_payment', priceLow).lte('monthly_payment', priceHigh)
-        .order('monthly_payment', { ascending: true }).limit(15);
-      // Filter by body type
-      if (data && data.length > 0) {
-        const filtered = data.filter(c => (BODY_MAP[c.model] || 'suv') === userBody);
-        if (filtered.length >= 2) {
-          countyDealerComps = filtered.slice(0, 10);
-          dealerMatchLevel = 'segment_county';
-          const bodyLabel = userBody === 'sedan' ? 'sedans' : userBody === 'truck' ? 'trucks' : 'SUVs';
-          dealerMatchNote = 'Dealer pricing for ' + make + ' ' + model + ' is not yet available in ' + county + ' County. Showing comparable ' + bodyLabel + ' in a similar price range for reference.';
-        }
-      }
-    }
-
-    // Tier 4: Same segment + similar price band, any NJ county
-    if (!countyDealerComps || countyDealerComps.length < 2) {
-      const priceLow = Math.round(payment * 0.65);
-      const priceHigh = Math.round(payment * 1.35);
-      const { data } = await sb.from('dealer_comps')
-        .select('*')
+        .eq('make', make).eq('county', county)
         .eq('is_active', true)
-        .gte('monthly_payment', priceLow).lte('monthly_payment', priceHigh)
         .order('monthly_payment', { ascending: true }).limit(15);
       if (data && data.length > 0) {
         const filtered = data.filter(c => (BODY_MAP[c.model] || 'suv') === userBody);
         if (filtered.length >= 2) {
           countyDealerComps = filtered.slice(0, 10);
-          dealerMatchLevel = 'segment_nj';
-          const bodyLabel = userBody === 'sedan' ? 'sedans' : userBody === 'truck' ? 'trucks' : 'SUVs';
-          dealerMatchNote = 'Dealer pricing for ' + make + ' ' + model + ' is not yet available in NJ. Showing comparable ' + bodyLabel + ' across NJ in a similar price range for reference.';
+          dealerMatchLevel = 'same_make_county';
+          dealerMatchNote = 'Dealer pricing for the ' + make + ' ' + model + ' is not yet available in ' + county + ' County. Showing other ' + make + ' ' + (userBody === 'sedan' ? 'sedans' : userBody === 'truck' ? 'trucks' : 'SUVs') + ' for reference.';
         }
       }
     }
 
+    // Tier 4: Competitor makes + same body type, same county (threshold: 2)
+    if (!countyDealerComps || countyDealerComps.length < 2) {
+      if (competitors.length > 0) {
+        const { data } = await sb.from('dealer_comps')
+          .select('*')
+          .eq('county', county)
+          .eq('is_active', true)
+          .in('make', competitors)
+          .order('monthly_payment', { ascending: true }).limit(30);
+        if (data && data.length > 0) {
+          // Filter to same body type AND similar price (±30%)
+          const priceLow = Math.round(payment * 0.70);
+          const priceHigh = Math.round(payment * 1.30);
+          const filtered = data.filter(c => 
+            (BODY_MAP[c.model] || 'suv') === userBody &&
+            c.monthly_payment >= priceLow && c.monthly_payment <= priceHigh
+          );
+          if (filtered.length >= 2) {
+            countyDealerComps = filtered.slice(0, 10);
+            dealerMatchLevel = 'competitor_county';
+            const competitorNames = [...new Set(filtered.map(c => c.make))].slice(0, 4).join(', ');
+            const bodyLabel = userBody === 'sedan' ? 'sedans' : userBody === 'truck' ? 'trucks' : 'SUVs';
+            dealerMatchNote = 'Dealer pricing for the ' + make + ' ' + model + ' is not yet available in ' + county + ' County. Showing competing ' + bodyLabel + ' (' + competitorNames + ') in a similar price range.';
+          }
+        }
+      }
+    }
+
+    // Tier 5: Competitor makes + same body type, any NJ county (threshold: 2)
+    if (!countyDealerComps || countyDealerComps.length < 2) {
+      if (competitors.length > 0) {
+        const { data } = await sb.from('dealer_comps')
+          .select('*')
+          .eq('is_active', true)
+          .in('make', competitors)
+          .order('monthly_payment', { ascending: true }).limit(40);
+        if (data && data.length > 0) {
+          const priceLow = Math.round(payment * 0.70);
+          const priceHigh = Math.round(payment * 1.30);
+          const filtered = data.filter(c => 
+            (BODY_MAP[c.model] || 'suv') === userBody &&
+            c.monthly_payment >= priceLow && c.monthly_payment <= priceHigh
+          );
+          if (filtered.length >= 2) {
+            countyDealerComps = filtered.slice(0, 10);
+            dealerMatchLevel = 'competitor_nj';
+            const competitorNames = [...new Set(filtered.map(c => c.make))].slice(0, 4).join(', ');
+            const bodyLabel = userBody === 'sedan' ? 'sedans' : userBody === 'truck' ? 'trucks' : 'SUVs';
+            dealerMatchNote = 'Dealer pricing for the ' + make + ' ' + model + ' is not yet available in NJ. Showing competing ' + bodyLabel + ' (' + competitorNames + ') across NJ in a similar price range.';
+          }
+        }
+      }
+    }
+
+    // No data at any tier — hide section entirely
     if (countyDealerComps && countyDealerComps.length > 0) {
       document.getElementById('secDealer').style.display = 'block';
       document.getElementById('dealerSubtitle').textContent = dealerMatchNote;
@@ -956,19 +1017,24 @@ async function loadReportData() {
       const lowestDealer = Math.min(...countyDealerComps.map(c => c.monthly_payment));
       const highestDealer = Math.max(...countyDealerComps.map(c => c.monthly_payment));
 
-      // Same-model dealer comps (only relevant for Tier 1-2)
+      // Same-model dealer comps (relevant for Tier 1-3)
       const sameModelDealer = countyDealerComps.filter(c => c.make === make && c.model === model);
       const sameModelAvg = sameModelDealer.length ? Math.round(sameModelDealer.reduce((s,c) => s + c.monthly_payment, 0) / sameModelDealer.length) : null;
 
-      const dealerCardTitle = (dealerMatchLevel === 'exact_county' || dealerMatchLevel === 'exact_nj')
-        ? make + ' ' + model + ' Dealer Prices'
-        : (dealerMatchLevel === 'segment_county')
-        ? county + ' County — Comparable ' + (userBody === 'sedan' ? 'Sedans' : userBody === 'truck' ? 'Trucks' : 'SUVs')
-        : 'NJ — Comparable ' + (userBody === 'sedan' ? 'Sedans' : userBody === 'truck' ? 'Trucks' : 'SUVs');
+      // Card title reflects match level
+      const dealerCardTitle = (dealerMatchLevel === 'exact_county')
+        ? make + ' ' + model + ' — ' + county + ' County'
+        : (dealerMatchLevel === 'exact_nj')
+        ? make + ' ' + model + ' — NJ Dealers'
+        : (dealerMatchLevel === 'same_make_county')
+        ? make + ' ' + (userBody === 'sedan' ? 'Sedans' : userBody === 'truck' ? 'Trucks' : 'SUVs') + ' — ' + county + ' County'
+        : (dealerMatchLevel === 'competitor_county')
+        ? 'Competing ' + (userBody === 'sedan' ? 'Sedans' : userBody === 'truck' ? 'Trucks' : 'SUVs') + ' — ' + county + ' County'
+        : 'Competing ' + (userBody === 'sedan' ? 'Sedans' : userBody === 'truck' ? 'Trucks' : 'SUVs') + ' — NJ Dealers';
 
       let dealerHTML = '<div class="dlr-head">'
         + '<div class="dlr-name">' + dealerCardTitle + '</div>'
-        + '<div class="dlr-badge avg">' + countyDealerComps.length + ' Advertised Deals</div>'
+        + '<div class="dlr-badge avg">' + countyDealerComps.length + ' Advertised Deal' + (countyDealerComps.length > 1 ? 's' : '') + '</div>'
         + '</div>';
 
       dealerHTML += '<div class="dlr-stats">'
@@ -977,20 +1043,20 @@ async function loadReportData() {
         + '<div><div class="dlr-stat-l">Highest Advertised</div><div class="dlr-stat-v">$' + highestDealer + '/mo</div></div>'
         + '</div>';
 
+      // Show model-specific average for Tier 1-2
       if (sameModelAvg && (dealerMatchLevel === 'exact_county' || dealerMatchLevel === 'exact_nj')) {
         dealerHTML += '<div style="padding:12px 0;border-top:1px solid var(--bg2);border-bottom:1px solid var(--bg2);margin:10px 0;">'
           + '<div style="font-family:var(--mono);font-size:0.44rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink4);margin-bottom:4px;">' + make + ' ' + model + ' Dealer Average</div>'
           + '<div style="font-family:var(--serif);font-size:1.3rem;color:var(--ink);">$' + sameModelAvg + '/mo</div>'
-          + '<div style="font-size:0.72rem;color:var(--ink4);margin-top:2px;">From ' + sameModelDealer.length + ' advertised ' + model + ' deals</div>'
+          + '<div style="font-size:0.72rem;color:var(--ink4);margin-top:2px;">From ' + sameModelDealer.length + ' advertised ' + model + ' deal' + (sameModelDealer.length > 1 ? 's' : '') + '</div>'
           + '</div>';
       }
 
-      // Disclaimer for Tier 3-4
-      if (dealerMatchLevel === 'segment_county' || dealerMatchLevel === 'segment_nj') {
+      // Disclaimer for Tier 3-5 (not exact model)
+      if (dealerMatchLevel === 'same_make_county' || dealerMatchLevel === 'competitor_county' || dealerMatchLevel === 'competitor_nj') {
+        const disclaimerVehicles = [...new Set(countyDealerComps.map(c => c.make + ' ' + c.model))].slice(0, 5).join(', ');
         dealerHTML += '<div style="padding:10px 14px;background:rgba(168,105,46,0.06);border:1px solid rgba(168,105,46,0.15);border-radius:4px;margin:12px 0;font-size:0.78rem;color:var(--ink3);line-height:1.5;">'
-          + '<strong style="color:var(--copper);">Note:</strong> These are not ' + make + ' ' + model + ' dealer prices. They are from comparable '
-          + (userBody === 'sedan' ? 'sedans' : userBody === 'truck' ? 'trucks' : 'SUVs')
-          + ' in a similar price range, provided for directional reference.'
+          + '<strong style="color:var(--copper);">Note:</strong> These are not ' + make + ' ' + model + ' dealer prices. Showing comparable vehicles (' + disclaimerVehicles + ') for directional reference.'
           + '</div>';
       }
 
