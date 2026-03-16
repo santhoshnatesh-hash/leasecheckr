@@ -225,6 +225,21 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);-webkit-font-
   @page{margin:0.5in}
   .cover{min-height:auto;padding:40px 0}
 }
+
+/* HAMBURGER MENU */
+.sr-nav-right{display:flex;align-items:center;gap:28px}
+.nav-hamburger{display:none;cursor:pointer;background:none;border:none;padding:8px;flex-direction:column;gap:5px;z-index:101}
+.nav-hamburger span{display:block;width:22px;height:2px;background:#1c1917;transition:all 0.3s ease;border-radius:1px}
+.nav-hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav-hamburger.open span:nth-child(2){opacity:0}
+.nav-hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.nav-mobile-menu{display:none;position:fixed;top:60px;left:0;right:0;background:rgba(248,245,240,0.98);backdrop-filter:blur(24px);border-bottom:1px solid rgba(28,25,23,0.10);padding:16px 24px 24px;z-index:99;flex-direction:column;animation:menuSlide 0.25s ease both}
+.nav-mobile-menu.open{display:flex}
+.nav-mobile-menu a{display:block;padding:14px 0;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;color:#6b6259;text-decoration:none;border-bottom:1px solid rgba(28,25,23,0.08);transition:color 0.2s}
+.nav-mobile-menu a:last-child{border-bottom:none}
+.nav-mobile-menu a.mobile-founder{color:#a8692e;font-weight:600;margin-top:4px;border-bottom:none;padding-top:18px}
+@keyframes menuSlide{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:960px){.sr-nav-right{display:none !important}.nav-hamburger{display:flex}}
 </style>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231c1917'/><text x='5' y='22' font-family='Georgia,serif' font-size='18' font-weight='500' fill='%23a8692e'>LC</text></svg>">
 </head>
@@ -233,13 +248,23 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);-webkit-font-
 <!-- NAV -->
 <nav style="position:fixed;top:0;left:0;right:0;z-index:100;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;background:rgba(248,245,240,0.92);backdrop-filter:blur(24px);border-bottom:1px solid rgba(28,25,23,0.10);">
   <a href="index.html" style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;color:#1c1917;text-decoration:none;">Lease<span style="color:#a8692e;">Checkr</span></a>
-  <div style="display:flex;align-items:center;gap:28px;">
+  <div class="sr-nav-right">
     <a href="blog.html" style="font-size:0.73rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:#6b6259;text-decoration:none;">Learn</a>
     <a href="calculator.html" style="font-size:0.73rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:#6b6259;text-decoration:none;">Calculator</a>
     <a href="pricing.html" style="font-size:0.73rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:#6b6259;text-decoration:none;">Pricing</a>
     <a href="founder.html" style="font-size:0.72rem;font-weight:500;letter-spacing:0.06em;color:#a8692e;text-decoration:none;border-bottom:1px solid rgba(168,105,46,0.3);padding-bottom:1px;">Founding Member →</a>
   </div>
+  <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
+<div class="nav-mobile-menu" id="navMobileMenu">
+  <a href="index.html">Check a Lease</a>
+  <a href="pricing.html">Pricing</a>
+  <a href="sample-report.html">Sample Report</a>
+  <a href="privacy.html">Privacy</a>
+  <a href="terms.html">Terms</a>
+  <a href="founder.html" class="mobile-founder">Founding Member →</a>
+</div>
+<script>function toggleMobileMenu(){document.getElementById('navHamburger').classList.toggle('open');document.getElementById('navMobileMenu').classList.toggle('open');}document.addEventListener('click',function(e){var m=document.getElementById('navMobileMenu'),b=document.getElementById('navHamburger');if(m.classList.contains('open')&&!m.contains(e.target)&&!b.contains(e.target)){m.classList.remove('open');b.classList.remove('open');}});</script>
 
 <div class="r" style="padding-top:60px;">
 

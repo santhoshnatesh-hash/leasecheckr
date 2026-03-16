@@ -26,6 +26,20 @@
     .nav-back{font-size:0.72rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-3);text-decoration:none;display:flex;align-items:center;gap:6px;transition:color 0.2s;}
     .nav-back:hover{color:var(--ink);}
 
+    /* HAMBURGER MENU */
+    .nav-hamburger { display:none;cursor:pointer;background:none;border:none;padding:8px;flex-direction:column;gap:5px;z-index:101; }
+    .nav-hamburger span { display:block;width:22px;height:2px;background:var(--ink);transition:all 0.3s ease;border-radius:1px; }
+    .nav-hamburger.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
+    .nav-hamburger.open span:nth-child(2) { opacity:0; }
+    .nav-hamburger.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+    .nav-mobile-menu { display:none;position:fixed;top:60px;left:0;right:0;background:rgba(248,245,240,0.98);backdrop-filter:blur(24px);border-bottom:1px solid rgba(28,25,23,0.10);padding:16px 24px 24px;z-index:99;flex-direction:column;animation:menuSlide 0.25s ease both; }
+    .nav-mobile-menu.open { display:flex; }
+    .nav-mobile-menu a { display:block;padding:14px 0;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;color:#6b6259;text-decoration:none;border-bottom:1px solid rgba(28,25,23,0.08);transition:color 0.2s; }
+    .nav-mobile-menu a:last-child { border-bottom:none; }
+    .nav-mobile-menu a.mobile-founder { color:var(--copper);font-weight:600;margin-top:4px;border-bottom:none;padding-top:18px; }
+    @keyframes menuSlide { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+    @media(max-width:960px){ .nav-back{display:none;} .nav-hamburger{display:flex;} }
+
     @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
     @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.45;transform:scale(0.75);}}
     @keyframes shimmer{0%{opacity:0.4;}50%{opacity:0.75;}100%{opacity:0.4;}}
@@ -312,7 +326,17 @@
 <nav>
   <a href="index.html" class="nav-logo">Lease<span>Checkr</span></a>
   <a href="index.html" class="nav-back">← Back to LeaseCheckr</a>
+  <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
+<div class="nav-mobile-menu" id="navMobileMenu">
+  <a href="index.html">Check a Lease</a>
+  <a href="pricing.html">Pricing</a>
+  <a href="sample-report.html">Sample Report</a>
+  <a href="privacy.html">Privacy</a>
+  <a href="terms.html">Terms</a>
+  <a href="founder.html" class="mobile-founder">Founding Member →</a>
+</div>
+<script>function toggleMobileMenu(){document.getElementById('navHamburger').classList.toggle('open');document.getElementById('navMobileMenu').classList.toggle('open');}document.addEventListener('click',function(e){var m=document.getElementById('navMobileMenu'),b=document.getElementById('navHamburger');if(m.classList.contains('open')&&!m.contains(e.target)&&!b.contains(e.target)){m.classList.remove('open');b.classList.remove('open');}});</script>
 
 <section class="hero">
   <div class="hero-eyebrow">First 1,000 Contributors</div>
