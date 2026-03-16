@@ -114,11 +114,26 @@ footer a:hover{color:var(--ink)}
   <h1 class="page-title">Submit your <em>signed deal.</em></h1>
   <p class="page-sub">Enter the terms from your <strong>signed NJ lease</strong> below. This is a lower-friction alternative to uploading your lease document — and still helps build the benchmark.</p>
 
-  <div class="price-badge">
+  <div class="price-badge" id="priceBadge">
     <span class="curr">$</span><span class="amt">9</span><span class="per">.99 per report</span>
   </div>
 
-  <div class="upload-nudge">
+  <!-- EARLY CONTRIBUTOR BANNER (shown when ?ref=founder) -->
+  <div id="earlyContribBanner" style="display:none;margin-bottom:20px;padding:20px 24px;background:linear-gradient(135deg,#faf3ea,#f8f5f0);border:1px solid rgba(168,105,46,0.18);border-radius:6px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <div style="width:6px;height:6px;border-radius:50%;background:#a8692e;"></div>
+      <div style="font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.14em;text-transform:uppercase;color:#a8692e;">Early Contributor · Launch Offer</div>
+    </div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:#1c1917;margin-bottom:6px;">Your full report is on us.</div>
+    <div style="font-size:0.84rem;color:#3d3830;line-height:1.6;">
+      As an early contributor to the NJ lease benchmark, you'll receive <strong>one full report free</strong> after we verify your deal. This is a limited launch offer — one per email, subject to verification.
+    </div>
+    <div style="margin-top:10px;font-size:0.78rem;color:#6b6259;line-height:1.5;">
+      Want full Founding Member status instead? <a href="intake-upload.html" style="color:#a8692e;text-decoration:none;font-weight:500;">Upload your lease document →</a>
+    </div>
+  </div>
+
+  <div class="upload-nudge" id="uploadNudge">
     <strong>Want your report free?</strong> Upload your signed lease document instead — verified uploads get full access at no cost. <a href="intake-upload.html">Upload my lease →</a>
   </div>
 
@@ -268,6 +283,25 @@ try{if(window.supabase){sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KE
 // ── STRIPE PAYMENT LINK
 const STRIPE_MANUAL_LINK='https://buy.stripe.com/test_28EcN571r98kfma7AAdby01';
 
+// ── DETECT EARLY CONTRIBUTOR PATH
+const isEarlyContributor = new URLSearchParams(window.location.search).get('ref') === 'founder';
+
+if (isEarlyContributor) {
+  // Show early contributor banner, hide price badge and upload nudge
+  document.getElementById('earlyContribBanner').style.display = 'block';
+  document.getElementById('priceBadge').style.display = 'none';
+  document.getElementById('uploadNudge').style.display = 'none';
+  // Update submit button text
+  document.getElementById('submitBtn').textContent = 'Submit for Free Report →';
+  // Update submit sub text
+  document.querySelector('.submit-sub').textContent = 'Early Contributor launch offer · One free report per email · Subject to verification';
+  // Update email helper text
+  const emailHelper = document.querySelector('#email').nextElementSibling;
+  if (emailHelper) emailHelper.textContent = 'We\'ll send your free full report here after verification.';
+  // Update page subtitle
+  document.querySelector('.page-sub').innerHTML = 'Enter the terms from your <strong>signed NJ lease</strong> below. As an early contributor, you\'ll receive one full report free after we verify your deal details.';
+}
+
 // ── PRE-POPULATE FROM TEASER
 (function prefill(){
   try{
@@ -386,6 +420,7 @@ async function handleSubmit(){
   btn.disabled=true;
   btn.textContent='Saving…';
 
+  const emailVal=document.getElementById('email').value.trim();
   const zipVal=document.getElementById('zip').value;
   // ZIP to county
   const p=zipVal?zipVal.substring(0,3):'';
@@ -397,8 +432,99 @@ async function handleSubmit(){
   const dasVal=parseFloat(document.getElementById('signing').value)||null;
   const effMonthly=payVal&&termVal?Math.round((payVal*termVal+(dasVal||0))/termVal*100)/100:null;
 
+  // ── EARLY CONTRIBUTOR PATH (free, from founder page)
+  if (isEarlyContributor) {
+    // Check email uniqueness — one free report per email
+    if(sb){
+      const{count,error}=await sb.from('lease_submissions')
+        .select('id',{count:'exact',head:true})
+        .eq('email',emailVal)
+        .eq('report_entitlement','early_contributor');
+      if(!error && count > 0){
+        btn.textContent='This email has already claimed a free report';
+        btn.style.background='#a85a4a';
+        setTimeout(()=>{
+          btn.textContent='Submit for Free Report →';
+          btn.style.background='';
+          btn.disabled=false;
+        },3000);
+        return;
+      }
+
+      // Check if 1,000 early contributor slots are full
+      const{count:totalCount}=await sb.from('lease_submissions')
+        .select('id',{count:'exact',head:true})
+        .eq('report_entitlement','early_contributor');
+      if(totalCount >= 1000){
+        btn.textContent='Early Contributor spots are full';
+        btn.style.background='#a85a4a';
+        setTimeout(()=>{
+          btn.textContent='Submit & Pay $9.99 for Full Report →';
+          btn.style.background='';
+          btn.disabled=false;
+          // Switch to paid path
+          window.history.replaceState(null,'',window.location.pathname);
+          location.reload();
+        },3000);
+        return;
+      }
+    }
+
+    const data={
+      email:emailVal,
+      make:document.getElementById('make').value,
+      model:document.getElementById('model').value,
+      trim:document.getElementById('trim').value,
+      monthly_payment:payVal,
+      due_at_signing:dasVal,
+      term:termVal,
+      annual_mileage:parseInt(document.getElementById('mileage').value)||null,
+      zip:zipVal,
+      county:county,
+      dealer_name:document.getElementById('dealer').value,
+      signed_month_year:document.getElementById('signed').value,
+      partial_vin:document.getElementById('vin').value||null,
+      money_factor:document.getElementById('mf').value?parseFloat(document.getElementById('mf').value):null,
+      residual_pct:document.getElementById('residual').value?parseFloat(document.getElementById('residual').value):null,
+      effective_monthly:effMonthly,
+      submission_type:'manual_signed',
+      deal_status:'signed_manual',
+      trust_tier:'medium',
+      verification_status:'pending',
+      report_entitlement:'early_contributor',
+      founder_eligible:false
+    };
+
+    if(sb){
+      const{error}=await sb.from('lease_submissions').insert([data]);
+      if(error){
+        console.error('Submit error:',error);
+        btn.textContent='Error saving — please try again';
+        setTimeout(()=>{btn.textContent='Submit for Free Report →';btn.disabled=false},2000);
+        return;
+      }
+    }
+
+    // Show confirmation (no Stripe redirect)
+    document.querySelector('main').innerHTML = ''
+      + '<div style="text-align:center;padding:60px 24px;">'
+      + '<div style="font-size:48px;margin-bottom:16px;">✓</div>'
+      + '<div style="font-family:\'DM Mono\',monospace;font-size:0.52rem;letter-spacing:0.14em;text-transform:uppercase;color:#a8692e;margin-bottom:8px;">Early Contributor · Received</div>'
+      + '<h1 style="font-family:\'Cormorant Garamond\',serif;font-size:2rem;font-weight:400;color:#1c1917;margin-bottom:12px;">Thank you for contributing.</h1>'
+      + '<p style="font-size:0.95rem;color:#6b6259;line-height:1.7;max-width:440px;margin:0 auto 24px;">'
+      + 'Your signed deal details have been received. We\'ll verify the data and email your full report to <strong style="color:#1c1917;">' + emailVal + '</strong> within 24 hours.'
+      + '</p>'
+      + '<div style="background:#f2ede4;border-radius:6px;padding:16px 20px;max-width:440px;margin:0 auto 24px;font-size:0.84rem;color:#3d3830;line-height:1.6;">'
+      + 'Want to upgrade to Founding Member status? <a href="intake-upload.html" style="color:#a8692e;text-decoration:none;font-weight:500;">Upload your lease document →</a> and if spots are still available, your contribution will be upgraded.'
+      + '</div>'
+      + '<a href="/" style="display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:#1c1917;color:#fdfaf6;border-radius:3px;text-decoration:none;font-size:0.88rem;font-weight:500;">Back to Home <span style="opacity:0.5">→</span></a>'
+      + '</div>';
+    return;
+  }
+
+  // ── STANDARD $9.99 PATH
   const data={
-    email:document.getElementById('email').value,
+    email:emailVal,
     make:document.getElementById('make').value,
     model:document.getElementById('model').value,
     trim:document.getElementById('trim').value,
