@@ -507,49 +507,6 @@
     <div class="cta-support">Document upload required · NJ leases only · First 1,000 verified contributors</div>
   </div>
 
-  <!-- EARLY CONTRIBUTOR FALLBACK -->
-  <div style="
-    max-width:620px; margin:0 auto 40px; padding:32px;
-    background:var(--canvas); border:1px solid var(--border);
-    border-radius:4px; animation:fadeUp 0.6s var(--ease) 0.7s both;
-  " id="earlyContribSection">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
-      <div style="width:6px;height:6px;border-radius:50%;background:var(--copper);"></div>
-      <div style="font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--copper);">Launch Offer · Limited</div>
-    </div>
-
-    <div style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;color:var(--ink);margin-bottom:10px;line-height:1.3;">
-      Don't have the document handy?
-    </div>
-
-    <div style="font-size:0.88rem;color:var(--ink-3);line-height:1.7;margin-bottom:18px;">
-      We understand — not everyone has their lease within arm's reach. As part of our founding launch, you can submit your signed deal details through a simple form and receive <strong style="color:var(--ink);">one full report — on us</strong>. Your deal will be verified by our team before the report is sent.
-    </div>
-
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;padding:12px 16px;background:var(--copper-bg,#faf3ea);border-radius:4px;">
-      <div style="font-family:'DM Mono',monospace;font-size:0.52rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--copper);">Early Contributor spots</div>
-      <div style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--ink);" id="earlyContribSpots">1,000 remaining</div>
-    </div>
-
-    <div style="font-size:0.82rem;color:var(--ink-4);line-height:1.6;margin-bottom:20px;">
-      This is not Founding Member status. However, if you later upload your signed lease and Founder spots are still available, your contribution can be upgraded.
-    </div>
-
-    <a href="submit-deal.html?ref=founder" style="
-      display:flex; align-items:center; justify-content:center; gap:10px;
-      padding:14px 28px; background:transparent; color:var(--ink);
-      border:1px solid rgba(28,25,23,0.18); border-radius:3px;
-      text-decoration:none; font-size:0.88rem; font-weight:500;
-      letter-spacing:0.02em; transition:all 0.25s;
-    " onmouseover="this.style.borderColor='var(--copper)';this.style.color='var(--copper)'" onmouseout="this.style.borderColor='rgba(28,25,23,0.18)';this.style.color='var(--ink)'">
-      <span>Submit Signed Deal Details</span>
-      <span>→</span>
-    </a>
-    <div style="text-align:center;margin-top:8px;font-family:'DM Mono',monospace;font-size:0.46rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-4);">
-      Free full report after verification · One per email · Launch offer only
-    </div>
-  </div>
-
 </div>
 
 <footer>
@@ -616,30 +573,6 @@
   document.addEventListener('mouseleave',()=>{
     card.style.transform='perspective(1000px) rotateX(2deg) rotateY(-2deg)';
   });
-
-  // ── EARLY CONTRIBUTOR COUNT
-  async function loadEarlyContribCount(){
-    if(!sb) return;
-    try{
-      const{count,error}=await sb.from('lease_submissions')
-        .select('id',{count:'exact',head:true})
-        .eq('report_entitlement','early_contributor');
-      if(!error && typeof count==='number'){
-        const remaining=1000-count;
-        const el=document.getElementById('earlyContribSpots');
-        if(el){
-          if(remaining<=0){
-            el.textContent='All spots claimed';
-            const sec=document.getElementById('earlyContribSection');
-            if(sec) sec.style.display='none';
-          } else {
-            el.textContent=remaining.toLocaleString()+' remaining';
-          }
-        }
-      }
-    }catch(e){console.error(e)}
-  }
-  loadEarlyContribCount();
 </script>
 </body>
 </html>

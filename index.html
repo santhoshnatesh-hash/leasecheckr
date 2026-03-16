@@ -135,11 +135,11 @@
     .divider { width: 36px; height: 1px; background: var(--border-2); margin-bottom: 22px; animation: fadeUp 0.55s var(--ease) 0.16s both; }
 
     .support-para {
-      font-size: 0.875rem; font-weight: 300; line-height: 1.82;
-      color: var(--ink-3); max-width: 400px; margin-bottom: 10px;
+      font-size: 1rem; font-weight: 300; line-height: 1.75;
+      color: var(--ink-3); max-width: 420px; margin-bottom: 10px;
       animation: fadeUp 0.55s var(--ease) 0.2s both;
     }
-    .support-para strong { color: var(--ink-2); font-weight: 500; }
+    .support-para strong { color: var(--ink); font-weight: 500; }
 
     /* PROOF ROW */
     .proof-row {
@@ -200,7 +200,7 @@
     .form-panel { transition: all 0.45s var(--ease); }
     .form-panel.hidden { opacity: 0; transform: translateX(-16px); pointer-events: none; height: 0; overflow: hidden; }
 
-    .form-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-4); margin-bottom: 18px; }
+    .form-eyebrow { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 500; color: var(--ink); margin-bottom: 18px; }
 
     /* FIELDS */
     .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 9px; }
@@ -805,7 +805,8 @@
       nav { padding: 0 24px; }
       .hero-split { grid-template-columns: 1fr; }
       .left-col { position: static; height: auto; padding: 48px 24px 32px; order: 1; }
-      .support-para, .proof-row, .founder-strip, .divider { display: none; }
+      .support-para { display: block; max-width: 100%; font-size: 0.92rem; }
+      .proof-row, .founder-strip, .divider { display: none; }
       .right-col { order: 2; padding: 24px; border-left: none; border-top: 1px solid var(--border); min-height: unset; }
       .section-mislead, .section-numbers, .section-how, .section-ask, .section-compare, .section-benchmark { padding: 64px 24px; }
       .mislead-grid, .how-split, .ask-grid, .benchmark-grid { grid-template-columns: 1fr; gap: 48px; }
@@ -863,7 +864,10 @@
     <div class="divider"></div>
 
     <p class="support-para">
-      <strong>Zillow changed home buying</strong> by showing what homes actually sold for, not just what sellers were asking. Car leasing still doesn't work that way. LeaseCheckr helps NJ drivers compare a dealer quote against real local lease data — so you can see whether the deal is fair before you sign.
+      A car is the second largest financial commitment most households make — yet most people spend more time researching a restaurant than the lease they're about to sign. A few minutes of research with the right data can save thousands.
+    </p>
+    <p class="support-para">
+      <strong>Zillow changed home buying</strong> by showing what homes actually sold for, not just what sellers were asking. Car leasing still doesn't work that way. LeaseCheckr brings that same transparency to NJ drivers — real signed deals, not dealer quotes.
     </p>
 
     <div class="proof-row">
@@ -1371,20 +1375,20 @@
         <div style="font-family:'DM Mono',monospace;font-size:0.52rem;letter-spacing:0.08em;color:var(--ink-4);text-transform:uppercase;margin-top:8px;text-align:center;">No contribution required</div>
       </div>
 
-      <!-- CARD 2: CONTRIBUTOR DISCOUNT -->
+      <!-- CARD 2: CONTRIBUTOR — FREE DURING LAUNCH -->
       <div class="compare-card full-card reveal reveal-delay-1">
-        <div class="cc-badge full">Contributor Discount</div>
-        <div class="cc-title">Submit your deal.<br><em>Save $10.</em></div>
-        <div class="cc-price" style="margin-bottom:16px;">$9.99 per report</div>
+        <div class="cc-badge full">Early Contributor</div>
+        <div class="cc-title">Submit your deal.<br><em>Free during launch.</em></div>
+        <div class="cc-price" style="margin-bottom:16px;"><span style="text-decoration:line-through;opacity:0.4;">$9.99</span> <span style="color:#c4864a;margin-left:6px;">Free · Launch offer</span></div>
         <div class="cc-items">
           <div class="cc-item"><span class="cc-check">✓</span><span>Everything in Premium</span></div>
           <div class="cc-item"><span class="cc-check">✓</span><span>Signed deal data only</span></div>
           <div class="cc-item"><span class="cc-check">✓</span><span>10 fields + 1 credibility check</span></div>
           <div class="cc-item"><span class="cc-check">✓</span><span>No document upload needed</span></div>
-          <div class="cc-item"><span class="cc-check">✓</span><span>Report after payment</span></div>
+          <div class="cc-item"><span class="cc-check">✓</span><span>Report after verification</span></div>
         </div>
-        <a href="submit-deal.html" class="cc-cta">Submit My Deal — $9.99 →</a>
-        <div style="font-family:'DM Mono',monospace;font-size:0.52rem;letter-spacing:0.08em;color:rgba(253,250,246,0.45);text-transform:uppercase;margin-top:8px;text-align:center;">Discounted for contributing</div>
+        <a href="submit-deal.html" class="cc-cta">Submit My Deal — Free →</a>
+        <div style="font-family:'DM Mono',monospace;font-size:0.52rem;letter-spacing:0.08em;color:rgba(253,250,246,0.45);text-transform:uppercase;margin-top:8px;text-align:center;">First 1,000 contributors · One per email</div>
       </div>
 
       <!-- CARD 3: FREE VIA UPLOAD -->

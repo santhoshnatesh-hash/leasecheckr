@@ -112,29 +112,29 @@ footer a:hover{color:var(--ink)}
 <main>
   <p class="page-eyebrow">Manual Signed-Deal Submission</p>
   <h1 class="page-title">Submit your <em>signed deal.</em></h1>
-  <p class="page-sub">Enter the terms from your <strong>signed NJ lease</strong> below. This is a lower-friction alternative to uploading your lease document — and still helps build the benchmark.</p>
+  <p class="page-sub">Enter the terms from your <strong>signed NJ lease</strong> below. Your deal data helps build the NJ benchmark — and during our founding launch, your full report is on us.</p>
 
-  <div class="price-badge" id="priceBadge">
-    <span class="curr">$</span><span class="amt">9</span><span class="per">.99 per report</span>
+  <!-- LAUNCH OFFER PRICE BADGE -->
+  <div class="price-badge" id="priceBadge" style="position:relative;">
+    <span class="curr" style="text-decoration:line-through;opacity:0.4;">$</span>
+    <span class="amt" style="text-decoration:line-through;opacity:0.4;">9</span>
+    <span class="per" style="text-decoration:line-through;opacity:0.4;">.99</span>
+    <span style="margin-left:12px;font-family:'DM Mono',monospace;font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;color:#c4864a;">Free during launch</span>
   </div>
 
-  <!-- EARLY CONTRIBUTOR BANNER (shown when ?ref=founder) -->
-  <div id="earlyContribBanner" style="display:none;margin-bottom:20px;padding:20px 24px;background:linear-gradient(135deg,#faf3ea,#f8f5f0);border:1px solid rgba(168,105,46,0.18);border-radius:6px;">
+  <!-- LAUNCH OFFER BANNER (always visible) -->
+  <div style="margin-bottom:20px;padding:20px 24px;background:linear-gradient(135deg,#faf3ea,#f8f5f0);border:1px solid rgba(168,105,46,0.18);border-radius:6px;">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
       <div style="width:6px;height:6px;border-radius:50%;background:#a8692e;"></div>
-      <div style="font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.14em;text-transform:uppercase;color:#a8692e;">Early Contributor · Launch Offer</div>
+      <div style="font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.14em;text-transform:uppercase;color:#a8692e;">Founding Launch Offer</div>
     </div>
     <div style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:#1c1917;margin-bottom:6px;">Your full report is on us.</div>
     <div style="font-size:0.84rem;color:#3d3830;line-height:1.6;">
-      As an early contributor to the NJ lease benchmark, you'll receive <strong>one full report free</strong> after we verify your deal. This is a limited launch offer — one per email, subject to verification.
+      As part of our founding launch, submit your signed deal details and receive <strong>one full report free</strong> — no payment needed. Your deal will be verified by our team before the report is sent. One free report per email, limited to our first 1,000 contributors.
     </div>
     <div style="margin-top:10px;font-size:0.78rem;color:#6b6259;line-height:1.5;">
-      Want full Founding Member status instead? <a href="intake-upload.html" style="color:#a8692e;text-decoration:none;font-weight:500;">Upload your lease document →</a>
+      Want full Founding Member status? <a href="intake-upload.html" style="color:#a8692e;text-decoration:none;font-weight:500;">Upload your lease document instead →</a>
     </div>
-  </div>
-
-  <div class="upload-nudge" id="uploadNudge">
-    <strong>Want your report free?</strong> Upload your signed lease document instead — verified uploads get full access at no cost. <a href="intake-upload.html">Upload my lease →</a>
   </div>
 
   <div class="info-banner">
@@ -280,26 +280,17 @@ const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI
 let sb=null;
 try{if(window.supabase){sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}}catch(e){console.error(e)}
 
-// ── STRIPE PAYMENT LINK
+// ── STRIPE PAYMENT LINK (kept for when launch offer ends)
 const STRIPE_MANUAL_LINK='https://buy.stripe.com/test_28EcN571r98kfma7AAdby01';
 
-// ── DETECT EARLY CONTRIBUTOR PATH
-const isEarlyContributor = new URLSearchParams(window.location.search).get('ref') === 'founder';
+// ── LAUNCH OFFER: All manual submissions are free during founding launch
+const IS_LAUNCH_OFFER = true; // Set to false when launch offer ends to restore $9.99
 
-if (isEarlyContributor) {
-  // Show early contributor banner, hide price badge and upload nudge
-  document.getElementById('earlyContribBanner').style.display = 'block';
-  document.getElementById('priceBadge').style.display = 'none';
-  document.getElementById('uploadNudge').style.display = 'none';
-  // Update submit button text
+if (IS_LAUNCH_OFFER) {
   document.getElementById('submitBtn').textContent = 'Submit for Free Report →';
-  // Update submit sub text
-  document.querySelector('.submit-sub').textContent = 'Early Contributor launch offer · One free report per email · Subject to verification';
-  // Update email helper text
+  document.querySelector('.submit-sub').textContent = 'Founding launch offer · One free report per email · Subject to verification';
   const emailHelper = document.querySelector('#email').nextElementSibling;
   if (emailHelper) emailHelper.textContent = 'We\'ll send your free full report here after verification.';
-  // Update page subtitle
-  document.querySelector('.page-sub').innerHTML = 'Enter the terms from your <strong>signed NJ lease</strong> below. As an early contributor, you\'ll receive one full report free after we verify your deal details.';
 }
 
 // ── PRE-POPULATE FROM TEASER
@@ -432,8 +423,8 @@ async function handleSubmit(){
   const dasVal=parseFloat(document.getElementById('signing').value)||null;
   const effMonthly=payVal&&termVal?Math.round((payVal*termVal+(dasVal||0))/termVal*100)/100:null;
 
-  // ── EARLY CONTRIBUTOR PATH (free, from founder page)
-  if (isEarlyContributor) {
+  // ── LAUNCH OFFER PATH (free, no Stripe)
+  if (IS_LAUNCH_OFFER) {
     // Check email uniqueness — one free report per email
     if(sb){
       const{count,error}=await sb.from('lease_submissions')
